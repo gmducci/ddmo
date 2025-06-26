@@ -71,7 +71,7 @@ class DataGenerator:
         """
         # Sample parameters and instantiate model
         params = self._sample_parameters()
-        params = {'alpha': 2, 'beta': 3}
+        params = {'alpha': 1.3, 'beta': 3.4}
         model = self.model_cls(**params)
 
         # Determine state dimension
@@ -146,7 +146,7 @@ if __name__ == "__main__":
     from ddmo.library_functions.funcs_refactored import FunctionLibrary
 
     # Define parameter ranges and known state dimension
-    param_ranges = {'alpha': (1, 3), 'beta': (1, 3)}
+    param_ranges = {'alpha': (1, 4), 'beta': (1, 4)}
     state_dim = 3
 
     # Create generator instance
@@ -179,35 +179,34 @@ if __name__ == "__main__":
         alpha, beta = params
         return [
             (lambda x: x, "x"),
-            (lambda x: np.sin(x), "sin(x)"),
             (lambda x, y: x**alpha * y**beta, f"x^{alpha} * y^{beta}")
         ]
     
-    named_funcs = get_base_functions([2, 3])
-    functions = [f for f, _ in named_funcs]
-    function_names = [lambda *args, name=name: name for _, name in named_funcs]
+    # named_funcs = get_base_functions([2.05, 3.05])
+    # functions = [f for f, _ in named_funcs]
+    # function_names = [lambda *args, name=name: name for _, name in named_funcs]
 
-    lib_custom = ps.CustomLibrary(
-        library_functions=functions,
-        function_names=function_names
-    )
-    lib_custom.fit(x_noisy)
+    # lib_custom = ps.CustomLibrary(
+    #     library_functions=functions,
+    #     function_names=function_names
+    # )
+    # lib_custom.fit(x_noisy)
 
-    model = ps.SINDy(feature_library=lib_custom)
-    model.fit(X, t=t[1] - t[0], x_dot=dX)
-    print("\nRecovered model:")
-    model.print()
-    # problem, res, obj_space, solutions, coeff_matrices, alphas = identify(
-    #     x_train = x_noisy,
-    #     x_raw=x_noisy,
-    #     x_dot=x_dot,
-    #     t = t,
-    #     x0=x0_list,
-    #     solver_parameters= {'alpha': 0.001},
-    #     library_object=lib,
-    #     bounds= [np.array([1, 1]), np.array([4, 4])],
-    #     weak_form=False,
-    #     scale_theta=True,
-    #     solver='lasso',
-    #     number_generations=20,
-    #     population_size=25)
+    # model = ps.SINDy(feature_library=lib_custom)
+    # model.fit(X, t=t[1] - t[0], x_dot=dX)
+    # print("\nRecovered model:")
+    # model.print()
+    problem, res, obj_space, solutions, coeff_matrices, alphas = identify(
+        x_train = x_noisy,
+        x_raw=x_noisy,
+        x_dot=x_dot,
+        t = t,
+        x0=x0_list,
+        solver_parameters= {'alpha': 0.001},
+        library_object=get_base_functions,
+        bounds= [np.array([1, 1]), np.array([4, 4])],
+        weak_form=False,
+        scale_theta=True,
+        solver='lasso',
+        number_generations=10,
+        population_size=50)

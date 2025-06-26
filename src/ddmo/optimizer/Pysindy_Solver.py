@@ -6,7 +6,7 @@ from sklearn.preprocessing import normalize, StandardScaler, RobustScaler, Quant
 from scipy.integrate import odeint
 from sklearn import linear_model, metrics
 import pymoo.gradient.toolbox as anp
-
+from sklearn.linear_model import Lasso
 
 class Pysindy_Solver(Optimizer):
     def __init__(self,
@@ -17,9 +17,7 @@ class Pysindy_Solver(Optimizer):
                  x_0,
                  x_raw,
                  solver="lasso",
-                 solver_param={},
-                 alpha_lasso=1e-4,
-                 target="trajectory",
+                 solver_parameters={},
                  scale_theta=False,
                  objectives=None):
         # forward everything to the parent
@@ -31,19 +29,18 @@ class Pysindy_Solver(Optimizer):
             x_0=x_0,
             x_raw=x_raw,
             solver=solver,
-            alpha_lasso=alpha_lasso,
-            target=target,
             scale_theta=scale_theta,
             objectives=objectives,
         )
 
-        self.regression_model = {
-            'lasso': linear_model.Lasso(**solver_param)
-        }[solver]
 
-    def _compute_metrics(self, x_row, regression):
+    def _compute_metrics(self, x_row):
+        result = self.solver(x_row)
+        if result[0] is None:
+            return [[np.nan, np.nan, np.nan, np.nan], []]
+        
 
-        sol, x_ref, regression_coeff, opt_vars = self.solver(x_row, regression)
+        sol, x_ref, regression_coeff, opt_vars = self.solver(x_row)
         objective_funcs = []
         for obj_func in self.objectives:
             try:
@@ -64,7 +61,7 @@ class Pysindy_Solver(Optimizer):
         print(f"Objective function values: {objective_funcs}")
         return objective_funcs, sol, regression_coeff, opt_vars
 
-    def solver(self, optimization_vars, regression):
+    def solver(self, optimization_vars):
         """
         """
         if len(optimization_vars) == 1:
@@ -73,42 +70,41 @@ class Pysindy_Solver(Optimizer):
             opt_vars = optimization_vars  # Leave it as is otherwise
 
         self.alphas.append(opt_vars)
-        self.library_object.set_base_funcs((opt_vars[0], opt_vars[1]))
+        named_funcs = self.library_object([opt_vars[0], opt_vars[1]])
+        functions = [f for f, _ in named_funcs]
+        function_names = [lambda *args, name=name: name for _, name in named_funcs]
 
-        translator = FunctionLibraryTranslator(self.library_object)
-        sindy_library = translator.to_sindy_library(alpha)
+        lib_custom = ps.CustomLibrary(
+            library_functions=functions,
+            function_names=function_names
+        )
+        lib_custom.fit(self.x_train)
+        dt = self.time_array[1] - self.time_array[0]
+        # optimizer = ps.SR3(threshold=0.01, nu=0.5, tol=1e-3)
+          # Increase threshold to enforce more sparsity
+        try:
+            model = ps.SINDy(feature_library=lib_custom)
+            X = np.vstack(self.x_train)
+            model.fit(X, t=dt, x_dot=self.x_dot)
 
-        model = ps.SINDy(feature_library=sindy_library)
-        model.fit(X, t=dt, x_dot=dX)
+            regression_coeff = model.coefficients()
+            regression_coeff = regression_coeff.T
+            sol_list = []
 
-        regression_coeff = model.coefficients()
-        regression_coeff = regression_coeff.T
-        sol_list = []
-        def get_rhs_local(ssp, t):
-            ode_lib.fit(ssp)
-            theta = ode_lib.transform_simple(ssp)
-            rhs = theta @ regression_coeff
-            return rhs
+            for x_0_ in self.initial_values:
 
-        for x_0_ in self.initial_values:
+                sol_ = model.simulate(x_0_, self.time_array)
 
-            sol_ = odeint(get_rhs_local, x_0_, self.time_array)
+                sol_list.append(sol_)
+            sol = np.vstack(sol_list)
 
-            sol_list.append(sol_)
-        sol = np.vstack(sol_list)
-
-        if self.target == 'trajectory':
             x_ref = self.x_raw
             x = sol
 
-        elif self.target == 'derivative':
-            x_ref = self.x_dot
-            rhs = theta @ coeff_matrix
-            x = rhs
-        else:
-            raise ValueError("Invalid target specified. Must be 'trajectory' or 'derivative'.")
-        
-        return x, x_ref, regression_coeff, opt_vars
+            return x, x_ref, regression_coeff, opt_vars
+        except Exception as e:
+            print(f"Error during solver execution: {e}")
+            return None, None, None, None
 
     def _evaluate(self, x, out, *args, **kwargs):
         self.coefficient_matrix.clear()
@@ -119,7 +115,7 @@ class Pysindy_Solver(Optimizer):
         coefficient_matrix = []
         coefficient_matrix.clear()
         flat_x = [tuple(row) for row in x]
-        f = [self._compute_metrics(xi, self.regression_model) for xi in flat_x]
+        f = [self._compute_metrics(xi) for xi in flat_x]
 
 
         objectives = [fi[0] for fi in f]

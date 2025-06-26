@@ -86,7 +86,6 @@ def identify(
     solver: str = "lasso",
     solver_parameters: dict = {},
     scale_theta: bool = True,
-    target: str = "trajectory",
     weak_form: bool = False,
     seed: Optional[int] = None,
     verbose: bool = True,
@@ -110,8 +109,9 @@ def identify(
         - solutions: optimized parameter sets
         - coeff_matrices, alphas, dw_stats
     """
-    from ddmo.optimizer.Scipy_Solver import Scipy_Solver
-    problem = Scipy_Solver(     x_train,
+
+    from ddmo.optimizer.Pysindy_Solver import Pysindy_Solver
+    problem = Pysindy_Solver(     x_train,
                                 t,
                                 x_dot,
                                 library_object,
@@ -119,8 +119,6 @@ def identify(
                                 x_raw = x_raw,
                                 solver=solver,
                                 solver_parameters = solver_parameters,
-                                #alpha_lasso=0.000005,
-                                target= target,
                                 scale_theta= scale_theta,
                                 # solver = pysindy, pysindy_weak, scikit
                                 objectives=None)

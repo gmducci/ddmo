@@ -1,0 +1,7 @@
+numpy>=1.20
+scipy>=1.6
+matplotlib>=3.3
+pysindy>=0.7
+pymoo>=0.6
+statsmodels>=0.12
+PyWavelets>=1.1

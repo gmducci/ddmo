@@ -1,0 +1,216 @@
+2025-02-06 17:58:10,337 [INFO] 
+Limited Total Variation Regularization Support Detected! 
+---> CVXPY is not installed. 
+---> Many Total Variation Methods require CVXPY including: 
+---> velocity, acceleration, jerk, jerk_sliding, smooth_acceleration
+---> Please install CVXPY to use these methods.
+---> Recommended to also install MOSEK and obtain a MOSEK license.
+You can still use: total_variation_regularization.iterative_velocity
+
+2025-02-06 17:58:10,339 [INFO] 
+Limited Linear Model Support Detected! 
+---> PYCHEBFUN is not installed. 
+---> Install pychebfun to use chebfun derivatives (https://github.com/pychebfun/pychebfun/) 
+You can still use other methods 
+
+2025-02-06 17:58:10,339 [INFO] 
+Limited Linear Model Support Detected! 
+---> CVXPY is not installed. 
+---> Install CVXPY to use lineardiff derivatives 
+You can still use other methods 
+
+2025-02-06 17:58:10,341 [INFO] Limited support for total variation regularization and linear model detected!
+                    ---> Some functions in pynumdiff.optimize.total_variation_regularization and require CVXPY to be installed.
+                    ---> Some functions in pynumdiff.linear_model and require CVXPY to be installed.
+                    You can still pynumdiff.optimize for other functions.
+2025-02-06 17:58:10,640 [INFO] Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2025-02-06 17:58:10,641 [INFO] NumExpr defaulting to 8 threads.
+2025-02-06 18:14:34,717 [INFO] 
+Limited Total Variation Regularization Support Detected! 
+---> CVXPY is not installed. 
+---> Many Total Variation Methods require CVXPY including: 
+---> velocity, acceleration, jerk, jerk_sliding, smooth_acceleration
+---> Please install CVXPY to use these methods.
+---> Recommended to also install MOSEK and obtain a MOSEK license.
+You can still use: total_variation_regularization.iterative_velocity
+
+2025-02-06 18:14:34,719 [INFO] 
+Limited Linear Model Support Detected! 
+---> PYCHEBFUN is not installed. 
+---> Install pychebfun to use chebfun derivatives (https://github.com/pychebfun/pychebfun/) 
+You can still use other methods 
+
+2025-02-06 18:14:34,719 [INFO] 
+Limited Linear Model Support Detected! 
+---> CVXPY is not installed. 
+---> Install CVXPY to use lineardiff derivatives 
+You can still use other methods 
+
+2025-02-06 18:14:34,721 [INFO] Limited support for total variation regularization and linear model detected!
+                    ---> Some functions in pynumdiff.optimize.total_variation_regularization and require CVXPY to be installed.
+                    ---> Some functions in pynumdiff.linear_model and require CVXPY to be installed.
+                    You can still pynumdiff.optimize for other functions.
+2025-02-06 18:14:35,035 [INFO] Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2025-02-06 18:14:35,036 [INFO] NumExpr defaulting to 8 threads.
+2025-02-06 18:17:45,971 [INFO] 
+Limited Total Variation Regularization Support Detected! 
+---> CVXPY is not installed. 
+---> Many Total Variation Methods require CVXPY including: 
+---> velocity, acceleration, jerk, jerk_sliding, smooth_acceleration
+---> Please install CVXPY to use these methods.
+---> Recommended to also install MOSEK and obtain a MOSEK license.
+You can still use: total_variation_regularization.iterative_velocity
+
+2025-02-06 18:17:45,973 [INFO] 
+Limited Linear Model Support Detected! 
+---> PYCHEBFUN is not installed. 
+---> Install pychebfun to use chebfun derivatives (https://github.com/pychebfun/pychebfun/) 
+You can still use other methods 
+
+2025-02-06 18:17:45,973 [INFO] 
+Limited Linear Model Support Detected! 
+---> CVXPY is not installed. 
+---> Install CVXPY to use lineardiff derivatives 
+You can still use other methods 
+
+2025-02-06 18:17:45,975 [INFO] Limited support for total variation regularization and linear model detected!
+                    ---> Some functions in pynumdiff.optimize.total_variation_regularization and require CVXPY to be installed.
+                    ---> Some functions in pynumdiff.linear_model and require CVXPY to be installed.
+                    You can still pynumdiff.optimize for other functions.
+2025-02-06 18:17:46,317 [INFO] Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2025-02-06 18:17:46,318 [INFO] NumExpr defaulting to 8 threads.
+2025-02-06 18:23:09,916 [INFO] 
+Limited Total Variation Regularization Support Detected! 
+---> CVXPY is not installed. 
+---> Many Total Variation Methods require CVXPY including: 
+---> velocity, acceleration, jerk, jerk_sliding, smooth_acceleration
+---> Please install CVXPY to use these methods.
+---> Recommended to also install MOSEK and obtain a MOSEK license.
+You can still use: total_variation_regularization.iterative_velocity
+
+2025-02-06 18:23:09,918 [INFO] 
+Limited Linear Model Support Detected! 
+---> PYCHEBFUN is not installed. 
+---> Install pychebfun to use chebfun derivatives (https://github.com/pychebfun/pychebfun/) 
+You can still use other methods 
+
+2025-02-06 18:23:09,918 [INFO] 
+Limited Linear Model Support Detected! 
+---> CVXPY is not installed. 
+---> Install CVXPY to use lineardiff derivatives 
+You can still use other methods 
+
+2025-02-06 18:23:09,920 [INFO] Limited support for total variation regularization and linear model detected!
+                    ---> Some functions in pynumdiff.optimize.total_variation_regularization and require CVXPY to be installed.
+                    ---> Some functions in pynumdiff.linear_model and require CVXPY to be installed.
+                    You can still pynumdiff.optimize for other functions.
+2025-02-06 18:23:10,228 [INFO] Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2025-02-06 18:23:10,228 [INFO] NumExpr defaulting to 8 threads.
+2025-02-06 18:38:17,733 [INFO] 
+Limited Total Variation Regularization Support Detected! 
+---> CVXPY is not installed. 
+---> Many Total Variation Methods require CVXPY including: 
+---> velocity, acceleration, jerk, jerk_sliding, smooth_acceleration
+---> Please install CVXPY to use these methods.
+---> Recommended to also install MOSEK and obtain a MOSEK license.
+You can still use: total_variation_regularization.iterative_velocity
+
+2025-02-06 18:38:17,734 [INFO] 
+Limited Linear Model Support Detected! 
+---> PYCHEBFUN is not installed. 
+---> Install pychebfun to use chebfun derivatives (https://github.com/pychebfun/pychebfun/) 
+You can still use other methods 
+
+2025-02-06 18:38:17,734 [INFO] 
+Limited Linear Model Support Detected! 
+---> CVXPY is not installed. 
+---> Install CVXPY to use lineardiff derivatives 
+You can still use other methods 
+
+2025-02-06 18:38:17,737 [INFO] Limited support for total variation regularization and linear model detected!
+                    ---> Some functions in pynumdiff.optimize.total_variation_regularization and require CVXPY to be installed.
+                    ---> Some functions in pynumdiff.linear_model and require CVXPY to be installed.
+                    You can still pynumdiff.optimize for other functions.
+2025-02-06 18:38:18,035 [INFO] Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2025-02-06 18:38:18,035 [INFO] NumExpr defaulting to 8 threads.
+2025-02-06 18:40:07,291 [INFO] 
+Limited Total Variation Regularization Support Detected! 
+---> CVXPY is not installed. 
+---> Many Total Variation Methods require CVXPY including: 
+---> velocity, acceleration, jerk, jerk_sliding, smooth_acceleration
+---> Please install CVXPY to use these methods.
+---> Recommended to also install MOSEK and obtain a MOSEK license.
+You can still use: total_variation_regularization.iterative_velocity
+
+2025-02-06 18:40:07,293 [INFO] 
+Limited Linear Model Support Detected! 
+---> PYCHEBFUN is not installed. 
+---> Install pychebfun to use chebfun derivatives (https://github.com/pychebfun/pychebfun/) 
+You can still use other methods 
+
+2025-02-06 18:40:07,293 [INFO] 
+Limited Linear Model Support Detected! 
+---> CVXPY is not installed. 
+---> Install CVXPY to use lineardiff derivatives 
+You can still use other methods 
+
+2025-02-06 18:40:07,295 [INFO] Limited support for total variation regularization and linear model detected!
+                    ---> Some functions in pynumdiff.optimize.total_variation_regularization and require CVXPY to be installed.
+                    ---> Some functions in pynumdiff.linear_model and require CVXPY to be installed.
+                    You can still pynumdiff.optimize for other functions.
+2025-02-06 18:40:07,607 [INFO] Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2025-02-06 18:40:07,608 [INFO] NumExpr defaulting to 8 threads.
+2025-02-06 18:42:40,286 [INFO] 
+Limited Total Variation Regularization Support Detected! 
+---> CVXPY is not installed. 
+---> Many Total Variation Methods require CVXPY including: 
+---> velocity, acceleration, jerk, jerk_sliding, smooth_acceleration
+---> Please install CVXPY to use these methods.
+---> Recommended to also install MOSEK and obtain a MOSEK license.
+You can still use: total_variation_regularization.iterative_velocity
+
+2025-02-06 18:42:40,287 [INFO] 
+Limited Linear Model Support Detected! 
+---> PYCHEBFUN is not installed. 
+---> Install pychebfun to use chebfun derivatives (https://github.com/pychebfun/pychebfun/) 
+You can still use other methods 
+
+2025-02-06 18:42:40,287 [INFO] 
+Limited Linear Model Support Detected! 
+---> CVXPY is not installed. 
+---> Install CVXPY to use lineardiff derivatives 
+You can still use other methods 
+
+2025-02-06 18:42:40,290 [INFO] Limited support for total variation regularization and linear model detected!
+                    ---> Some functions in pynumdiff.optimize.total_variation_regularization and require CVXPY to be installed.
+                    ---> Some functions in pynumdiff.linear_model and require CVXPY to be installed.
+                    You can still pynumdiff.optimize for other functions.
+2025-02-06 18:42:40,608 [INFO] Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2025-02-06 18:42:40,608 [INFO] NumExpr defaulting to 8 threads.
+2025-02-06 18:48:51,850 [INFO] 
+Limited Total Variation Regularization Support Detected! 
+---> CVXPY is not installed. 
+---> Many Total Variation Methods require CVXPY including: 
+---> velocity, acceleration, jerk, jerk_sliding, smooth_acceleration
+---> Please install CVXPY to use these methods.
+---> Recommended to also install MOSEK and obtain a MOSEK license.
+You can still use: total_variation_regularization.iterative_velocity
+
+2025-02-06 18:48:51,851 [INFO] 
+Limited Linear Model Support Detected! 
+---> PYCHEBFUN is not installed. 
+---> Install pychebfun to use chebfun derivatives (https://github.com/pychebfun/pychebfun/) 
+You can still use other methods 
+
+2025-02-06 18:48:51,852 [INFO] 
+Limited Linear Model Support Detected! 
+---> CVXPY is not installed. 
+---> Install CVXPY to use lineardiff derivatives 
+You can still use other methods 
+
+2025-02-06 18:48:51,854 [INFO] Limited support for total variation regularization and linear model detected!
+                    ---> Some functions in pynumdiff.optimize.total_variation_regularization and require CVXPY to be installed.
+                    ---> Some functions in pynumdiff.linear_model and require CVXPY to be installed.
+                    You can still pynumdiff.optimize for other functions.
+2025-02-06 18:48:52,154 [INFO] Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2025-02-06 18:48:52,154 [INFO] NumExpr defaulting to 8 threads.

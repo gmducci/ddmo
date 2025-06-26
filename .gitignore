@@ -1,0 +1,7 @@
+# ignore python cache
+*.pyc
+__pycache__/
+ddmo/debug.log
+# ignore results folder
+results/
+

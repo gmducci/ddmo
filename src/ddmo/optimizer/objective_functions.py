@@ -45,8 +45,8 @@ def compute_mse(Problem, sol):
         for j in range(Problem.dimension):
             
             x_raw = np.vstack(Problem.x_raw)
-            x_ref = x_raw[i*len(Problem.time_array):(i+1)*len(Problem.time_array), j]
-            x_pred = sol[i*len(Problem.time_array):(i+1)*len(Problem.time_array), j]
+            x_ref = x_raw[i*len(x_raw):(i+1)*len(x_raw), j]
+            x_pred = sol[i*len(x_raw):(i+1)*len(x_raw), j]
             score_fit_matrix[j, i] = metrics.mean_squared_error(x_ref, x_pred)
 
     score_fit = np.max(score_fit_matrix)

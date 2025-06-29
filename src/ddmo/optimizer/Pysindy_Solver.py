@@ -7,6 +7,7 @@ from scipy.integrate import odeint
 from sklearn import linear_model, metrics
 import pymoo.gradient.toolbox as anp
 from sklearn.linear_model import Lasso
+from pysindy.optimizers import STLSQ, SR3, ConstrainedSR3, EnsembleOptimizer
 
 class Pysindy_Solver(Optimizer):
     def __init__(self,
@@ -16,6 +17,7 @@ class Pysindy_Solver(Optimizer):
                  library_object,
                  x_0,
                  x_raw,
+                 optimizer="stlsq",
                  solver="lasso",
                  solver_parameters={},
                  scale_theta=False,
@@ -28,6 +30,8 @@ class Pysindy_Solver(Optimizer):
             library_object=library_object,
             x_0=x_0,
             x_raw=x_raw,
+            optimizer=optimizer,
+            solver_parameters = solver_parameters,
             solver=solver,
             scale_theta=scale_theta,
             objectives=objectives,
@@ -38,9 +42,8 @@ class Pysindy_Solver(Optimizer):
         result = self.solver(x_row)
         if result[0] is None:
             return [[np.nan, np.nan, np.nan, np.nan], []]
-        
 
-        sol, x_ref, regression_coeff, opt_vars = self.solver(x_row)
+        sol, regression_coeff, opt_vars = self.solver(x_row)
         objective_funcs = []
         for obj_func in self.objectives:
             try:
@@ -60,6 +63,8 @@ class Pysindy_Solver(Optimizer):
 
         print(f"Objective function values: {objective_funcs}")
         return objective_funcs, sol, regression_coeff, opt_vars
+    
+    
 
     def solver(self, optimization_vars):
         """
@@ -69,8 +74,20 @@ class Pysindy_Solver(Optimizer):
         else:
             opt_vars = optimization_vars  # Leave it as is otherwise
 
+        # Optimizer dispatch logic
+        _optimizers = {
+            "STLSQ": STLSQ,
+            "SR3": SR3,
+            "ConstrainedSR3": ConstrainedSR3,
+            "EnsembleOptimizer": EnsembleOptimizer,
+            "Lasso": Lasso,
+        }
+
         self.alphas.append(opt_vars)
-        named_funcs = self.library_object([opt_vars[0], opt_vars[1]])
+        if np.isscalar(opt_vars) or isinstance(opt_vars, np.float64):
+            opt_vars = (opt_vars,)
+        
+        named_funcs = self.library_object([*opt_vars])
         functions = [f for f, _ in named_funcs]
         function_names = [lambda *args, name=name: name for _, name in named_funcs]
 
@@ -78,80 +95,97 @@ class Pysindy_Solver(Optimizer):
             library_functions=functions,
             function_names=function_names
         )
+
         lib_custom.fit(self.x_train)
         dt = self.time_array[1] - self.time_array[0]
-        # optimizer = ps.SR3(threshold=0.01, nu=0.5, tol=1e-3)
+        params_dict = self.solver_parameters[0]
+        optimizer = _optimizers[self.optimizer](**params_dict)
+
           # Increase threshold to enforce more sparsity
         try:
-            model = ps.SINDy(feature_library=lib_custom)
-            X = np.vstack(self.x_train)
+
+            model = ps.SINDy(feature_library=lib_custom, optimizer=optimizer)
+            if isinstance(self.x_train[0], (list, tuple, np.ndarray)):
+                X = np.vstack(self.x_train)
+            else:
+                X = self.x_train
             model.fit(X, t=dt, x_dot=self.x_dot)
 
             regression_coeff = model.coefficients()
             regression_coeff = regression_coeff.T
             sol_list = []
 
-            for x_0_ in self.initial_values:
+            initials = self.initial_values
+            if initials.ndim == 1:
+                initials = [initials]  # Wrap single vector in a list
+
+            for x_0_ in initials:
 
                 sol_ = model.simulate(x_0_, self.time_array)
 
                 sol_list.append(sol_)
             sol = np.vstack(sol_list)
 
-            x_ref = self.x_raw
             x = sol
 
-            return x, x_ref, regression_coeff, opt_vars
+            return x, regression_coeff, opt_vars
         except Exception as e:
             print(f"Error during solver execution: {e}")
             return None, None, None, None
 
     def _evaluate(self, x, out, *args, **kwargs):
+        # Clear previous state
         self.coefficient_matrix.clear()
         self.alphas.clear()
         self.results.clear()
         self.solution.clear()
 
-        coefficient_matrix = []
-        coefficient_matrix.clear()
         flat_x = [tuple(row) for row in x]
-        f = [self._compute_metrics(xi) for xi in flat_x]
+
+        # Run model on each candidate
+        results = [self._compute_metrics(xi) for xi in flat_x]
+
+        # Initialize containers with fallback values
+        objectives = []
+        solutions = []
+        coeff_matrices = []
+        alphas = []
+
+        for res in results:
+            if (
+                isinstance(res, (list, tuple)) and
+                len(res) == 4 and
+                res[0] is not None and
+                not np.all(np.isnan(res[0]))
+            ):
+                obj, sol, coeff, alpha = res
+            else:
+                obj = [np.nan, np.nan]
+                sol = None
+                coeff = None
+                alpha = np.array([np.nan])
 
 
-        objectives = [fi[0] for fi in f]
-        data = [row if row else [np.nan, np.nan] for row in objectives]
-        obj_arrays = np.array(data)
-        solution = [fi[1] for fi in f]
-        coeff_matrix = [fi[2] for fi in f]
-        alpha = [fi[3] for fi in f]
+            objectives.append(obj)
+            solutions.append(sol)
+            coeff_matrices.append(coeff)
+            alphas.append(alpha)
 
+        # Convert to numpy arrays
+        obj_arrays = np.array(objectives, dtype=float)
+        dw_stats = obj_arrays[:, 1]
+        max_dw_stats = 2 - np.nanmin(dw_stats)
 
-        dw_stats = np.asarray(obj_arrays[:, 1])
-
-        max_dw_stats = 2 - min(dw_stats)
-
-        # Monitoring print message
-        message = (
+        # Monitoring output
+        print(
             f"+{'-' * 60}+\n"
             f"| DW statistic monitoring: Maximum value = {max_dw_stats:.4f} |\n"
             f"+{'-' * 60}+"
         )
 
-        print(message)
-        names = []
-        funct_d = []
-
-        # for alpha_ in np.asarray(alpha):
-
-        #     names.append(np.asarray(self.library_object._functions(alpha_)[1]))
-
-        #     funct_d.append(np.asarray(self.library_object._functions(alpha_)[2]))
-
-        out["F"] = anp.column_stack([obj_arrays[:, 0],  obj_arrays[:, 1]])
-
-        solution = np.asanyarray(solution)
-        lasso_coeff = np.asanyarray(coeff_matrix)
-        out.__setitem__("solution", solution)
-        out.__setitem__("coeff_matrix", lasso_coeff)
-        out.__setitem__("alphas", np.asarray(alpha))
-        out.__setitem__("dw_coeff", dw_stats)
+        # Store output
+        out["F"] = anp.column_stack([obj_arrays[:, 0], dw_stats])
+        out["solution"] = np.asarray(solutions, dtype=object)
+        out["coeff_matrix"] = np.asarray(coeff_matrices, dtype=object)
+        out["alphas"] = np.asarray(alphas, dtype=object)
+        out["dw_coeff"] = dw_stats

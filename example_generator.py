@@ -71,7 +71,7 @@ class DataGenerator:
         """
         # Sample parameters and instantiate model
         params = self._sample_parameters()
-        params = {'alpha': 1.3, 'beta': 3.4}
+        params = {'alpha': 1.1, 'beta': 3.8}
         model = self.model_cls(**params)
 
         # Determine state dimension
@@ -202,11 +202,15 @@ if __name__ == "__main__":
         x_dot=x_dot,
         t = t,
         x0=x0_list,
-        solver_parameters= {'alpha': 0.001},
         library_object=get_base_functions,
         bounds= [np.array([1, 1]), np.array([4, 4])],
         weak_form=False,
         scale_theta=True,
+        optimizer='STLSQ',
+        solver_parameters={
+            "threshold": 0.1},
         solver='lasso',
-        number_generations=10,
-        population_size=50)
+        number_generations=5,
+        population_size=25)
+    
+    print(alphas)

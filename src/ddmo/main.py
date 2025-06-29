@@ -42,8 +42,8 @@ from pymoo.optimize import minimize
 import pysindy as ps
 
 import ddmo.differentiation.differentiation as diff
-from ddmo.optimizer.optimizer import Optimizer
-from ddmo.optimizer.Scipy_Solver import Scipy_Solver
+# from ddmo.optimizer.optimizer import Optimizer
+# from ddmo.optimizer.Scipy_Solver import Scipy_Solver
 from ddmo.equations import plugflow_equation, lorenz, goodwin_eqs
 import ddmo.library_functions.functions as fcs
 
@@ -83,6 +83,7 @@ def identify(
     n_vars: int = 2, # number of optimization variables
     population_size: int = 20,
     number_generations: int = 10,
+    optimizer: str = "stlsq",  # 'pysindy', 'pysindy_weak', 'scikit'
     solver: str = "lasso",
     solver_parameters: dict = {},
     scale_theta: bool = True,
@@ -90,7 +91,7 @@ def identify(
     seed: Optional[int] = None,
     verbose: bool = True,
     library_object: Optional[Callable[[List[float]], Any]] = None,
-) -> Tuple[Optimizer, object]:
+):
     """
     Run sparse identification on provided data x(t).
 
@@ -117,6 +118,7 @@ def identify(
                                 library_object,
                                 x0,
                                 x_raw = x_raw,
+                                optimizer=optimizer,
                                 solver=solver,
                                 solver_parameters = solver_parameters,
                                 scale_theta= scale_theta,
@@ -144,8 +146,10 @@ def identify(
 
     problem.n_obj = n_objectives
     problem.n_var = n_vars
-    problem.dimension = len(x0[0])  # Assuming x0 is a list of initial conditions
-
+    if isinstance(x0[0], (list, tuple)):
+        problem.dimension = len(x0[0])
+    else:
+        problem.dimension = len(x0)
     problem.xl = bounds[0]
     problem.xu = bounds[1]
 

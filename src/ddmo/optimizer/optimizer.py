@@ -29,11 +29,11 @@ class Optimizer(Problem):
                  library_object,
                  x_0,
                  x_raw,
-                 solver,
-                 target = 'trajectory',
-                 scale_theta = False,
-                 weak_form = False,
-                 objectives = None):
+                 optimizer="STLSQ",
+                 solver="lasso",
+                 solver_parameters={},
+                 scale_theta=False,
+                 objectives=None):
 
         """Initialize the class with sparse algorithm variables.
 
@@ -56,11 +56,11 @@ class Optimizer(Problem):
         self.library_object = library_object
         self.x_raw = x_raw
         self.model_type = solver
-        self.target = target
+        self.optimizer = optimizer
+        self.solver_parameters = solver_parameters,
         self.scale_theta = scale_theta
         self.dimension = len(x_train[0])
-        self.number_initial_conditions = len(x_0)
-        self.weak_form = weak_form
+        self.number_initial_conditions = 1 # Input i.c. as list of lists and automiatically set this to the number of initial conditions
         self.objectives = objectives if objectives is not None else [compute_mse, compute_mse]
         self.n_obj = len(self.objectives)
 
@@ -82,25 +82,6 @@ class Optimizer(Problem):
         print(f"Objective function values: {objective_funcs}")
         return objective_funcs, sol, regression_coeff, opt_vars
 
-    def _select_regression_model(self):
-        if self.model_type == "lasso":
-            return linear_model.Lasso(alpha=self.alpha_lasso, tol=0.0000001, fit_intercept=True)
-        elif self.model_type == "ridge":
-            return linear_model.Ridge(alpha=self.alpha_lasso, fit_intercept=True, copy_X=True, max_iter=None, tol=0.0000001, solver='auto', positive=False, random_state=None)
-        elif self.model_type == "lasso_lars":
-            return linear_model.LassoLars(self.alpha_lasso)
-        elif self.model_type == "lasso_lars_cv":
-            return linear_model.LassoLarsCV(fit_intercept=True, verbose=False, max_iter=500, precompute='auto',  max_n_alphas=1000,  eps=0.01)
-        elif self.model_type == "e-net":
-            return linear_model.ElasticNet(alpha=self.alpha_lasso, tol=0.00001, l1_ratio=0.6, fit_intercept=True)
-        elif self.model_type == "e-net-cv":
-            return linear_model.MultiTaskElasticNetCV(l1_ratio=1., eps=.05, n_alphas=300, alphas=None, fit_intercept=True, max_iter=1000, tol=0.001, cv=None, copy_X=True, selection='cyclic')
-        elif self.model_type == "mt-e-net":
-            return linear_model.MultiTaskElasticNet(alpha=self.alpha_lasso, tol=0.00001, l1_ratio=0.7)
-
-        else:
-            raise ValueError("Invalid model type. Choose between 'lasso', 'ridge', or 'lasso_lars'")
-
     def _evaluate(self, x, out, *args, **kwargs):
         self.coefficient_matrix.clear()
         self.alphas.clear()
@@ -108,7 +89,6 @@ class Optimizer(Problem):
         self.solution.clear()
 
         coefficient_matrix = []
-        regression = self._select_regression_model()
         coefficient_matrix.clear()
         flat_x = [tuple(row) for row in x]
         f = [self._compute_metrics(xi, regression) for xi in flat_x]

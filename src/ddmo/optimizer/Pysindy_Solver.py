@@ -43,7 +43,7 @@ class Pysindy_Solver(Optimizer):
         if result[0] is None:
             return [[np.nan, np.nan, np.nan, np.nan], []]
 
-        sol, regression_coeff, opt_vars = self.solver(x_row)
+        sol, regression_coeff, opt_vars, model = self.solver(x_row)
         objective_funcs = []
         for obj_func in self.objectives:
             try:
@@ -52,7 +52,7 @@ class Pysindy_Solver(Optimizer):
                 objective_funcs.append(1e5)
 
         print(f"Objective function values: {objective_funcs}")
-        return objective_funcs, sol, regression_coeff, opt_vars
+        return objective_funcs, sol, regression_coeff, opt_vars, model
 
         objective_funcs = []
         for obj_func in self.objectives:
@@ -89,18 +89,17 @@ class Pysindy_Solver(Optimizer):
         
         named_funcs = self.library_object([*opt_vars])
         functions = [f for f, _ in named_funcs]
-        function_names = [lambda *args, name=name: name for _, name in named_funcs]
+        function_names = [name for _, name in named_funcs]
 
         lib_custom = ps.CustomLibrary(
             library_functions=functions,
             function_names=function_names
         )
-
         lib_custom.fit(self.x_train)
         dt = self.time_array[1] - self.time_array[0]
         params_dict = self.solver_parameters[0]
         optimizer = _optimizers[self.optimizer](**params_dict)
-
+        
           # Increase threshold to enforce more sparsity
         try:
 
@@ -115,23 +114,19 @@ class Pysindy_Solver(Optimizer):
             regression_coeff = regression_coeff.T
             sol_list = []
 
-            initials = self.initial_values
-            if initials.ndim == 1:
-                initials = [initials]  # Wrap single vector in a list
+            for i in range(self.number_initial_conditions):
 
-            for x_0_ in initials:
-
-                sol_ = model.simulate(x_0_, self.time_array)
+                sol_ = model.simulate(self.initial_values[i], self.time_array)
 
                 sol_list.append(sol_)
             sol = np.vstack(sol_list)
 
             x = sol
 
-            return x, regression_coeff, opt_vars
+            return x, regression_coeff, opt_vars, model
         except Exception as e:
             print(f"Error during solver execution: {e}")
-            return None, None, None, None
+            return None, None, None, None, None
 
     def _evaluate(self, x, out, *args, **kwargs):
         # Clear previous state
@@ -150,26 +145,28 @@ class Pysindy_Solver(Optimizer):
         solutions = []
         coeff_matrices = []
         alphas = []
+        models = [] 
 
         for res in results:
             if (
                 isinstance(res, (list, tuple)) and
-                len(res) == 4 and
                 res[0] is not None and
                 not np.all(np.isnan(res[0]))
             ):
-                obj, sol, coeff, alpha = res
+                obj, sol, coeff, alpha, sindy_model = res
             else:
                 obj = [np.nan, np.nan]
                 sol = None
                 coeff = None
                 alpha = np.array([np.nan])
+                sindy_model = None
 
 
             objectives.append(obj)
             solutions.append(sol)
             coeff_matrices.append(coeff)
             alphas.append(alpha)
+            models.append(sindy_model)
 
         # Convert to numpy arrays
         obj_arrays = np.array(objectives, dtype=float)
@@ -189,3 +186,4 @@ class Pysindy_Solver(Optimizer):
         out["coeff_matrix"] = np.asarray(coeff_matrices, dtype=object)
         out["alphas"] = np.asarray(alphas, dtype=object)
         out["dw_coeff"] = dw_stats
+        out['models'] = models 

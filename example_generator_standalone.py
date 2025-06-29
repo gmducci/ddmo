@@ -25,18 +25,20 @@ NamedFunc = Tuple[Callable[[float, float], float], str]
 def get_base_functions(params: List[float]) -> List[NamedFunc]:
     alpha = params
     return [
-        (lambda x: x, "x"),
-        (lambda x: (1 / (1 + x**alpha)), f"1 / 1 + x^{alpha}")
+        (lambda x: x, lambda x: x),
+        (lambda x: x**2, lambda x: x + '^2'),
+        (lambda x: (1 / (1 + x**alpha)), lambda x: f"1 / 1 + " + x + "^{alpha}")
     ]
 
-problem, res, obj_space, solutions, coeff_matrices, alphas = identify(
+x_0 = [x_0_train]
+problem, res, obj_space, solutions, coeff_matrices, alphas, sindy_model = identify(
     x_train = x_train[40:-40,:],
     x_raw=x_raw[40:-40,:],
     x_dot=x_dot_hat[40:-40,:],
     t = time_array,
-    x0=x_0_train,
+    x0=x_0,
     library_object=get_base_functions,
-    bounds= [np.array([5]), np.array([10])],
+    bounds= [np.array([1]), np.array([10])],
     weak_form=False,
     scale_theta=True,
     n_vars=1,
@@ -44,7 +46,7 @@ problem, res, obj_space, solutions, coeff_matrices, alphas = identify(
     solver_parameters={
         "threshold": 0.1},
     solver='lasso',
-    number_generations=5,
-    population_size=25)
+    number_generations=1,
+    population_size=10)
 
 print(alphas)

@@ -164,5 +164,6 @@ def identify(
     solutions = res.opt.get("solution")
     coeff_matrices = res.opt.get("coeff_matrix")
     alphas = res.opt.get("alphas")
+    model = res.opt.get("models")
 
-    return problem, res, obj_space, solutions, coeff_matrices, alphas
+    return problem, res, obj_space, solutions, coeff_matrices, alphas, model

@@ -161,9 +161,9 @@ def identify(
         ('n_gen', number_generations))
     
     obj_space = res.F
-    solutions = res.opt.get("solution")
-    coeff_matrices = res.opt.get("coeff_matrix")
-    alphas = res.opt.get("alphas")
-    model = res.opt.get("models")
+    solutions = res.opt.get("solution", to_numpy=False)
+    coeff_matrices = res.opt.get("coeff_matrix", to_numpy=False)
+    alphas = res.opt.get("alphas", to_numpy=False)
+    model = res.opt.get("models", to_numpy=False)
 
     return problem, res, obj_space, solutions, coeff_matrices, alphas, model

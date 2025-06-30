@@ -23,11 +23,13 @@ from typing import Callable, List, Tuple
 
 NamedFunc = Tuple[Callable[[float, float], float], str]
 def get_base_functions(params: List[float]) -> List[NamedFunc]:
-    alpha = params
+    alpha, beta = params
     return [
         (lambda x: x, lambda x: x),
-        (lambda x: x**2, lambda x: x + '^2'),
-        (lambda x: (1 / (1 + x**alpha)), lambda x: f"1 / 1 + " + x + "^{alpha}")
+        (lambda x: x**2, lambda x: f"{x}^2"),
+        (lambda x: (1 / (1 + x**alpha)), lambda x: f"1 / 1 + " + x + "^{alpha}"),
+        (lambda x: np.exp(- beta * x), lambda x: f"exp( " + "-{beta}" + x + ")")
+
     ]
 
 x_0 = [x_0_train]
@@ -38,15 +40,15 @@ problem, res, obj_space, solutions, coeff_matrices, alphas, sindy_model = identi
     t = time_array,
     x0=x_0,
     library_object=get_base_functions,
-    bounds= [np.array([1]), np.array([10])],
+    bounds= [np.array([1, 1]), np.array([10, 10])],
     weak_form=False,
     scale_theta=True,
-    n_vars=1,
+    n_vars=2,
     optimizer='STLSQ',
     solver_parameters={
-        "threshold": 0.1},
+        "threshold": 0.075},
     solver='lasso',
-    number_generations=1,
-    population_size=10)
+    number_generations=5,
+    population_size=25)
 
 print(alphas)

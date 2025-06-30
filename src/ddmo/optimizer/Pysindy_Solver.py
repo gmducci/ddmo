@@ -99,7 +99,7 @@ class Pysindy_Solver(Optimizer):
         dt = self.time_array[1] - self.time_array[0]
         params_dict = self.solver_parameters[0]
         optimizer = _optimizers[self.optimizer](**params_dict)
-        
+
           # Increase threshold to enforce more sparsity
         try:
 
@@ -155,7 +155,7 @@ class Pysindy_Solver(Optimizer):
             ):
                 obj, sol, coeff, alpha, sindy_model = res
             else:
-                obj = [np.nan, np.nan]
+                obj = [np.inf, np.inf]
                 sol = None
                 coeff = None
                 alpha = np.array([np.nan])
@@ -183,7 +183,7 @@ class Pysindy_Solver(Optimizer):
         # Store output
         out["F"] = anp.column_stack([obj_arrays[:, 0], dw_stats])
         out["solution"] = np.asarray(solutions, dtype=object)
-        out["coeff_matrix"] = np.asarray(coeff_matrices, dtype=object)
+        out["coeff_matrix"] =  np.asarray(coeff_matrices, dtype=object)
         out["alphas"] = np.asarray(alphas, dtype=object)
         out["dw_coeff"] = dw_stats
         out['models'] = models 

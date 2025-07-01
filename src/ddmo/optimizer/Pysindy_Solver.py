@@ -38,12 +38,13 @@ class Pysindy_Solver(Optimizer):
         )
 
 
-    def _compute_metrics(self, x_row):
-        result = self.solver(x_row)
-        if result[0] is None:
+    def _compute_metrics(self, optimization_variables):
+
+        sol, regression_coeff, opt_vars, model = self.solver(optimization_variables)
+
+        if sol is None:
             return [[np.nan, np.nan, np.nan, np.nan], []]
 
-        sol, regression_coeff, opt_vars, model = self.solver(x_row)
         objective_funcs = []
         for obj_func in self.objectives:
             try:
@@ -151,7 +152,6 @@ class Pysindy_Solver(Optimizer):
                 alpha = np.array([np.nan])
                 sindy_model = None
 
-
             objectives.append(obj)
             solutions.append(sol)
             coeff_matrices.append(coeff)
@@ -176,4 +176,4 @@ class Pysindy_Solver(Optimizer):
         out["coeff_matrix"] =  np.asarray(coeff_matrices, dtype=object)
         out["alphas"] = np.asarray(alphas, dtype=object)
         out["dw_coeff"] = dw_stats
-        out['models'] = models 
+        out['models'] = models

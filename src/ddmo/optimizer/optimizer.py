@@ -61,7 +61,7 @@ class Optimizer(Problem):
         self.scale_theta = scale_theta
         self.dimension = len(x_train[0])
         self.number_initial_conditions = len(x_0) # Input i.c. as list of lists and automiatically set this to the number of initial conditions
-        self.objectives = objectives if objectives is not None else [compute_mse, compute_mse]
+        self.objectives = objectives if objectives is not None else [compute_mse, compute_dw_coefficient]
         self.n_obj = len(self.objectives)
 
         self.coefficient_matrix = []

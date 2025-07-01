@@ -8,35 +8,21 @@ import scipy.stats as stats
 def compute_dw_coefficient(Problem, sol):
     """
     Computes the Durbin-Watson statistic for residuals between reference and predicted values.
-    Returns the absolute difference from 2 (ideal value for no autocorrelation).
+    Returns the maximum absolute deviation from 2 across all dimensions and initial conditions.
     """
-    n_ic = Problem.number_initial_conditions
-    n_dim = Problem.dimension
-    t_len = len(Problem.time_array)
+    dw_matrix = np.zeros((Problem.dimension, Problem.number_initial_conditions))
+    x_raw = np.vstack(Problem.x_raw)
+    t_len = len(Problem.x_raw[0])  # Assuming all initial conditions have the same length
 
-    if n_dim == 1:
-        dw = np.zeros(n_ic)
-        for i in range(n_ic):
-            x_ref = Problem.x_raw[i * t_len:(i + 1) * t_len]
-            x_pred = sol[i * t_len:(i + 1) * t_len]
+    for i in range(Problem.number_initial_conditions):
+        for j in range(Problem.dimension):
+            x_ref = x_raw[i * t_len:(i + 1) * t_len, j]
+            x_pred = sol[i * t_len:(i + 1) * t_len, j]
             residuals = x_ref - x_pred
-            dw[i] = sm.stats.stattools.durbin_watson(residuals)
-        dw_stat = np.min(dw)
-    else:
-        dw = np.zeros((n_dim, n_ic))
-        for i in range(n_ic):
-            for j in range(n_dim):
-                x_ref = Problem.x_raw[i * t_len:(i + 1) * t_len, j]
-                x_pred = sol[i * t_len:(i + 1) * t_len, j]
-                residuals = x_ref - x_pred
-                dw[j, i] = sm.stats.stattools.durbin_watson(residuals)
-        dw_stat = np.min(dw)
+            dw_matrix[j, i] = np.abs(sm.stats.stattools.durbin_watson(residuals) - 2)
 
-    # If dw_stat is very close to 2, treat as zero difference
-    if np.isclose(dw_stat, 2, atol=1e-4):
-        dw_stat = 2
-
-    return abs(2 - dw_stat)
+    dw_stat = np.min(dw_matrix)
+    return dw_stat
 
 def compute_mse(Problem, sol):
 

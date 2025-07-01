@@ -54,16 +54,6 @@ class Pysindy_Solver(Optimizer):
         print(f"Objective function values: {objective_funcs}")
         return objective_funcs, sol, regression_coeff, opt_vars, model
 
-        objective_funcs = []
-        for obj_func in self.objectives:
-            try:
-                objective_funcs.append(obj_func(self, sol))
-            except Exception:
-                objective_funcs.append(1e5)
-
-        print(f"Objective function values: {objective_funcs}")
-        return objective_funcs, sol, regression_coeff, opt_vars
-    
     
 
     def solver(self, optimization_vars):

@@ -1,4 +1,3 @@
-import numpy as np
 
 class Lorenz:
     def __init__(self, sigma=10, beta=8/3, rho=28):

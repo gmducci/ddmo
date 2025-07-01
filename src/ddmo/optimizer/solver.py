@@ -1,9 +1,13 @@
 # compute_tajectory.py
 import numpy as np
-from sklearn.preprocessing import normalize, StandardScaler, RobustScaler, QuantileTransformer
 import pysindy as ps
 from scipy.integrate import odeint
-from ..feature_library.weak_pde_library import WeakPDELibrary
+from sklearn.preprocessing import (
+    StandardScaler,
+)
+
+from ddmo.feature_library.weak_pde_library import WeakPDELibrary
+
 
 def solver(Problem, optimization_vars, regression):
     """
@@ -77,9 +81,9 @@ def solver(Problem, optimization_vars, regression):
                 sol_list.append(sol_)
             sol = np.vstack(sol_list)
     else:
-        
+
         custom_lib = Problem.library_object.library(opt_vars)
-        
+
         ode_lib = WeakPDELibrary(
             library_functions = Problem.library_object.library(opt_vars).functions,
             function_names = Problem.library_object.library(opt_vars).function_names,
@@ -87,7 +91,7 @@ def solver(Problem, optimization_vars, regression):
             is_uniform=True,
             K=5000,
             p=4)
-        
+
         input_features = []
         input_indices = []
 
@@ -150,6 +154,6 @@ def solver(Problem, optimization_vars, regression):
         x = rhs
     else:
         raise ValueError("Invalid target specified. Must be 'trajectory' or 'derivative'.")
-    
+
     return x, x_ref, regression_coeff, opt_vars
 

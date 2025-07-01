@@ -28,45 +28,29 @@ Usage:
   ...     individual_funcs=[lambda x: x**3]
   ... )
 """
-import argparse
-import logging
-import sys
-from pathlib import Path
-from typing import Callable, Iterable, Optional, Sequence, Tuple, Union, List, Any
+
+from collections.abc import Callable
+from typing import Any
 
 import numpy as np
-from scipy.integrate import odeint
-from scipy.special import erf
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.optimize import minimize
-import pysindy as ps
 
-import ddmo.differentiation.differentiation as diff
 # from ddmo.optimizer.optimizer import Optimizer
 # from ddmo.optimizer.Scipy_Solver import Scipy_Solver
-from ddmo.equations import plugflow_equation, lorenz, goodwin_eqs
-import ddmo.library_functions.functions as fcs
 
-import functools
-import operator
 #!/usr/bin/env python3
 # ddmo/library_factory.py
 
-from typing import Callable, List, Optional, Tuple, Any, Dict
-import pysindy as ps
-import ddmo.library_functions.functions as fcs  # for LibrarySindy / LibraryFunctions
-import itertools
-from typing import Callable, List, Tuple
 
 # Type aliases for clarity
 Func = Callable[..., float]
-NamedFunc = Tuple[Func, str]
+NamedFunc = tuple[Func, str]
 
 
-from typing import Callable, Tuple, List
-import numpy as np
+from collections.abc import Callable
 
-NamedFunc = Tuple[Callable[..., float], str]
+NamedFunc = tuple[Callable[..., float], str]
 
 # -----------------------------------------------------------------------------# Main identification function
 # -----------------------------------------------------------------------------
@@ -78,7 +62,7 @@ def identify(
     x_dot: np.ndarray,
     t: np.ndarray,
     x0:np.ndarray,
-    bounds: Tuple[Tuple[float, float], Tuple[float, float]],
+    bounds: tuple[tuple[float, float], tuple[float, float]],
     n_objectives: int = 2, # number of objective functions
     n_vars: int = 2, # number of optimization variables
     population_size: int = 20,
@@ -88,9 +72,9 @@ def identify(
     solver_parameters: dict = {},
     scale_theta: bool = True,
     weak_form: bool = False,
-    seed: Optional[int] = None,
+    seed: int | None = None,
     verbose: bool = True,
-    library_object: Optional[Callable[[List[float]], Any]] = None,
+    library_object: Callable[[list[float]], Any] | None = None,
 ):
     """
     Run sparse identification on provided data x(t).
@@ -153,13 +137,12 @@ def identify(
     problem.xl = bounds[0]
     problem.xu = bounds[1]
 
-    
     algorithm = NSGA2(pop_size=population_size)
     res = minimize(
         problem,
         algorithm,
         ('n_gen', number_generations))
-    
+
     obj_space = res.F
     solutions = res.opt.get("solution", to_numpy=False)
     coeff_matrices = res.opt.get("coeff_matrix", to_numpy=False)

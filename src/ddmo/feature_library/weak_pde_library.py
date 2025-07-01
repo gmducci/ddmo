@@ -4,17 +4,14 @@ from itertools import combinations_with_replacement as combinations_w_r
 from itertools import product as iproduct
 
 import numpy as np
-from scipy.special import binom
-from scipy.special import perm
+from pysindy.differentiation import FiniteDifference
+from scipy.special import binom, perm
 from sklearn import __version__
 from sklearn.utils.validation import check_is_fitted
 
+from ddmo.feature_library.base import BaseFeatureLibrary, x_sequence_or_item
+from ddmo.utils import AxesArray, comprehend_axes
 
-from .base import BaseFeatureLibrary
-from .base import x_sequence_or_item
-from pysindy.differentiation import FiniteDifference
-from ..utils import comprehend_axes
-from ..utils import AxesArray
 
 class WeakPDELibrary(BaseFeatureLibrary):
     """Generate a weak formulation library with custom functions and,
@@ -578,7 +575,7 @@ class WeakPDELibrary(BaseFeatureLibrary):
 
             if n_features != n_input_features:
                 raise ValueError("x shape does not match training shape")
-            
+
             n_library_terms = sum(sum(sublist[1]) for sublist in self.library_feature_input)
             xp = np.zeros((*x.shape[:-1], n_library_terms))
 
@@ -922,7 +919,7 @@ class WeakPDELibrary(BaseFeatureLibrary):
             else:
                 library_functions = np.empty((self.K, n_library_terms), dtype=x.dtype)
             # Evaluate the functions on the indices of domain cells
-            
+
             funcs = np.zeros((*x.shape[:-1], n_library_terms))
             funcs_test = np.zeros((*x.shape[:-1], n_library_terms))
             # func_idx = 0
@@ -1142,8 +1139,8 @@ class WeakPDELibrary(BaseFeatureLibrary):
                     library_idx += n_library_terms * self.num_derivatives * n_features
 
             xp_full = xp_full + [AxesArray(xp, {"ax_sample": 0, "ax_coord": 1})]
-        return xp_full    
-    
+        return xp_full
+
     def calc_trajectory(self, diff_method, x, t):
         x_dot = self.convert_u_dot_integral(x)
         return AxesArray(x_dot, {"ax_sample": 0, "ax_coord": 1})

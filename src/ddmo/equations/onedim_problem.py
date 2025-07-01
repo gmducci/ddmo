@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class OneDProblem:
     def __init__(self, a=0.1, b=0.5, c=0.5):
         self.a = a

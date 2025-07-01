@@ -1,20 +1,15 @@
-import numpy
+import logging
+from concurrent.futures import ThreadPoolExecutor
+from multiprocessing import Pool
+
 import numpy as np
-from scipy.integrate import odeint, solve_ivp
-import pandas
-import seaborn
-import pywt
 import pynumdiff
 import pynumdiff.optimize
-from scipy.optimize import minimize
-from multiprocessing import Pool
-import multiprocessing as mp
-from concurrent.futures import ProcessPoolExecutor
-from concurrent.futures import ThreadPoolExecutor
-from scipy import sparse
-from scipy.sparse import linalg as splin
-import logging
+import pywt
 import scipy.stats as stats
+from scipy import sparse
+from scipy.optimize import minimize
+from scipy.sparse import linalg as splin
 
 _has_matplotlib = True
 try:
@@ -283,10 +278,8 @@ class TVReg:
 
         relative_change = np.linalg.norm(s0) / np.linalg.norm(u)
         g_norm = np.linalg.norm(g)
-        logging.info('iteration {0:4d}: relative change = {1:.3e}, '
-                     'gradient norm = {2:.3e}\n'.format(ii,
-                                                        relative_change,
-                                                        g_norm))
+        logging.info(f'iteration {ii:4d}: relative change = {relative_change:.3e}, '
+                     f'gradient norm = {g_norm:.3e}\n')
 
     def TVRegDiff(self, data, itern, alph, u0=None, scale='small', ep=1e-6, dx=None,
                   plotflag=False, diagflag=False, precondflag=True,

@@ -1,8 +1,9 @@
-import numpy as np
-from typing import Callable, List, Tuple
+from collections.abc import Callable
 from itertools import permutations
 
-NamedFunc = Tuple[Callable[..., float], str]
+import numpy as np
+
+NamedFunc = tuple[Callable[..., float], str]
 
 class FunctionLibrary:
     """
@@ -15,12 +16,12 @@ class FunctionLibrary:
         library (List[NamedFunc]): The expanded list of functions after applying permutations.
     """
 
-    def __init__(self, base_func_generator: Callable[[List[float]], List[NamedFunc]]):
+    def __init__(self, base_func_generator: Callable[[list[float]], list[NamedFunc]]):
         self.base_func_generator = base_func_generator
-        self.base_funcs: List[NamedFunc] = []
-        self.library: List[NamedFunc] = []
+        self.base_funcs: list[NamedFunc] = []
+        self.library: list[NamedFunc] = []
 
-    def set_base_funcs(self, parameters: Tuple[float, float]):
+    def set_base_funcs(self, parameters: tuple[float, float]):
         self.base_funcs = self.base_func_generator(list(parameters))
 
     def build(self, n_vars: int):
@@ -43,7 +44,7 @@ class FunctionLibrary:
         self.library = new_library
 
     @staticmethod
-    def _wrap_func_with_indices(func: Callable, indices: Tuple[int, ...]) -> Callable:
+    def _wrap_func_with_indices(func: Callable, indices: tuple[int, ...]) -> Callable:
         def wrapped(*args):
             selected_args = tuple(args[i] for i in indices)
             return func(*selected_args)
@@ -56,7 +57,7 @@ class FunctionLibrary:
             raise TypeError(f"Expected input of type np.ndarray, got {type(x).__name__}")
         if x.ndim != 2:
             raise ValueError(f"Expected a 2D array, got array with shape {x.shape}")
-        
+
         n_samples = x.shape[0]
         n_funcs = len(self.library)
         theta = np.empty((n_samples, n_funcs), dtype=float)
@@ -65,8 +66,8 @@ class FunctionLibrary:
             theta[:, j] = np.fromiter((func(*row) for row in x), dtype=float, count=n_samples)
 
         return theta
-    
-    def get_rhs(self, state: np.ndarray, t: float, matrices: Tuple[np.ndarray, np.ndarray]) -> np.ndarray:
+
+    def get_rhs(self, state: np.ndarray, t: float, matrices: tuple[np.ndarray, np.ndarray]) -> np.ndarray:
         """
         Computes the right-hand side (RHS) of the differential system using the constructed function library 
         and a coefficient matrix.
@@ -89,19 +90,19 @@ class FunctionLibrary:
             return rhs[0]
         return rhs
 
-    
 
 
-    def get_labels(self) -> List[str]:
+
+    def get_labels(self) -> list[str]:
         return [label for _, label in self.library]
 
 
 # MAIN EXECUTION
 if __name__ == "__main__":
     # Replace this import with your actual function source or definition
-    from ddmo.library_functions import functions_template  
+    from ddmo.library_functions import functions_template
 
-    def get_base_functions(params: List[float]) -> List[NamedFunc]:
+    def get_base_functions(params: list[float]) -> list[NamedFunc]:
         alpha, beta = params
         return [
             (functions_template.identity, "x"),

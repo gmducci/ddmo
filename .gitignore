@@ -1,7 +1,29 @@
-# ignore python cache
-*.pyc
+# Python related
 __pycache__/
-ddmo/debug.log
-# ignore results folder
-results/
+*.pyc
+.pytest_cache/
+.coverage
+coverage*
+*.egg-info/
 
+# Project specific
+results/
+*results*
+*tmp*
+*build*
+ddmo/debug.log
+debug.log
+src/*.egg-info/**
+
+# Development environments
+.vscode/
+.idea/
+pyrightconfig.json
+.python-version
+
+# OS specific
+.DS_Store
+
+# Temporary files
+.ipynb_checkpoints/
+.eggs/

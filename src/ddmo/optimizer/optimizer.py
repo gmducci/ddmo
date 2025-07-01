@@ -1,23 +1,22 @@
 # optimizer.py
-from sklearn import linear_model, metrics
-from sklearn.utils import resample
-import scipy.stats as stats
-from pymoo.core.problem import Problem
-import pymoo.gradient.toolbox as anp
-import numpy as np
-from scipy.integrate import odeint
-import multiprocessing
-import statsmodels.api as sm
-from sklearn.metrics import r2_score
-from sklearn.preprocessing import normalize, StandardScaler, RobustScaler, QuantileTransformer
-from scipy.stats import linregress
-from .solver import solver
-from .objective_functions import compute_dw_coefficient, compute_mse, compute_ppcc_matrix
-import pysindy as ps
 import warnings
+
+import numpy as np
+import pymoo.gradient.toolbox as anp
+from pymoo.core.problem import Problem
+
+# import statsmodels.api as sm
+from .objective_functions import (
+    compute_dw_coefficient,
+    compute_mse,
+)
+from .solver import solver
+
 warnings.filterwarnings("ignore")
-from pymoo.config import Config
 import multiprocessing as mp
+
+from pymoo.config import Config
+
 Config.warnings['not_compiled'] = False
 mp.set_start_method("fork", force=True)
 
@@ -48,7 +47,7 @@ class Optimizer(Problem):
                         n_ieq_constr=0,
                         xl = 0.,
                         xu = 1., vtype=float)
-        
+
         self.x_train = x_train
         self.time_array = time_array
         self.initial_values = x_0

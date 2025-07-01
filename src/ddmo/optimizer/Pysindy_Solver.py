@@ -1,13 +1,11 @@
-from ..feature_library.weak_pde_library import WeakPDELibrary
-from .optimizer import Optimizer
 import numpy as np
-import pysindy as ps
-from sklearn.preprocessing import normalize, StandardScaler, RobustScaler, QuantileTransformer
-from scipy.integrate import odeint
-from sklearn import linear_model, metrics
 import pymoo.gradient.toolbox as anp
+import pysindy as ps
+from pysindy.optimizers import SR3, STLSQ, ConstrainedSR3, EnsembleOptimizer
 from sklearn.linear_model import Lasso
-from pysindy.optimizers import STLSQ, SR3, ConstrainedSR3, EnsembleOptimizer
+
+from .optimizer import Optimizer
+
 
 class Pysindy_Solver(Optimizer):
     def __init__(self,
@@ -54,7 +52,7 @@ class Pysindy_Solver(Optimizer):
         print(f"Objective function values: {objective_funcs}")
         return objective_funcs, sol, regression_coeff, opt_vars, model
 
-    
+
 
     def solver(self, optimization_vars):
         """
@@ -76,7 +74,7 @@ class Pysindy_Solver(Optimizer):
         self.alphas.append(opt_vars)
         if np.isscalar(opt_vars) or isinstance(opt_vars, np.float64):
             opt_vars = (opt_vars,)
-        
+
         named_funcs = self.library_object([*opt_vars])
         functions = [f for f, _ in named_funcs]
         function_names = [name for _, name in named_funcs]
@@ -90,7 +88,7 @@ class Pysindy_Solver(Optimizer):
         params_dict = self.solver_parameters[0]
         optimizer = _optimizers[self.optimizer](**params_dict)
 
-          # Increase threshold to enforce more sparsity
+        # Increase threshold to enforce more sparsity
         try:
 
             model = ps.SINDy(feature_library=lib_custom, optimizer=optimizer)
@@ -135,7 +133,7 @@ class Pysindy_Solver(Optimizer):
         solutions = []
         coeff_matrices = []
         alphas = []
-        models = [] 
+        models = []
 
         for res in results:
             if (
@@ -176,4 +174,4 @@ class Pysindy_Solver(Optimizer):
         out["coeff_matrix"] =  np.asarray(coeff_matrices, dtype=object)
         out["alphas"] = np.asarray(alphas, dtype=object)
         out["dw_coeff"] = dw_stats
-        out['models'] = models 
+        out['models'] = models

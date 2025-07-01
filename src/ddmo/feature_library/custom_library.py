@@ -1,15 +1,11 @@
 from itertools import combinations
 from itertools import combinations_with_replacement as combinations_w_r
 
-from numpy import empty
-from numpy import ones
-from numpy import shape
+from numpy import empty, ones, shape
 from sklearn.utils.validation import check_is_fitted
 
-from ..utils import AxesArray
-from ..utils import comprehend_axes
-from .base import BaseFeatureLibrary
-from .base import x_sequence_or_item
+from ddmo.utils import AxesArray, comprehend_axes
+from .base import BaseFeatureLibrary, x_sequence_or_item
 
 
 class CustomLibrary(BaseFeatureLibrary):

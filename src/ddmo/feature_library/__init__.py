@@ -1,5 +1,4 @@
-from .base import ConcatLibrary
-from .base import TensoredLibrary
+from .base import ConcatLibrary, TensoredLibrary
 from .custom_library import CustomLibrary
 from .weak_pde_library import WeakPDELibrary
 

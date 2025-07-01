@@ -1,10 +1,10 @@
 import random
+import warnings
 
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib
-import warnings
-import os
+
 warnings.filterwarnings("ignore")
 
 
@@ -104,7 +104,7 @@ fig, axes = plt.subplots(nrows=3, ncols=11, figsize=(16, 9))
 # Adjust the spacing between subplots
 plt.subplots_adjust(wspace=0.4, hspace=0.4)
 custom_labels = ['$x$', '$y$', '$z$', r'$\frac{1}{1 + z^{\gamma_1}}$', r'$\exp(-\gamma_2 z)$', '$x^2$', '$y^2$', '$z^2$', '', '', '']
-custom_y = ['$\dot{x}$', '$\dot{y}$', '$\dot{z}$']
+custom_y = [r'$\dot{x}$', r'$\dot{y}$', r'$\dot{z}$']
 
 # Add titles to subplots
 for i in range(3):

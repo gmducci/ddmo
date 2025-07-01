@@ -3,10 +3,9 @@ Base class for feature library classes.
 """
 import abc
 import warnings
+from collections.abc import Sequence
 from functools import wraps
 from itertools import repeat
-from typing import Optional
-from typing import Sequence
 
 import jax
 import numpy as np
@@ -14,10 +13,7 @@ from scipy import sparse
 from sklearn.base import TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
-from ..utils import AxesArray
-from ..utils import comprehend_axes
-from ..utils import validate_no_reshape
-from ..utils import wrap_axes
+from ddmo.utils import AxesArray, comprehend_axes, validate_no_reshape, wrap_axes
 
 
 class BaseFeatureLibrary(TransformerMixin):
@@ -30,7 +26,7 @@ class BaseFeatureLibrary(TransformerMixin):
     def __init__(self, library_ensemble: bool = False, ensemble_indices: list = [0]):
         self.library_ensemble = library_ensemble
         self.ensemble_indices = ensemble_indices
-        
+
     def validate_input(self, x, *args, **kwargs):
         return validate_no_reshape(x, *args, **kwargs)
 
@@ -344,7 +340,7 @@ class TensoredLibrary(BaseFeatureLibrary):
     def __init__(
         self,
         libraries: list,
-        inputs_per_library: Optional[Sequence[Sequence[int]]] = None,
+        inputs_per_library: Sequence[Sequence[int]] | None = None,
     ):
         self.libraries = libraries
         self.inputs_per_library = inputs_per_library

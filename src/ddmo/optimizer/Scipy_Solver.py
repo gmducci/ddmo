@@ -1,10 +1,10 @@
-from ..feature_library.weak_pde_library import WeakPDELibrary
-from .optimizer import Optimizer
 import numpy as np
-from sklearn.preprocessing import StandardScaler
-from sklearn import linear_model
-from scipy.integrate import odeint
 import pymoo.gradient.toolbox as anp
+from scipy.integrate import odeint
+from sklearn import linear_model
+from sklearn.preprocessing import StandardScaler
+
+from .optimizer import Optimizer
 
 # Default hyperparameters for supported regressors
 _DEFAULT_SOLVER_PARAMS: dict[str, dict] = {

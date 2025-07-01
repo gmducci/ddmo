@@ -1,4 +1,3 @@
-from typing import List
 
 import numpy as np
 from sklearn.base import TransformerMixin
@@ -148,7 +147,7 @@ class SampleConcatter(TransformerMixin):
         return concat_sample_axis(x_list)
 
 
-def concat_sample_axis(x_list: List[AxesArray]):
+def concat_sample_axis(x_list: list[AxesArray]):
     """Concatenate all trajectories and axes used to create samples."""
     new_arrs = []
     for x in x_list:

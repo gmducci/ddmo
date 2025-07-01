@@ -1,7 +1,8 @@
+import matplotlib
+from torchdyn import *
 from torchdyn.core import NeuralODE
 from torchdyn.datasets import *
-from torchdyn import *
-import matplotlib
+
 matplotlib.use('Qt5Agg')
 
 # quick run for automated notebook validation
@@ -21,6 +22,7 @@ for i in range(len(X)):
 
 import torch
 import torch.utils.data as data
+
 device = torch.device("cpu") # all of this works in GPU as well :)
 
 X_train = torch.Tensor(X).to(device)
@@ -28,8 +30,9 @@ y_train = torch.LongTensor(yn.long()).to(device)
 train = data.TensorDataset(X_train, y_train)
 trainloader = data.DataLoader(train, batch_size=len(X), shuffle=True)
 
-import torch.nn as nn
 import pytorch_lightning as pl
+import torch.nn as nn
+
 
 class Learner(pl.LightningModule):
     def __init__(self, t_span:torch.Tensor, model:nn.Module):
@@ -87,8 +90,8 @@ fig = plt.figure(figsize=(10,2))
 ax0 = fig.add_subplot(121)
 ax1 = fig.add_subplot(122)
 for i in range(500):
-    ax0.plot(t_span, trajectory[:,i,0], color=color[int(yn[i])], alpha=.1);
-    ax1.plot(t_span, trajectory[:,i,1], color=color[int(yn[i])], alpha=.1);
+    ax0.plot(t_span, trajectory[:,i,0], color=color[int(yn[i])], alpha=.1)
+    ax1.plot(t_span, trajectory[:,i,1], color=color[int(yn[i])], alpha=.1)
 ax0.set_xlabel(r"$t$ [Depth]") ; ax0.set_ylabel(r"$h_0(t)$")
 ax1.set_xlabel(r"$t$ [Depth]") ; ax1.set_ylabel(r"$z_1(t)$")
 ax0.set_title("Dimension 0") ; ax1.set_title("Dimension 1")

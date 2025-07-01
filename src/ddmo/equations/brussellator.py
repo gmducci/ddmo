@@ -1,4 +1,3 @@
-import numpy as np
 
 class Brussellator:
     def __init__(self, a=10, b=8/3, c=28):

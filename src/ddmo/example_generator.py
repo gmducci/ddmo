@@ -1,9 +1,7 @@
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import odeint
-import matplotlib.pyplot as plt
-from ddmo.optimizer.optimizer import SparseIdentification
-from pymoo.algorithms.moo.nsga2 import NSGA2
-from pymoo.optimize import minimize
+
 
 class DataGenerator:
     """
@@ -166,13 +164,14 @@ if __name__ == "__main__":
     # Plot trajectories
     #generator.plot_trajectories(x_noisy)
 
+    from collections.abc import Callable
+
     from ddmo import identify
-    from ddmo.library_functions import functions_template 
-    from typing import Callable, List, Tuple
+    from ddmo.library_functions import functions_template
 
 
-    NamedFunc = Tuple[Callable[[float, float], float], str]
-    def get_base_functions(params: List[float]) -> List[NamedFunc]:
+    NamedFunc = tuple[Callable[[float, float], float], str]
+    def get_base_functions(params: list[float]) -> list[NamedFunc]:
         alpha, beta = params
         return [
             (functions_template.identity, "x"),

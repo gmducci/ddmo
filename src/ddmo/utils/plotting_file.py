@@ -1,16 +1,16 @@
-import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
+
+
 def plot_coefficients(coeff_matrix, lib_names, fig):
 
     import pandas as pd
     import seaborn as sns
-    import matplotlib.pyplot as plt
 
     # Sample DataFrame with random data
 
     df = pd.DataFrame(np.round(coeff_matrix.T, 2))
-    df.index = ['$\dot{x}$', '$\dot{y}$', '$\dot{z}$' ]#lib_names
+    df.index = [r'$\dot{x}$', r'$\dot{y}$', r'$\dot{z}$' ]#lib_names
     df.columns = lib_names#['$\dot{x}$', '$\dot{y}$', '$\dot{z}$' ]
 
     # Calculate the correlation matrix

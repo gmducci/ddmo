@@ -1,11 +1,14 @@
-import numpy as np
-from scipy.integrate import odeint
+import inspect
+
 import matplotlib.pyplot as plt
-from ddmo.optimizer.optimizer import Optimizer
+import numpy as np
+import pysindy as ps
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.optimize import minimize
-import pysindy as ps
-import inspect
+from scipy.integrate import odeint
+
+from ddmo.optimizer.optimizer import Optimizer
+
 
 class DataGenerator:
     """
@@ -169,9 +172,10 @@ if __name__ == "__main__":
     # Plot trajectories
     #generator.plot_trajectories(x_noisy)
 
-    from ddmo import identify
-    from ddmo.library_functions import functions_template 
     from typing import Callable, List, Tuple
+
+    from ddmo import identify
+    from ddmo.library_functions import functions_template
 
 
     NamedFunc = Tuple[Callable[[float, float], float], str]

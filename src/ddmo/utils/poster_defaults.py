@@ -1,7 +1,6 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-
-from matplotlib.colors import LinearSegmentedColormap, LogNorm
+from matplotlib.colors import LinearSegmentedColormap
 
 dark_blue = [0./255., 108./255., 102./255.]
 light_green = [198./255., 211./255., 37./255.]

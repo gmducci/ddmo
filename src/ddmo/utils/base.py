@@ -1,5 +1,5 @@
+from collections.abc import Sequence
 from itertools import repeat
-from typing import Sequence
 
 import numpy as np
 from scipy.optimize import bisect
@@ -111,7 +111,7 @@ def validate_control_variables(x, u, trim_last_point=False):
         if u.shape[u.ax_time] != x.shape[x.ax_time]:
             raise ValueError(
                 "control variables u must have same number of rows as x. "
-                "u has {} rows and x has {} rows".format(u.shape[0], len(x))
+                f"u has {u.shape[0]} rows and x has {len(x)} rows"
             )
         return u[:-1] if trim_last_point else u
 
@@ -224,7 +224,7 @@ def get_prox(regularization):
     if regularization.lower() in prox.keys():
         return prox[regularization.lower()]
     else:
-        raise NotImplementedError("{} has not been implemented".format(regularization))
+        raise NotImplementedError(f"{regularization} has not been implemented")
 
 
 def get_regularization(regularization):
@@ -243,7 +243,7 @@ def get_regularization(regularization):
     elif regularization.lower() == "cad":  # dummy function
         return lambda x, lam: 0
     else:
-        raise NotImplementedError("{} has not been implemented".format(regularization))
+        raise NotImplementedError(f"{regularization} has not been implemented")
 
 
 def capped_simplex_projection(trimming_array, trimming_fraction):

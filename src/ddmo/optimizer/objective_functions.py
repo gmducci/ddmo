@@ -1,9 +1,10 @@
 # objective_functions.py
 import numpy as np
-import statsmodels.api as sm
-from sklearn import linear_model, metrics
-from scipy.stats import linregress
 import scipy.stats as stats
+import statsmodels.api as sm
+from scipy.stats import linregress
+from sklearn import metrics
+
 
 def compute_dw_coefficient(Problem, sol):
     """
@@ -29,7 +30,7 @@ def compute_mse(Problem, sol):
     score_fit_matrix = np.zeros((Problem.dimension, Problem.number_initial_conditions))
     for i in range(Problem.number_initial_conditions):
         for j in range(Problem.dimension):
-            
+
             x_raw = np.vstack(Problem.x_raw)
             x_ref = x_raw[i*len(x_raw):(i+1)*len(x_raw), j]
             x_pred = sol[i*len(x_raw):(i+1)*len(x_raw), j]

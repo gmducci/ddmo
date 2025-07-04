@@ -62,7 +62,8 @@ def identify(
     x_dot: np.ndarray,
     t: np.ndarray,
     x0:np.ndarray,
-    bounds: tuple[tuple[float, float], tuple[float, float]],
+    bounds: Tuple[Tuple[float, float], Tuple[float, float]],
+    objective_functions: Dict = None,
     n_objectives: int = 2, # number of objective functions
     n_vars: int = 2, # number of optimization variables
     population_size: int = 20,
@@ -96,18 +97,19 @@ def identify(
     """
 
     from ddmo.optimizer.Pysindy_Solver import Pysindy_Solver
-    problem = Pysindy_Solver(     x_train,
-                                t,
-                                x_dot,
-                                library_object,
-                                x0,
-                                x_raw = x_raw,
-                                optimizer=optimizer,
-                                solver=solver,
-                                solver_parameters = solver_parameters,
-                                scale_theta= scale_theta,
-                                # solver = pysindy, pysindy_weak, scikit
-                                objectives=None)
+    problem = Pysindy_Solver(x_train,
+                            t,
+                            x_dot,
+                            library_object,
+                            x0,
+                            x_raw = x_raw,
+                            optimizer=optimizer,
+                            solver=solver,
+                            solver_parameters = solver_parameters,
+                            scale_theta= scale_theta,
+                            # solver = pysindy, pysindy_weak, scikit
+                            objectives=None,
+                            objective_functions = objective_functions)
 
 
     '''

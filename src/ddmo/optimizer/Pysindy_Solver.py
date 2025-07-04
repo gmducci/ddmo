@@ -1,10 +1,11 @@
 import numpy as np
+import pysindy as ps
 import pymoo.gradient.toolbox as anp
 import pysindy as ps
 from pysindy.optimizers import SR3, STLSQ, ConstrainedSR3, EnsembleOptimizer
 from sklearn.linear_model import Lasso
-
-from .optimizer import Optimizer
+from pysindy.optimizers import STLSQ, SR3, ConstrainedSR3, EnsembleOptimizer
+from .objective_functions import compute_dw_coefficient, compute_mse, compute_ppcc_matrix
 
 
 class Pysindy_Solver(Optimizer):
@@ -19,7 +20,22 @@ class Pysindy_Solver(Optimizer):
                  solver="lasso",
                  solver_parameters={},
                  scale_theta=False,
-                 objectives=None):
+                 objectives=None,
+                 objective_functions=None):
+        
+        '''
+        Initialize the class with sparse algorithm variables.
+
+        Args:
+            x_train (list): Training data with noise. Or pre-smoothed data.
+            time_array (list): time array related to the training data.
+            x_dot (list): numerical derivative of training data. This corresponds to the LHS of the system
+            library_object (callable): Function that returns a list of library functions.
+            x_0 (list): Initial conditions for the system.
+            x_raw (list): Raw training data without noise.
+            optimizer (str): Optimizer to use for the SINDy algorithm. Default is "
+            solver (str): Solver to use for the SINDy algorithm. Default is "lasso".
+        '''
         # forward everything to the parent
         super().__init__(
             x_train=x_train,
@@ -33,12 +49,20 @@ class Pysindy_Solver(Optimizer):
             solver=solver,
             scale_theta=scale_theta,
             objectives=objectives,
+            objective_functions=objective_functions
         )
 
 
-    def _compute_metrics(self, x_row):
-        result = self.solver(x_row)
-        if result[0] is None:
+    def _compute_metrics(self, optimization_variables):
+
+        _objective_functions_dict = {
+            "mse": compute_mse,
+            "dw_coefficient": compute_dw_coefficient,
+            "ppcc_matrix": compute_ppcc_matrix
+        }
+        sol, regression_coeff, opt_vars, model = self.solver(optimization_variables)
+
+        if sol is None:
             return [[np.nan, np.nan, np.nan, np.nan], []]
 
         sol, regression_coeff, opt_vars, model = self.solver(x_row)
@@ -51,8 +75,6 @@ class Pysindy_Solver(Optimizer):
 
         print(f"Objective function values: {objective_funcs}")
         return objective_funcs, sol, regression_coeff, opt_vars, model
-
-
 
     def solver(self, optimization_vars):
         """
@@ -114,7 +136,7 @@ class Pysindy_Solver(Optimizer):
             return x, regression_coeff, opt_vars, model
         except Exception as e:
             print(f"Error during solver execution: {e}")
-            return None, None, None, None, None
+            return None, None, None, None
 
     def _evaluate(self, x, out, *args, **kwargs):
         # Clear previous state

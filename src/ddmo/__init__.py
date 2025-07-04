@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from .main import identify
+from ddmo.main import identify
 
 __all__ = ["identify"]
 

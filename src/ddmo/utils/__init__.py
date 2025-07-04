@@ -1,11 +1,11 @@
-from .axes import (
+from ddmo.axes import (
     AxesArray,
     SampleConcatter,
     comprehend_axes,
     concat_sample_axis,
     wrap_axes,
 )
-from .base import (
+from ddmo.base import (
     capped_simplex_projection,
     drop_nan_samples,
     flatten_2d_tall,
@@ -17,7 +17,7 @@ from .base import (
     validate_input,
     validate_no_reshape,
 )
-from .odes import (
+from ddmo.odes import (
     bacterial,
     burgers_galerkin,
     cubic_damped_SHO,

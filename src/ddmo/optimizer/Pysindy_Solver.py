@@ -1,11 +1,14 @@
 import numpy as np
-import pysindy as ps
 import pymoo.gradient.toolbox as anp
 import pysindy as ps
 from pysindy.optimizers import SR3, STLSQ, ConstrainedSR3, EnsembleOptimizer
 from sklearn.linear_model import Lasso
-from pysindy.optimizers import STLSQ, SR3, ConstrainedSR3, EnsembleOptimizer
-from .objective_functions import compute_dw_coefficient, compute_mse, compute_ppcc_matrix
+
+from ddmo.objective_functions import (
+    compute_dw_coefficient,
+    compute_mse,
+    compute_ppcc_matrix,
+)
 
 
 class Pysindy_Solver(Optimizer):

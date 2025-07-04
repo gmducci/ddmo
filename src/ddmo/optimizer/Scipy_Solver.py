@@ -4,7 +4,7 @@ from scipy.integrate import odeint
 from sklearn import linear_model
 from sklearn.preprocessing import StandardScaler
 
-from .optimizer import Optimizer
+from ddmo.optimizer import Optimizer
 
 # Default hyperparameters for supported regressors
 _DEFAULT_SOLVER_PARAMS: dict[str, dict] = {

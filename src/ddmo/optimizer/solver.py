@@ -2,9 +2,7 @@
 import numpy as np
 import pysindy as ps
 from scipy.integrate import odeint
-from sklearn.preprocessing import (
-    StandardScaler,
-)
+from sklearn.preprocessing import StandardScaler
 
 from ddmo.feature_library.weak_pde_library import WeakPDELibrary
 

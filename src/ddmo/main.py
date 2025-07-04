@@ -62,8 +62,8 @@ def identify(
     x_dot: np.ndarray,
     t: np.ndarray,
     x0:np.ndarray,
-    bounds: Tuple[Tuple[float, float], Tuple[float, float]],
-    objective_functions: Dict = None,
+    bounds: tuple[tuple[float, float], tuple[float, float]],
+    objective_functions: dict = None,
     n_objectives: int = 2, # number of objective functions
     n_vars: int = 2, # number of optimization variables
     population_size: int = 20,

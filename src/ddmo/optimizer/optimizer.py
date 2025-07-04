@@ -6,8 +6,8 @@ import pymoo.gradient.toolbox as anp
 from pymoo.core.problem import Problem
 
 # import statsmodels.api as sm
-from ddmo.objective_functions import compute_dw_coefficient, compute_mse
-from ddmo.solver import solver
+from ddmo.optimizer.objective_functions import compute_dw_coefficient, compute_mse
+from ddmo.optimizer.solver import solver
 
 warnings.filterwarnings("ignore")
 import multiprocessing as mp

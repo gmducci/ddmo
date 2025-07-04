@@ -1,23 +1,24 @@
-from ddmo.axes import (
+# from ddmo.feature_library.base import (
+#     # capped_simplex_projection,
+#     drop_nan_samples,
+#     flatten_2d_tall,
+#     get_prox,
+#     get_regularization,
+#     reorder_constraints,
+#     supports_multiple_targets,
+#     validate_control_variables,
+#     validate_input,
+#     validate_no_reshape,
+# )
+
+from ddmo.utils.axes import (
     AxesArray,
     SampleConcatter,
     comprehend_axes,
     concat_sample_axis,
     wrap_axes,
 )
-from ddmo.base import (
-    capped_simplex_projection,
-    drop_nan_samples,
-    flatten_2d_tall,
-    get_prox,
-    get_regularization,
-    reorder_constraints,
-    supports_multiple_targets,
-    validate_control_variables,
-    validate_input,
-    validate_no_reshape,
-)
-from ddmo.odes import (
+from ddmo.utils.odes import (
     bacterial,
     burgers_galerkin,
     cubic_damped_SHO,

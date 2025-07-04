@@ -4,8 +4,8 @@ from itertools import combinations_with_replacement as combinations_w_r
 from numpy import empty, ones, shape
 from sklearn.utils.validation import check_is_fitted
 
-from ddmo.base import BaseFeatureLibrary, x_sequence_or_item
-from ddmo.utils import AxesArray, comprehend_axes
+from ddmo.feature_library.base import BaseFeatureLibrary, x_sequence_or_item
+from ddmo.utils.axes import AxesArray, comprehend_axes
 
 
 class CustomLibrary(BaseFeatureLibrary):

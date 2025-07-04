@@ -13,7 +13,8 @@ from scipy import sparse
 from sklearn.base import TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
-from ddmo.utils import AxesArray, comprehend_axes, validate_no_reshape, wrap_axes
+from ddmo.utils.axes import AxesArray, comprehend_axes, wrap_axes
+from ddmo.utils.base import validate_no_reshape
 
 
 class BaseFeatureLibrary(TransformerMixin):

@@ -20,13 +20,13 @@ classifiers = [
 ]
 
 dependencies = [
-    "numpy>=2.0",
-    "scipy>=1.6",
-    "matplotlib>=3.3",
-    "pysindy>=0.7",
-    "pymoo>=0.6",
-    "PyWavelets>=1.1",
-    "seaborn>=0.11",
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "pysindy@git+https://github.com/dynamicslab/pysindy",
+    "pymoo",
+    "PyWavelets",
+    "seaborn",
     "pynumdiff",
     "jax",
     "statsmodels@git+https://github.com/statsmodels/statsmodels"

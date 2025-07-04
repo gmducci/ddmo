@@ -33,20 +33,27 @@ build-job: # This job runs in the build stage, which runs first.
     - echo $(pip --version)
   script:
     - pip install .
-
-unit-test-job: # This job runs in the test stage.
-  stage: test # It only starts when the job in the build stage completes successfully.
-  dependencies:
-    - build-job
-  script:
     - pip install pytest coverage --quiet
     - coverage run -m pytest -v --junitxml=junit.xml
-
   artifacts:
     paths:
       - .coverage
     reports:
       junit: junit.xml
+
+# unit-test-job: # This job runs in the test stage.
+#   stage: test # It only starts when the job in the build stage completes successfully.
+# dependencies:
+#   - build-job
+# script:
+#   - pip install pytest coverage --quiet
+#   - coverage run -m pytest -v --junitxml=junit.xml
+
+# artifacts:
+#   paths:
+#     - .coverage
+#   reports:
+#     junit: junit.xml
 
 lint-test-job: # This job also runs in the test stage.
   stage: test # It can run at the same time as unit-test-job (in parallel).

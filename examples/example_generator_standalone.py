@@ -1,29 +1,20 @@
-from pathlib import Path
+from collections.abc import Callable
 from pprint import pprint as pp
-from typing import Callable, List, Tuple
 
-import matplotlib.pyplot as plt
 import numpy as np
-from pymoo.algorithms.moo.nsga2 import NSGA2
-from pymoo.optimize import minimize
-from scipy.integrate import odeint
 
-import ddmo.differentiation.differentiation as diff
 from ddmo import BENCHMARK_FOLDER, identify
-from ddmo.equations import goodwin_eqs
-from ddmo.library_functions import functions_template
-from ddmo.optimizer.optimizer import Optimizer
 
 if __name__ == "__main__":
     x_0_train = np.load(BENCHMARK_FOLDER / 'x_0.npy')
     x_raw = np.load(BENCHMARK_FOLDER / 'x_train_noise.npy')
     x_train= np.load(BENCHMARK_FOLDER / 'x_train.npy')
-    x_dot_hat = np.load(BENCHMARK_FOLDER / 'x_dot_train.npy') 
-    time_array = np.load(BENCHMARK_FOLDER / 'time.npy')   
+    x_dot_hat = np.load(BENCHMARK_FOLDER / 'x_dot_train.npy')
+    time_array = np.load(BENCHMARK_FOLDER / 'time.npy')
     x_dot_gt = np.load(BENCHMARK_FOLDER / 'x_dot_gt.npy')
 
-    NamedFunc = Tuple[Callable[[float, float], float], str]
-    def get_base_functions(params: List[float]) -> List[NamedFunc]:
+    NamedFunc = tuple[Callable[[float, float], float], str]
+    def get_base_functions(params: list[float]) -> list[NamedFunc]:
         alpha, beta = params
         return [
             (lambda x: x, lambda x: x),

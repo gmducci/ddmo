@@ -1,13 +1,7 @@
-import inspect
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pysindy as ps
-from pymoo.algorithms.moo.nsga2 import NSGA2
-from pymoo.optimize import minimize
 from scipy.integrate import odeint
-
-from ddmo.optimizer.optimizer import Optimizer
 
 
 class DataGenerator:
@@ -146,7 +140,6 @@ class DataGenerator:
 # Example usage:
 if __name__ == "__main__":
     from ddmo.equations.plugflow_equation import PlugFlow
-    from ddmo.library_functions.funcs_refactored import FunctionLibrary
 
     # Define parameter ranges and known state dimension
     param_ranges = {'alpha': (1, 4), 'beta': (1, 4)}
@@ -172,20 +165,19 @@ if __name__ == "__main__":
     # Plot trajectories
     #generator.plot_trajectories(x_noisy)
 
-    from typing import Callable, List, Tuple
+    from collections.abc import Callable
 
     from ddmo import identify
-    from ddmo.library_functions import functions_template
 
 
-    NamedFunc = Tuple[Callable[[float, float], float], str]
-    def get_base_functions(params: List[float]) -> List[NamedFunc]:
+    NamedFunc = tuple[Callable[[float, float], float], str]
+    def get_base_functions(params: list[float]) -> list[NamedFunc]:
         alpha, beta = params
         return [
             (lambda x: x, "x"),
             (lambda x, y: x**alpha * y**beta, f"x^{alpha} * y^{beta}")
         ]
-    
+
     # named_funcs = get_base_functions([2.05, 3.05])
     # functions = [f for f, _ in named_funcs]
     # function_names = [lambda *args, name=name: name for _, name in named_funcs]
@@ -216,5 +208,5 @@ if __name__ == "__main__":
         solver='lasso',
         number_generations=5,
         population_size=25)
-    
+
     print(alphas)

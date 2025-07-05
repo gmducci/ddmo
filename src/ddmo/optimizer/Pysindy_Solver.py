@@ -25,7 +25,7 @@ class Pysindy_Solver(Optimizer):
                  scale_theta=False,
                  objectives=None,
                  objective_functions=None):
-        
+
         '''
         Initialize the class with sparse algorithm variables.
 

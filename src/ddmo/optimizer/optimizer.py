@@ -1,19 +1,17 @@
 # optimizer.py
+import multiprocessing as mp
 import warnings
 
 import numpy as np
 import pymoo.gradient.toolbox as anp
+from pymoo.config import Config
 from pymoo.core.problem import Problem
 
-# import statsmodels.api as sm
-from ddmo.optimizer.objective_functions import compute_dw_coefficient, compute_mse
+from ddmo.optimizer.objective_functions import compute_mse
 from ddmo.optimizer.solver import solver
 
+# Configure environment
 warnings.filterwarnings("ignore")
-import multiprocessing as mp
-
-from pymoo.config import Config
-
 Config.warnings['not_compiled'] = False
 mp.set_start_method("fork", force=True)
 

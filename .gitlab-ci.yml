@@ -29,11 +29,21 @@ build-job: # This job runs in the build stage, which runs first.
     - apt-get -qq install -y git gfortran libblas-dev liblapack-dev cmake wget < /dev/null > /dev/null
     - echo "gfortran" $(gfortran -dumpfullversion) "from" $(which gfortran)
 
-    - python -m pip install  --upgrade pip --quiet
-    - echo $(pip --version)
+    - pip install uv --quiet
+    - echo $(uv --version)
   script:
-    - pip install .
-    - pip install pytest coverage --quiet
+    - uv pip install .
+
+unit-test-job: # This job runs in the test stage.
+  stage: test # It only starts when the job in the build stage completes successfully.
+  image: python:3.11
+  before_script:
+    - apt-get -qq update
+    - apt-get -qq install -y git gfortran libblas-dev liblapack-dev cmake wget < /dev/null > /dev/null
+    - pip install uv --quiet
+    - uv pip install . --quiet # Install the project and its dependencies
+  script:
+    - uv pip install pytest coverage --quiet
     - coverage run -m pytest -v --junitxml=junit.xml
   artifacts:
     paths:
@@ -41,26 +51,20 @@ build-job: # This job runs in the build stage, which runs first.
     reports:
       junit: junit.xml
 
-# unit-test-job: # This job runs in the test stage.
-#   stage: test # It only starts when the job in the build stage completes successfully.
-# dependencies:
-#   - build-job
-# script:
-#   - pip install pytest coverage --quiet
-#   - coverage run -m pytest -v --junitxml=junit.xml
-
-# artifacts:
-#   paths:
-#     - .coverage
-#   reports:
-#     junit: junit.xml
-
 lint-test-job: # This job also runs in the test stage.
   stage: test # It can run at the same time as unit-test-job (in parallel).
+  image: python:3.11
+  before_script:
+    - apt-get -qq update
+    - apt-get -qq install -y git gfortran libblas-dev liblapack-dev cmake wget < /dev/null > /dev/null
+    - pip install ruff
+    - ruff --version
   script:
-    - echo "Linting code... This will take about 10 seconds."
-    - sleep 10
-    - echo "No lint issues found."
+    - echo "Running Ruff linter..."
+    - ruff check --output-format=github dsko
+    - echo "Running Ruff formatter check..."
+    - ruff format --check dsko
+  allow_failure: true # This job can fail without affecting the pipeline status.
 
 deploy-job: # This job runs in the deploy stage.
   stage: deploy # It only runs when *both* jobs in the test stage complete successfully.

@@ -198,8 +198,4 @@ class Pysindy_Solver(Optimizer):
         out["coeff_matrix"] =  np.asarray(coeff_matrices, dtype=object)
         out["alphas"] = np.asarray(alphas, dtype=object)
         out["dw_coeff"] = dw_stats
-<<<<<<< HEAD
         out['models'] = models
-=======
-        out['models'] = models
->>>>>>> 1-improve-architecture-of-the-code

@@ -26,7 +26,7 @@ if __name__ == "__main__":
     x_0 = [x_0_train]
     problem, res, obj_space, solutions, coeff_matrices, alphas, sindy_model = identify(
         x_train = x_train[40:-40,:],
-        x_raw=x_raw[40:-40,:],
+        x_raw=x_raw, # here the full raw data is used.
         x_dot=x_dot_hat[40:-40,:],
         t = time_array,
         x0=x_0,
@@ -37,9 +37,9 @@ if __name__ == "__main__":
         n_vars=2,
         optimizer='STLSQ',
         solver_parameters={
-            "threshold": 0.001},
+            "threshold": 0.05},
         solver='lasso',
         number_generations=5,
-        population_size=25)
+        population_size=15)
 
-    pp(alphas)
+    print(alphas)

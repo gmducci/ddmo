@@ -132,10 +132,8 @@ def identify(
 
     problem.n_obj = n_objectives
     problem.n_var = n_vars
-    if isinstance(x0[0], (list, tuple)):
-        problem.dimension = len(x0[0])
-    else:
-        problem.dimension = len(x0)
+    
+    problem.dimension = len(x_raw[0, :])  # Number of variables in the system
     problem.xl = bounds[0]
     problem.xu = bounds[1]
 

@@ -3,8 +3,8 @@ import pymoo.gradient.toolbox as anp
 import pysindy as ps
 from pysindy.optimizers import SR3, STLSQ, ConstrainedSR3, EnsembleOptimizer
 from sklearn.linear_model import Lasso
-
-from ddmo.objective_functions import (
+from ddmo.optimizer.optimizer import Optimizer
+from ddmo.optimizer.objective_functions import (
     compute_dw_coefficient,
     compute_mse,
     compute_ppcc_matrix,
@@ -68,7 +68,7 @@ class Pysindy_Solver(Optimizer):
         if sol is None:
             return [[np.nan, np.nan, np.nan, np.nan], []]
 
-        sol, regression_coeff, opt_vars, model = self.solver(x_row)
+        sol, regression_coeff, opt_vars, model = self.solver(optimization_variables)
         objective_funcs = []
         for obj_func in self.objectives:
             try:

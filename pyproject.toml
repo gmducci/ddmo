@@ -23,7 +23,7 @@ dependencies = [
     "numpy",
     "scipy",
     "matplotlib",
-    "pysindy@git+https://github.com/dynamicslab/pysindy",
+    "pysindy==1.7.5",
     "pymoo",
     "PyWavelets",
     "seaborn",

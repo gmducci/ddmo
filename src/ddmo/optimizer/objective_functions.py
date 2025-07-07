@@ -13,17 +13,19 @@ def compute_dw_coefficient(Problem, sol):
     """
     dw_matrix = np.zeros((Problem.dimension, Problem.number_initial_conditions))
     x_raw = np.vstack(Problem.x_raw)
-    t_len = len(Problem.x_raw[0])  # Assuming all initial conditions have the same length
+    t_len = len(x_raw)  # Assuming all initial conditions have the same length
 
     for i in range(Problem.number_initial_conditions):
         for j in range(Problem.dimension):
             x_ref = x_raw[i * t_len:(i + 1) * t_len, j]
             x_pred = sol[i * t_len:(i + 1) * t_len, j]
             residuals = x_ref - x_pred
-            dw_matrix[j, i] = np.abs(sm.stats.stattools.durbin_watson(residuals) - 2)
+            dw_matrix[j, i] = np.abs(sm.stats.stattools.durbin_watson(residuals))
 
     dw_stat = np.min(dw_matrix)
-    return dw_stat
+
+    dw_measure = 2 - dw_stat
+    return dw_measure
 
 def compute_mse(Problem, sol):
 

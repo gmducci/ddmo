@@ -7,7 +7,7 @@ import pymoo.gradient.toolbox as anp
 from pymoo.config import Config
 from pymoo.core.problem import Problem
 
-from ddmo.optimizer.objective_functions import compute_mse
+from ddmo.optimizer.objective_functions import compute_mse, compute_dw_coefficient
 from ddmo.optimizer.solver import solver
 
 # Configure environment
@@ -54,9 +54,9 @@ class Optimizer(Problem):
         self.optimizer = optimizer
         self.solver_parameters = solver_parameters,
         self.scale_theta = scale_theta
-        self.dimension = len(x_train[0])
+        self.dimension = 3 #len(x_raw[0, :])
         self.number_initial_conditions = len(x_0)
-        self.objectives = objectives if objectives is not None else [compute_mse, compute_mse]
+        self.objectives = objectives if objectives is not None else [compute_mse, compute_dw_coefficient]
         self.objective_functions = objective_functions,
         self.n_obj = len(self.objectives)
 
@@ -100,7 +100,7 @@ class Optimizer(Problem):
 
         dw_stats = np.asarray(obj_arrays[:, 1])
 
-        max_dw_stats = 2 - min(dw_stats)
+        max_dw_stats = min(dw_stats)
 
         # Monitoring print message
         message = (

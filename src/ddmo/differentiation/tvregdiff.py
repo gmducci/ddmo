@@ -76,14 +76,12 @@ POSSIBILITY OF SUCH DAMAGE.
 #########################################################
 """
 
-import sys
 
 import logging
+
 import numpy as np
-import scipy as sp
 from scipy import sparse
 from scipy.sparse import linalg as splin
-from scipy.optimize import minimize
 
 _has_matplotlib = True
 try:
@@ -97,10 +95,8 @@ except ImportError:
 def log_iteration(ii, s0, u, g):
     relative_change = np.linalg.norm(s0) / np.linalg.norm(u)
     g_norm = np.linalg.norm(g)
-    logging.info('iteration {0:4d}: relative change = {1:.3e}, '
-                 'gradient norm = {2:.3e}\n'.format(ii,
-                                                    relative_change,
-                                                    g_norm))
+    logging.info(f'iteration {ii:4d}: relative change = {relative_change:.3e}, '
+                 f'gradient norm = {g_norm:.3e}\n')
 
 
 def TVRegDiff(data, itern, alph, u0=None, scale='small', ep=1e-6, dx=None,
@@ -364,10 +360,10 @@ def TVRegDiff(data, itern, alph, u0=None, scale='small', ep=1e-6, dx=None,
 if __name__ == "__main__":
 
     # Command line operation
+    import matplotlib
+    import matplotlib.pyplot as plt
     import numpy as np
     from scipy.integrate import odeint
-    import matplotlib.pyplot as plt
-    import matplotlib
 
     matplotlib.use('Qt5Agg')
     import pylops

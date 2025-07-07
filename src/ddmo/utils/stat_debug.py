@@ -1,13 +1,13 @@
-import random
 
+import warnings
+
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib
-import warnings
-import os
-import statsmodels.api as sm
 import scipy.stats as stats
+import statsmodels.api as sm
 from scipy.stats import linregress
+
 warnings.filterwarnings("ignore")
 
 

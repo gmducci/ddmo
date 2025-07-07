@@ -1,16 +1,14 @@
-import matplotlib.pyplot as plt
-import torch
-from torch.utils.data import DataLoader, TensorDataset
-from ddmo.equations import plugflow_equation, goodwin_eqs
-from scipy.integrate import odeint
-import ddmo.differentiation.differentiation as diff
 import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
 import torch
-from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
 import torch.optim as optim
-import numpy as np
 from scipy.integrate import odeint
+from torch.utils.data import DataLoader, Dataset
+
+import ddmo.differentiation.differentiation as diff
+from ddmo.equations import goodwin_eqs, plugflow_equation
 
 matplotlib.use('Qt5Agg')
 # Assume X_train and Y_train are your input and output data for training

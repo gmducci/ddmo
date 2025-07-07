@@ -1,0 +1,125 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ddmo"
+version = "0.1.0"
+description = "Data-Driven Model Optimization: Discover differential equations from data using sparse regression and multi-objective optimization."
+readme = "README.md"
+authors = [
+    {name = "Your Name", email = "your.email@example.com"},
+]
+license = {text = "MIT"}
+requires-python = ">=3.10, <4"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "pysindy==1.7.5",
+    "pymoo",
+    "PyWavelets",
+    "seaborn",
+    "pynumdiff",
+    "jax",
+    "statsmodels@git+https://github.com/statsmodels/statsmodels"
+]
+
+[project.optional-dependencies]
+# docs = ['sphinx', 'sphinx_rtd_theme', 'pillow']
+dev = [
+    'pytest>=7.0.0',
+    'pytest-xdist>=2.1.0',
+    'coverage>=6.0.0',
+    'ruff']
+
+[project.urls]
+Homepage = "https://github.com/FHI-theory/ddmo"
+
+[project.scripts]
+ddmo = "ddmo.main:main"
+
+[tool.ruff.lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
+# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+# McCabe complexity (`C901`) by default.
+select = [
+    "E",    # pycodestyle
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "W"     # pycodestyle
+]
+
+ignore = [
+    "E501",     # Line too long (Black-compatible)
+    "N801",     # Variable name should be lowercase
+    "N802",     # Function name should be lowercase
+    "N803",     # Argument name should be lowercase
+    "N806",     # Variable in function should be lowercase
+    "N817",     # Camel-case name for a class name, not an acronym
+    "N999",     # Acronym in name of the module
+]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Use double quotes for strings.
+quote-style = "preserve"
+
+# Indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Automatically detect the appropriate line ending.
+line-ending = "auto"
+
+# Enable auto-formatting of code examples in docstrings. Markdown,
+# reStructuredText code/literal blocks and doctests are all supported.
+#
+# This is currently disabled by default, but it is planned for this
+# to be opt-out in the future.
+docstring-code-format = false
+
+# Set the line length limit used when formatting code snippets in
+# docstrings.
+#
+# This only has an effect when the `docstring-code-format` setting is
+# enabled.
+docstring-code-line-length = "dynamic"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["ddmo", "ddmo.*"]
+
+[tool.setuptools.package-data]
+ddmo = [
+    "dataset_benchmark/**",
+    "examples/**",
+    "tests/**",
+]
+
+# dsko = [
+#     "examples/**",
+#     "skgenerators/skdef.hsd.template",
+#     "skgenerators/tests/inputs/**",
+#     "tests/inputs/**",
+# ]

@@ -1,4 +1,6 @@
 import numpy as np
+
+
 class PlugFlow:
     def __init__(self, k0=0, k12=0.2, alpha = 2, beta = 3, v0 = .1):
         self.k0 = k0

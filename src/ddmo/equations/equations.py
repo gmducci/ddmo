@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class GoodwinModel:
     def __init__(self, k1=1, k2=0.2, k3=1, k4=0.15, k5=1, k6=0.1,
                  K1=1, K2=1, K4=1, K6=1, n=9.5, perturbation=False):

@@ -1,23 +1,17 @@
 # optimizer.py
-from sklearn import linear_model, metrics
-from sklearn.utils import resample
-import scipy.stats as stats
-from pymoo.core.problem import Problem
-import pymoo.gradient.toolbox as anp
-import numpy as np
-from scipy.integrate import odeint
-import multiprocessing
-import statsmodels.api as sm
-from sklearn.metrics import r2_score
-from sklearn.preprocessing import normalize, StandardScaler, RobustScaler, QuantileTransformer
-from scipy.stats import linregress
-from .solver import solver
-from .objective_functions import compute_dw_coefficient, compute_mse, compute_ppcc_matrix
-import pysindy as ps
-import warnings
-warnings.filterwarnings("ignore")
-from pymoo.config import Config
 import multiprocessing as mp
+import warnings
+
+import numpy as np
+import pymoo.gradient.toolbox as anp
+from pymoo.config import Config
+from pymoo.core.problem import Problem
+
+from ddmo.optimizer.objective_functions import compute_mse, compute_dw_coefficient
+from ddmo.optimizer.solver import solver
+
+# Configure environment
+warnings.filterwarnings("ignore")
 Config.warnings['not_compiled'] = False
 mp.set_start_method("fork", force=True)
 
@@ -33,7 +27,8 @@ class Optimizer(Problem):
                  solver="lasso",
                  solver_parameters={},
                  scale_theta=False,
-                 objectives=None):
+                 objectives=None,
+                 objective_functions=None):
 
         """Initialize the class with sparse algorithm variables.
 
@@ -48,7 +43,7 @@ class Optimizer(Problem):
                         n_ieq_constr=0,
                         xl = 0.,
                         xu = 1., vtype=float)
-        
+
         self.x_train = x_train
         self.time_array = time_array
         self.initial_values = x_0
@@ -59,9 +54,10 @@ class Optimizer(Problem):
         self.optimizer = optimizer
         self.solver_parameters = solver_parameters,
         self.scale_theta = scale_theta
-        self.dimension = len(x_train[0])
-        self.number_initial_conditions = len(x_0) # Input i.c. as list of lists and automiatically set this to the number of initial conditions
+        self.dimension = 3 #len(x_raw[0, :])
+        self.number_initial_conditions = len(x_0)
         self.objectives = objectives if objectives is not None else [compute_mse, compute_dw_coefficient]
+        self.objective_functions = objective_functions,
         self.n_obj = len(self.objectives)
 
         self.coefficient_matrix = []
@@ -104,7 +100,7 @@ class Optimizer(Problem):
 
         dw_stats = np.asarray(obj_arrays[:, 1])
 
-        max_dw_stats = 2 - min(dw_stats)
+        max_dw_stats = min(dw_stats)
 
         # Monitoring print message
         message = (

@@ -1,16 +1,7 @@
-import numpy
+
 import numpy as np
-from scipy.integrate import odeint, solve_ivp
-import pandas
-import seaborn
-import pywt
 import pynumdiff
 import pynumdiff.optimize
-from scipy.optimize import minimize
-from multiprocessing import Pool
-import multiprocessing as mp
-from concurrent.futures import ProcessPoolExecutor
-from concurrent.futures import ThreadPoolExecutor
 
 
 def get_derivative(x_train, time_array, optimization=True):

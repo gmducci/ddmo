@@ -1,13 +1,15 @@
-from ..feature_library.weak_pde_library import WeakPDELibrary
-from .optimizer import Optimizer
 import numpy as np
-import pysindy as ps
-from sklearn.preprocessing import normalize, StandardScaler, RobustScaler, QuantileTransformer
-from scipy.integrate import odeint
-from sklearn import linear_model, metrics
 import pymoo.gradient.toolbox as anp
+import pysindy as ps
+from pysindy.optimizers import SR3, STLSQ, ConstrainedSR3, EnsembleOptimizer
 from sklearn.linear_model import Lasso
-from pysindy.optimizers import STLSQ, SR3, ConstrainedSR3, EnsembleOptimizer
+from ddmo.optimizer.optimizer import Optimizer
+from ddmo.optimizer.objective_functions import (
+    compute_dw_coefficient,
+    compute_mse,
+    compute_ppcc_matrix,
+)
+
 
 class Pysindy_Solver(Optimizer):
     def __init__(self,
@@ -21,7 +23,22 @@ class Pysindy_Solver(Optimizer):
                  solver="lasso",
                  solver_parameters={},
                  scale_theta=False,
-                 objectives=None):
+                 objectives=None,
+                 objective_functions=None):
+
+        '''
+        Initialize the class with sparse algorithm variables.
+
+        Args:
+            x_train (list): Training data with noise. Or pre-smoothed data.
+            time_array (list): time array related to the training data.
+            x_dot (list): numerical derivative of training data. This corresponds to the LHS of the system
+            library_object (callable): Function that returns a list of library functions.
+            x_0 (list): Initial conditions for the system.
+            x_raw (list): Raw training data without noise.
+            optimizer (str): Optimizer to use for the SINDy algorithm. Default is "
+            solver (str): Solver to use for the SINDy algorithm. Default is "lasso".
+        '''
         # forward everything to the parent
         super().__init__(
             x_train=x_train,
@@ -35,16 +52,23 @@ class Pysindy_Solver(Optimizer):
             solver=solver,
             scale_theta=scale_theta,
             objectives=objectives,
+            objective_functions=objective_functions
         )
 
 
     def _compute_metrics(self, optimization_variables):
 
+        _objective_functions_dict = {
+            "mse": compute_mse,
+            "dw_coefficient": compute_dw_coefficient,
+            "ppcc_matrix": compute_ppcc_matrix
+        }
         sol, regression_coeff, opt_vars, model = self.solver(optimization_variables)
 
         if sol is None:
             return [[np.nan, np.nan, np.nan, np.nan], []]
 
+        sol, regression_coeff, opt_vars, model = self.solver(optimization_variables)
         objective_funcs = []
         for obj_func in self.objectives:
             try:
@@ -54,8 +78,6 @@ class Pysindy_Solver(Optimizer):
 
         print(f"Objective function values: {objective_funcs}")
         return objective_funcs, sol, regression_coeff, opt_vars, model
-
-    
 
     def solver(self, optimization_vars):
         """
@@ -77,7 +99,7 @@ class Pysindy_Solver(Optimizer):
         self.alphas.append(opt_vars)
         if np.isscalar(opt_vars) or isinstance(opt_vars, np.float64):
             opt_vars = (opt_vars,)
-        
+
         named_funcs = self.library_object([*opt_vars])
         functions = [f for f, _ in named_funcs]
         function_names = [name for _, name in named_funcs]
@@ -91,7 +113,7 @@ class Pysindy_Solver(Optimizer):
         params_dict = self.solver_parameters[0]
         optimizer = _optimizers[self.optimizer](**params_dict)
 
-          # Increase threshold to enforce more sparsity
+        # Increase threshold to enforce more sparsity
         try:
 
             model = ps.SINDy(feature_library=lib_custom, optimizer=optimizer)
@@ -117,7 +139,7 @@ class Pysindy_Solver(Optimizer):
             return x, regression_coeff, opt_vars, model
         except Exception as e:
             print(f"Error during solver execution: {e}")
-            return None, None, None, None, None
+            return None, None, None, None
 
     def _evaluate(self, x, out, *args, **kwargs):
         # Clear previous state
@@ -136,7 +158,7 @@ class Pysindy_Solver(Optimizer):
         solutions = []
         coeff_matrices = []
         alphas = []
-        models = [] 
+        models = []
 
         for res in results:
             if (
@@ -176,4 +198,8 @@ class Pysindy_Solver(Optimizer):
         out["coeff_matrix"] =  np.asarray(coeff_matrices, dtype=object)
         out["alphas"] = np.asarray(alphas, dtype=object)
         out["dw_coeff"] = dw_stats
+<<<<<<< HEAD
         out['models'] = models
+=======
+        out['models'] = models
+>>>>>>> 1-improve-architecture-of-the-code

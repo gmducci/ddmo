@@ -1,17 +1,12 @@
 # functions.py
-import numpy
+from collections.abc import Callable
+
 import numpy as np
-import pywt
-import pynumdiff
-import pynumdiff.optimize
-from scipy.optimize import minimize
-from typing import List, Tuple, Callable
 
-
-NamedFunc = Tuple[Callable[[float, float], float], str]
+NamedFunc = tuple[Callable[[float, float], float], str]
 
 class LibraryFunctions:
-    def __init__(self, function_generator: Callable[[float, float], List[NamedFunc]]):
+    def __init__(self, function_generator: Callable[[float, float], list[NamedFunc]]):
         """
         Parameters
         ----------
@@ -19,7 +14,7 @@ class LibraryFunctions:
             A function like poly_family(max_degree), which returns a function f(alpha, beta)
         """
         self.function_generator = function_generator
-        self.basis_functions: List[NamedFunc] = []
+        self.basis_functions: list[NamedFunc] = []
 
     def generate_functions(self, alpha: float, beta: float):
         """
@@ -46,7 +41,7 @@ class LibraryFunctions:
             X[:, j] = np.array([func(x, y) for x, y in data])
         return X
 
-    def get_labels(self) -> List[str]:
+    def get_labels(self) -> list[str]:
         return [label for _, label in self.basis_functions]
 
 
@@ -56,10 +51,10 @@ class LibraryFunctions_bak:
         self.function_list = function_list
     def _functions(self, alpha, beta = None, gamma = None):
         return self.function_list(alpha)
-    
+
     def evaluate_poly_family(
         data: np.ndarray,
-        poly_funcs: List[Tuple[callable, str]]
+        poly_funcs: list[tuple[callable, str]]
     ) -> np.ndarray:
         """
         Evaluates the functions from poly_family on a dataset.
@@ -122,9 +117,9 @@ class LibraryFunctions_bak:
         theta = self.get_theta_raw(ssp, matrices[0])
         #theta = [lib[0](x), lib[1](y), lib[2](z), lib[3](z), lib[4](x, y), lib[5](x), lib[6](x, z)]
         rhs = theta @ coeff_matrix
-        
+
         return rhs
-    
+
 class LibrarySindy:
 
     def __init__(self, library, function_list = None):

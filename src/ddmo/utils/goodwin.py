@@ -1,7 +1,8 @@
+import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import odeint
-import matplotlib.pyplot as plt
-import matplotlib
+
 matplotlib.use('Qt5Agg')
 
 # Goodwin class

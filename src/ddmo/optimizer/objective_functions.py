@@ -6,17 +6,17 @@ from scipy.stats import linregress
 from sklearn import metrics
 
 
-def compute_dw_coefficient(Problem, sol):
+def compute_dw_coefficient(DataConstructor, sol):
     """
     Computes the Durbin-Watson statistic for residuals between reference and predicted values.
     Returns the maximum absolute deviation from 2 across all dimensions and initial conditions.
     """
-    dw_matrix = np.zeros((Problem.dimension, Problem.number_initial_conditions))
-    x_raw = np.vstack(Problem.x_raw)
+    dw_matrix = np.zeros((DataConstructor.dimension, DataConstructor.number_initial_conditions))
+    x_raw = np.vstack(DataConstructor.x_raw)
     t_len = len(x_raw)  # Assuming all initial conditions have the same length
 
-    for i in range(Problem.number_initial_conditions):
-        for j in range(Problem.dimension):
+    for i in range(DataConstructor.number_initial_conditions):
+        for j in range(DataConstructor.dimension):
             x_ref = x_raw[i * t_len:(i + 1) * t_len, j]
             x_pred = sol[i * t_len:(i + 1) * t_len, j]
             residuals = x_ref - x_pred
@@ -27,13 +27,13 @@ def compute_dw_coefficient(Problem, sol):
     dw_measure = 2 - dw_stat
     return dw_measure
 
-def compute_mse(Problem, sol):
+def compute_mse(DataConstructor, sol):
 
-    score_fit_matrix = np.zeros((Problem.dimension, Problem.number_initial_conditions))
-    for i in range(Problem.number_initial_conditions):
-        for j in range(Problem.dimension):
+    score_fit_matrix = np.zeros((DataConstructor.dimension, DataConstructor.number_initial_conditions))
+    for i in range(DataConstructor.number_initial_conditions):
+        for j in range(DataConstructor.dimension):
 
-            x_raw = np.vstack(Problem.x_raw)
+            x_raw = np.vstack(DataConstructor.x_raw)
             x_ref = x_raw[i*len(x_raw):(i+1)*len(x_raw), j]
             x_pred = sol[i*len(x_raw):(i+1)*len(x_raw), j]
             score_fit_matrix[j, i] = metrics.mean_squared_error(x_ref, x_pred)
@@ -42,24 +42,24 @@ def compute_mse(Problem, sol):
 
     return score_fit
 
-def compute_ppcc_matrix(Problem, sol, metric = "quantiles"):
+def compute_ppcc_matrix(DataConstructor, sol, metric = "quantiles"):
 
-    ppcc_matrix = np.zeros((Problem.dimension, Problem.number_initial_conditions))
-    slope_qq_plot = np.zeros((Problem.dimension, Problem.number_initial_conditions))
-    intercept_qq_plot = np.zeros((Problem.dimension, Problem.number_initial_conditions))
+    ppcc_matrix = np.zeros((DataConstructor.dimension, DataConstructor.number_initial_conditions))
+    slope_qq_plot = np.zeros((DataConstructor.dimension, DataConstructor.number_initial_conditions))
+    intercept_qq_plot = np.zeros((DataConstructor.dimension, DataConstructor.number_initial_conditions))
     # calculate the pij element of P
-    for i in range(Problem.number_initial_conditions):
-        for j in range(Problem.dimension):
+    for i in range(DataConstructor.number_initial_conditions):
+        for j in range(DataConstructor.dimension):
 
-            x_ref = Problem.x_raw[i*len(Problem.time_array):(i+1)*len(Problem.time_array), j]
-            x_pred = sol[i*len(Problem.time_array):(i+1)*len(Problem.time_array), j]
+            x_ref = DataConstructor.x_raw[i*len(DataConstructor.time_array):(i+1)*len(DataConstructor.time_array), j]
+            x_pred = sol[i*len(DataConstructor.time_array):(i+1)*len(DataConstructor.time_array), j]
 
             residuals = x_ref - x_pred
 
             # De-trend the residuals, to compute the theoretical quantile
-            slope_drift, intercept, _, _, _ = linregress(Problem.time_array, residuals)
+            slope_drift, intercept, _, _, _ = linregress(DataConstructor.time_array, residuals)
 
-            drift = slope_drift * Problem.time_array + intercept
+            drift = slope_drift * DataConstructor.time_array + intercept
             corrected_residuals = residuals - drift
 
             # Compute the PP plot btw the theoretical quantile, and the residuals

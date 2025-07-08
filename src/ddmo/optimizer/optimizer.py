@@ -7,123 +7,148 @@ import pymoo.gradient.toolbox as anp
 from pymoo.config import Config
 from pymoo.core.problem import Problem
 
-from ddmo.optimizer.objective_functions import compute_mse, compute_dw_coefficient
+from ddmo.optimizer.objective_functions import (
+    compute_dw_coefficient,
+    compute_mse,
+    compute_ppcc_matrix,
+)
 from ddmo.optimizer.solver import solver
+from dataclasses import dataclass
+from typing import Optional, Any
+import numpy as np
+from typing import Callable
 
 # Configure environment
 warnings.filterwarnings("ignore")
 Config.warnings['not_compiled'] = False
 mp.set_start_method("fork", force=True)
 
+@dataclass
+class EvaluationResult:
+    obj_func_score: list[float]
+    solution: Optional[Any]
+    regression_coefficients: Optional[Any]
+    opt_vars: np.ndarray
+    symbolic_model: Optional[Any] = None
+
 class Optimizer(Problem):
     def __init__(self,
-                 x_train,
-                 time_array,
-                 x_dot,
-                 library_object,
-                 x_0,
-                 x_raw,
-                 optimizer="STLSQ",
-                 solver="lasso",
-                 solver_parameters={},
-                 scale_theta=False,
+                 data_constructor: Any,
+                 solver: Callable,
                  objectives=None,
                  objective_functions=None):
 
-        """Initialize the class with sparse algorithm variables.
-
-        Args:
-            x_train_noise (list): Training data with noise. Or pre-smoothed data.
-            time_array (list): time array related to the training data.
-            x_dot (list): numerical derivative of training data. This corresponds to the LHS of the system
-        """
-
         super().__init__(n_var=1,
-                        n_obj= None,
-                        n_ieq_constr=0,
-                        xl = 0.,
-                        xu = 1., vtype=float)
-
-        self.x_train = x_train
-        self.time_array = time_array
-        self.initial_values = x_0
-        self.x_dot = x_dot
-        self.library_object = library_object
-        self.x_raw = x_raw
-        self.model_type = solver
-        self.optimizer = optimizer
-        self.solver_parameters = solver_parameters,
-        self.scale_theta = scale_theta
-        self.dimension = 3 #len(x_raw[0, :])
-        self.number_initial_conditions = len(x_0)
+                         n_obj=None,
+                         n_ieq_constr=0,
+                         xl=0.,
+                         xu=1.,
+                         vtype=float)
+        
+        self.data_constructor = data_constructor
+        self.solver = solver
         self.objectives = objectives if objectives is not None else [compute_mse, compute_dw_coefficient]
-        self.objective_functions = objective_functions,
+        self.objective_functions = objective_functions
         self.n_obj = len(self.objectives)
 
         self.coefficient_matrix = []
         self.alphas = []
         self.results = []
         self.solution = []
+    def _compute_metrics(self, optimization_variables, *args):
 
-    def _compute_metrics(self, x_row, regression):
+        _objective_functions_dict = {
+            "mse": compute_mse,
+            "dw_coefficient": compute_dw_coefficient,
+            "ppcc_matrix": compute_ppcc_matrix
+        }
 
-        sol, x_ref, regression_coeff, opt_vars = solver(self, x_row, regression)
+
+        sol, regression_coeff, opt_vars, model = self.solver(optimization_variables)
+        if sol is None:
+            return EvaluationResult(
+                obj_func_score=[np.nan] * self.n_obj,
+                solution=None,
+                regression_coefficients=None,
+                opt_vars=np.array([np.nan]),
+                symbolic_model=None
+    )
+        
+        sol, regression_coeff, opt_vars, model = self.solver(optimization_variables)
         objective_funcs = []
         for obj_func in self.objectives:
             try:
-                objective_funcs.append(obj_func(self, sol))
+                objective_funcs.append(obj_func(self.data_constructor, sol))
             except Exception:
                 objective_funcs.append(1e5)
 
         print(f"Objective function values: {objective_funcs}")
-        return objective_funcs, sol, regression_coeff, opt_vars
-
+        return EvaluationResult(
+            obj_func_score=objective_funcs,
+            solution=sol,
+            regression_coefficients=regression_coeff,
+            opt_vars=opt_vars,
+            symbolic_model=model
+        )
+    
     def _evaluate(self, x, out, *args, **kwargs):
+        # Clear previous state
         self.coefficient_matrix.clear()
         self.alphas.clear()
         self.results.clear()
         self.solution.clear()
 
-        coefficient_matrix = []
-        coefficient_matrix.clear()
         flat_x = [tuple(row) for row in x]
-        f = [self._compute_metrics(xi, regression) for xi in flat_x]
+        # Run model on each candidate
+        results = [self._compute_metrics(xi) for xi in flat_x]
 
+        # Initialize containers with fallback values
+        objectives = []
+        solutions = []
+        coeff_matrices = []
+        alphas = []
+        models = []
 
-        objectives = [fi[0] for fi in f]
-        data = [row if row else [np.nan, np.nan] for row in objectives]
-        obj_arrays = np.array(data)
-        solution = [fi[1] for fi in f]
-        coeff_matrix = [fi[2] for fi in f]
-        alpha = [fi[3] for fi in f]
+        for res in results:
+            if (
+                res is not None and
+                res.obj_func_score is not None and
+                not np.all(np.isnan(res.obj_func_score))
+            ):
+                obj = res.obj_func_score
+                sol = res.solution
+                coeff = res.regression_coefficients
+                alpha = res.opt_vars
+                sindy_model = res.symbolic_model
+            else:
+                obj = [np.inf] * self.n_obj
+                sol = None
+                coeff = None
+                alpha = np.array([np.nan])
+                sindy_model = None
 
+            objectives.append(obj)
+            solutions.append(sol)
+            coeff_matrices.append(coeff)
+            alphas.append(alpha)
+            models.append(sindy_model)
 
-        dw_stats = np.asarray(obj_arrays[:, 1])
+        # Convert to numpy arrays
+        obj_arrays = np.array(objectives, dtype=float)
+        dw_stats = obj_arrays[:, 1]
+        max_dw_stats = 2 - np.nanmin(dw_stats)
 
-        max_dw_stats = min(dw_stats)
-
-        # Monitoring print message
-        message = (
+        # Monitoring output
+        print(
             f"+{'-' * 60}+\n"
             f"| DW statistic monitoring: Maximum value = {max_dw_stats:.4f} |\n"
             f"+{'-' * 60}+"
         )
 
-        print(message)
-        names = []
-        funct_d = []
-
-        # for alpha_ in np.asarray(alpha):
-
-        #     names.append(np.asarray(self.library_object._functions(alpha_)[1]))
-
-        #     funct_d.append(np.asarray(self.library_object._functions(alpha_)[2]))
-
-        out["F"] = anp.column_stack([obj_arrays[:, 0],  obj_arrays[:, 1]])
-
-        solution = np.asanyarray(solution)
-        lasso_coeff = np.asanyarray(coeff_matrix)
-        out.__setitem__("solution", solution)
-        out.__setitem__("coeff_matrix", lasso_coeff)
-        out.__setitem__("alphas", np.asarray(alpha))
-        out.__setitem__("dw_coeff", dw_stats)
+        # Store output
+        out["F"] = anp.column_stack([obj_arrays[:, 0], dw_stats])
+        out["solution"] = np.asarray(solutions, dtype=object)
+        out["coeff_matrix"] =  np.asarray(coeff_matrices, dtype=object)
+        out["alphas"] = np.asarray(alphas, dtype=object)
+        out["dw_coeff"] = dw_stats
+        out['models'] = models

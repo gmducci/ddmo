@@ -57,11 +57,7 @@ NamedFunc = tuple[Callable[..., float], str]
 
 
 def identify(
-    x_train: np.ndarray, # it can be equal to x, but we can also use a smoothed version
-    x_raw: np.ndarray, # raw data, used for initial conditions
-    x_dot: np.ndarray,
-    t: np.ndarray,
-    x0:np.ndarray,
+    data_constructor: classmethod,
     bounds: tuple[tuple[float, float], tuple[float, float]],
     objective_functions: dict = None,
     n_objectives: int = 2, # number of objective functions
@@ -69,7 +65,6 @@ def identify(
     population_size: int = 20,
     number_generations: int = 10,
     optimizer: str = "stlsq",  # 'pysindy', 'pysindy_weak', 'scikit'
-    solver: str = "lasso",
     solver_parameters: dict = {},
     scale_theta: bool = True,
     weak_form: bool = False,
@@ -97,43 +92,24 @@ def identify(
     """
 
     from ddmo.optimizer.Pysindy_Solver import Pysindy_Solver
-    problem = Pysindy_Solver(x_train,
-                            t,
-                            x_dot,
-                            library_object,
-                            x0,
-                            x_raw = x_raw,
-                            optimizer=optimizer,
-                            solver=solver,
-                            solver_parameters = solver_parameters,
-                            scale_theta= scale_theta,
-                            # solver = pysindy, pysindy_weak, scikit
-                            objectives=None,
-                            objective_functions = objective_functions)
+    from ddmo.optimizer.optimizer import Optimizer
 
+    solver_instance = Pysindy_Solver(data_constructor = data_constructor, 
+                                     optimizer=optimizer,
+                                     solver_parameters=solver_parameters)
 
-    '''
     problem = Optimizer(
-        x_train,
-                                t,
-                                x_dot,
-                                library_object,
-                                x0,
-                                x_raw = x_raw,
-                                solver=solver,
-                                alpha_lasso = alpha_lasso,
-                                #alpha_lasso=0.000005,
-                                target= target,
-                                scale_theta= scale_theta,
-                                # solver = pysindy, pysindy_weak, scikit
-                                weak_form = weak_form, # to remove
-                                objectives=None)
-    '''
+      data_constructor=data_constructor,
+      solver=solver_instance.solve,
+      objectives=None,
+      objective_functions=objective_functions
+  )
+    
 
     problem.n_obj = n_objectives
     problem.n_var = n_vars
     
-    problem.dimension = len(x_raw[0, :])  # Number of variables in the system
+    problem.dimension = len(data_constructor.x_raw[0, :])  # Number of variables in the system
     problem.xl = bounds[0]
     problem.xu = bounds[1]
 

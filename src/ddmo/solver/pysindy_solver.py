@@ -1,15 +1,13 @@
 import numpy as np
-import pymoo.gradient.toolbox as anp
 import pysindy as ps
 from pysindy.optimizers import SR3, STLSQ, ConstrainedSR3, EnsembleOptimizer
 from sklearn.linear_model import Lasso
-from ddmo.optimizer.optimizer import (
-    Optimizer, 
-    EvaluationResult)
-from ddmo.utils.constructors import DataConstructor
+from ddmo.utils.data_constructor import DataConstructor
+from ddmo.solver.base import BaseSolver
 
 
-class Pysindy_Solver:
+
+class Pysindy_Solver(BaseSolver):
     def __init__(self, 
                  data_instance: DataConstructor,
                  optimizer: str,
@@ -18,6 +16,9 @@ class Pysindy_Solver:
         self.data_instance = data_instance
         self.solver_parameters = solver_parameters
         self.optimizer = optimizer
+
+    def configure(self, **kwargs):
+        self.solver_parameters.update(kwargs)
 
     def solve(self, optimization_vars):
 

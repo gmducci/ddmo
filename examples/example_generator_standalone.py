@@ -2,9 +2,8 @@ from collections.abc import Callable
 from pprint import pprint as pp
 import matplotlib.pyplot as plt
 import numpy as np
-import importlib
+from ddmo.utils.data_constructor import DataConstructor
 from ddmo.utils.constructors import (
-    DataConstructor,
     ProblemSettings,
     AlgorithmSettings,
     TerminationSettings,

@@ -12,7 +12,6 @@ from ddmo.optimizer.objective_functions import (
     compute_mse,
     compute_ppcc_matrix,
 )
-from ddmo.optimizer.solver import solver
 from dataclasses import dataclass
 from typing import Optional, Any
 import numpy as np

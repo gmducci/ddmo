@@ -84,9 +84,7 @@ def identify(data_instance: DataConstructor,
         - coeff_matrices, alphas, dw_stats
     """
 
-    from ddmo.solver.pysindy_solver import Pysindy_Solver
     from ddmo.optimizer.optimizer import Optimizer
-
     problem = Optimizer(
       data_instance=data_instance,
       solver=solver_instance.solve,

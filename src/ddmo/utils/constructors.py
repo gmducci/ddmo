@@ -3,29 +3,6 @@ from typing import Any
 from ddmo.solver.registry import SOLVER_REGISTRY
 from ddmo.solver.base import BaseSolver
 
-
-
-# This classes are used to construct the data instance for the optimization problem.
-
-@dataclass
-class ProblemSettings:
-    """
-    Configuration for the optimization problem.
-
-    Attributes:
-        n_var (int): Number of optimization variables for the problem.
-        n_obj (int): Number of objective functions to minimize.
-        xl (float): Lower bound for each optimization variable (default: 0.0).
-        xu (float): Upper bound for each optimization variable (default: 1.0).
-        vtype (type): Data type of decision variables (default: float).
-    """
-    n_var: int
-    n_obj: int
-    xl: float = 0.0
-    xu: float = 1.0
-    vtype: type = float
-
-
 from dataclasses import dataclass
 from typing import Any, Optional
 

@@ -34,6 +34,7 @@ from typing import Any
 
 import numpy as np
 from pymoo.algorithms.moo.nsga2 import NSGA2
+from pymoo.algorithms.moo.nsga3 import NSGA3
 from pymoo.optimize import minimize
 from ddmo.utils.constructors import DataConstructor, GASettings
 # from ddmo.optimizer.optimizer import Optimizer
@@ -102,9 +103,9 @@ def identify(
     problem.n_var = ga_settings.problem.n_var
     problem.n_obj = ga_settings.problem.n_obj
     
-    problem.dimension = len(data_instance.x_raw[0, :])  # Number of variables in the system
     problem.xl = ga_settings.problem.xl
     problem.xu = ga_settings.problem.xu  
+    from pymoo.util.ref_dirs import get_reference_directions
 
     algorithm = NSGA2(pop_size=ga_settings.algorithm.pop_size,
                       sampling=ga_settings.algorithm.sampling,

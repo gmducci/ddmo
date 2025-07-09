@@ -54,9 +54,9 @@ if __name__ == "__main__":
                                        xu=np.array([10.0, 10.0]))
     
     algorithm_settings = AlgorithmSettings(pop_size=20,
-                                           sampling=FloatRandomSampling(),
-                                           crossover=SBX(eta=15, prob=0.9),
-                                           mutation=PM(eta=20))
+                                           sampling=FloatRandomSampling(),   # default
+                                           crossover=SBX(eta=15, prob=0.9),  # default
+                                           mutation=PM(eta=20))              # default
     
     termination_settings = TerminationSettings(n_gen=10)
 

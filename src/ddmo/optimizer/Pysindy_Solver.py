@@ -3,9 +3,6 @@ import pymoo.gradient.toolbox as anp
 import pysindy as ps
 from pysindy.optimizers import SR3, STLSQ, ConstrainedSR3, EnsembleOptimizer
 from sklearn.linear_model import Lasso
-from ddmo.optimizer.optimizer import (
-    Optimizer, 
-    EvaluationResult)
 from ddmo.utils.data_constructor import DataConstructor
 
 

@@ -48,7 +48,7 @@ if __name__ == "__main__":
         optimizer='STLSQ',
         solver_parameters={
             "threshold": 0.05},
-        number_generations=5,
-        population_size=30)
+        number_generations=15,
+        population_size=50)
 
     print(alphas)

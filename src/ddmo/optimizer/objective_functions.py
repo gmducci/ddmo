@@ -82,5 +82,3 @@ def compute_ppcc_matrix(DataConstructor, sol, metric = "quantiles"):
         intercept_qq_out = np.max(abs(intercept_qq_plot))
 
     return abs(1 - ppcc_stats), slope_qq_plot, intercept_qq_out
-
-

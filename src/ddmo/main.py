@@ -105,7 +105,6 @@ def identify(
       objective_functions=objective_functions
   )
     
-
     problem.n_obj = n_objectives
     problem.n_var = n_vars
     

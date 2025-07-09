@@ -63,7 +63,7 @@ lint-test-job: # This job also runs in the test stage.
     - ruff --version
   script:
     - echo "Running Ruff linter..."
-    - ruff check --output-format=github ddmo
+    - ruff check --output-format=github .src/ddmo
     - echo "Running Ruff formatter check..."
     - ruff format --check
   allow_failure: true # This job can fail without affecting the pipeline status.

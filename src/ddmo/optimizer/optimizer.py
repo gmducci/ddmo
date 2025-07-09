@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from typing import Optional, Any
 import numpy as np
 from typing import Callable
+from ddmo.utils.constructors import DataConstructor
 
 # Configure environment
 warnings.filterwarnings("ignore")
@@ -33,7 +34,7 @@ class EvaluationResult:
 
 class Optimizer(Problem):
     def __init__(self,
-                 data_constructor: Any,
+                 data_instance: DataConstructor,
                  solver: Callable,
                  objectives=None,
                  objective_functions=None):
@@ -45,7 +46,7 @@ class Optimizer(Problem):
                          xu=1.,
                          vtype=float)
         
-        self.data_constructor = data_constructor
+        self.data_instance = data_instance
         self.solver = solver
         self.objectives = objectives if objectives is not None else [compute_mse, compute_dw_coefficient]
         self.objective_functions = objective_functions
@@ -78,7 +79,7 @@ class Optimizer(Problem):
         objective_funcs = []
         for obj_func in self.objectives:
             try:
-                objective_funcs.append(obj_func(self.data_constructor, sol))
+                objective_funcs.append(obj_func(self.data_instance, sol))
             except Exception:
                 objective_funcs.append(1e5)
 

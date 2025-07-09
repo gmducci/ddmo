@@ -35,7 +35,7 @@ from typing import Any
 import numpy as np
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.optimize import minimize
-
+from ddmo.utils.constructors import DataConstructor, GASettings
 # from ddmo.optimizer.optimizer import Optimizer
 # from ddmo.optimizer.Scipy_Solver import Scipy_Solver
 
@@ -57,19 +57,13 @@ NamedFunc = tuple[Callable[..., float], str]
 
 
 def identify(
-    data_constructor: classmethod,
-    bounds: tuple[tuple[float, float], tuple[float, float]],
+    data_instance: DataConstructor,
+    ga_settings: GASettings,
     objective_functions: dict = None,
-    n_objectives: int = 2, # number of objective functions
-    n_vars: int = 2, # number of optimization variables
-    population_size: int = 20,
-    number_generations: int = 10,
     optimizer: str = "stlsq",  # 'pysindy', 'pysindy_weak', 'scikit'
     solver_parameters: dict = {},
     scale_theta: bool = True,
     weak_form: bool = False,
-    seed: int | None = None,
-    verbose: bool = True,
     library_object: Callable[[list[float]], Any] | None = None,
 ):
     """
@@ -94,29 +88,36 @@ def identify(
     from ddmo.optimizer.Pysindy_Solver import Pysindy_Solver
     from ddmo.optimizer.optimizer import Optimizer
 
-    solver_instance = Pysindy_Solver(data_constructor = data_constructor, 
+    solver_instance = Pysindy_Solver(data_instance = data_instance, 
                                      optimizer=optimizer,
                                      solver_parameters=solver_parameters)
 
     problem = Optimizer(
-      data_constructor=data_constructor,
+      data_instance=data_instance,
       solver=solver_instance.solve,
       objectives=None,
       objective_functions=objective_functions
   )
     
-    problem.n_obj = n_objectives
-    problem.n_var = n_vars
+    problem.n_var = ga_settings.problem.n_var
+    problem.n_obj = ga_settings.problem.n_obj
     
-    problem.dimension = len(data_constructor.x_raw[0, :])  # Number of variables in the system
-    problem.xl = bounds[0]
-    problem.xu = bounds[1]
+    problem.dimension = len(data_instance.x_raw[0, :])  # Number of variables in the system
+    problem.xl = ga_settings.problem.xl
+    problem.xu = ga_settings.problem.xu  
 
-    algorithm = NSGA2(pop_size=population_size)
+    algorithm = NSGA2(pop_size=ga_settings.algorithm.pop_size,
+                      sampling=ga_settings.algorithm.sampling,
+                      crossover=ga_settings.algorithm.crossover,
+                      mutation=ga_settings.algorithm.mutation,
+                      eliminate_duplicates=ga_settings.algorithm.eliminate_duplicates)
+    
     res = minimize(
         problem,
         algorithm,
-        ('n_gen', number_generations))
+        ('n_gen', ga_settings.termination.n_gen),
+        seed=ga_settings.seed,
+        verbose=ga_settings.verbose)
 
     obj_space = res.F
     solutions = res.opt.get("solution", to_numpy=False)

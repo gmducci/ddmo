@@ -2,13 +2,14 @@ from collections.abc import Callable
 from pprint import pprint as pp
 import matplotlib.pyplot as plt
 import numpy as np
-import importlib
+from ddmo.utils.data_constructor import DataConstructor
 from ddmo.utils.constructors import (
-    DataConstructor,
     ProblemSettings,
     AlgorithmSettings,
     TerminationSettings,
     GASettings)
+from ddmo.solver.registry import SOLVER_REGISTRY
+from ddmo.solver.settings import SolverSettings
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
@@ -58,7 +59,7 @@ if __name__ == "__main__":
                                            crossover=SBX(eta=15, prob=0.9),  # default
                                            mutation=PM(eta=20))              # default
     
-    termination_settings = TerminationSettings(n_gen=10)
+    termination_settings = TerminationSettings(n_gen=15)
 
     ga_settings = GASettings(problem=problem_settings,
                              algorithm=algorithm_settings,
@@ -67,13 +68,28 @@ if __name__ == "__main__":
                              verbose=True)
 
 
+    solver_settings = SolverSettings(solver_name="pysindy",
+                                    optimizer="STLSQ",
+                                    solver_parameters={
+                                    "threshold": 0.05
+                                    })
+
+    solver_class = SOLVER_REGISTRY[solver_settings.solver_name]
+
+    solver_settings = solver_class(data_instance=training_data,
+                          optimizer=solver_settings.optimizer,
+                          solver_parameters=solver_settings.solver_parameters)
+
+    identification = identify(data_instance=training_data,
+                              ga_settings=ga_settings,
+                              solver_instance=solver_settings)
     
-    problem, res, obj_space, solutions, coeff_matrices, alphas, sindy_model = identify(
-        data_instance=training_data,
-        ga_settings=ga_settings,
-        weak_form=False,
-        scale_theta=True,
-        optimizer='STLSQ',
-        solver_parameters={
-            "threshold": 0.05})
+    problem = identification[0]
+    res = identification[1]
+    obj_space = identification[2]
+    solutions = identification[3]
+    coeff_matrices = identification[4]
+    alphas = identification[5]
+    sindy_model = identification[6]
+
     print(alphas)

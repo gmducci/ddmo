@@ -1,22 +1,9 @@
-import numpy as np
 from dataclasses import dataclass, field
 from typing import Any
+from ddmo.solver.registry import SOLVER_REGISTRY
+from ddmo.solver.base import BaseSolver
 
 
-@dataclass
-class DataConstructor:
-    x_train: np.ndarray
-    time_array: np.ndarray
-    x_dot: np.ndarray
-    library_object: Any
-    x_0: list
-    x_raw: np.ndarray
-    dimension: int = field(init=False)
-    number_initial_conditions: int = field(init=False)
-
-    def __post_init__(self):
-        self.dimension = self.x_train.shape[1]
-        self.number_initial_conditions = len(self.x_0)
 
 # This classes are used to construct the data instance for the optimization problem.
 

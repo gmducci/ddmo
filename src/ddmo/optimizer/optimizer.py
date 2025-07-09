@@ -17,8 +17,7 @@ from dataclasses import dataclass
 from typing import Optional, Any
 import numpy as np
 from typing import Callable
-from ddmo.utils.constructors import DataConstructor
-
+from ddmo.utils.data_constructor import DataConstructor
 # Configure environment
 warnings.filterwarnings("ignore")
 Config.warnings['not_compiled'] = False

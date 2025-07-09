@@ -36,7 +36,10 @@ import numpy as np
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.algorithms.moo.nsga3 import NSGA3
 from pymoo.optimize import minimize
-from ddmo.utils.constructors import DataConstructor, GASettings
+from ddmo.utils.data_constructor import DataConstructor
+from ddmo.utils.constructors import GASettings
+from ddmo.solver.base import BaseSolver
+
 # from ddmo.optimizer.optimizer import Optimizer
 # from ddmo.optimizer.Scipy_Solver import Scipy_Solver
 
@@ -57,16 +60,11 @@ NamedFunc = tuple[Callable[..., float], str]
 # -----------------------------------------------------------------------------
 
 
-def identify(
-    data_instance: DataConstructor,
-    ga_settings: GASettings,
-    objective_functions: dict = None,
-    optimizer: str = "stlsq",  # 'pysindy', 'pysindy_weak', 'scikit'
-    solver_parameters: dict = {},
-    scale_theta: bool = True,
-    weak_form: bool = False,
-    library_object: Callable[[list[float]], Any] | None = None,
-):
+def identify(data_instance: DataConstructor,
+             ga_settings: GASettings,
+             solver_instance: BaseSolver,
+             objective_functions: dict = None):
+    
     """
     Run sparse identification on provided data x(t).
 
@@ -86,12 +84,8 @@ def identify(
         - coeff_matrices, alphas, dw_stats
     """
 
-    from ddmo.optimizer.Pysindy_Solver import Pysindy_Solver
+    from ddmo.solver.pysindy_solver import Pysindy_Solver
     from ddmo.optimizer.optimizer import Optimizer
-
-    solver_instance = Pysindy_Solver(data_instance = data_instance, 
-                                     optimizer=optimizer,
-                                     solver_parameters=solver_parameters)
 
     problem = Optimizer(
       data_instance=data_instance,

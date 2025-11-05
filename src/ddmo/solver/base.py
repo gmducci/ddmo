@@ -6,5 +6,5 @@ class BaseSolver(ABC):
         pass
 
     @abstractmethod
-    def solve(self, optimization_vars):
+    def solve(self, *args, **kwargs):
         pass

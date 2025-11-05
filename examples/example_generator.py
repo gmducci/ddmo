@@ -192,7 +192,7 @@ if __name__ == "__main__":
     # model.fit(X, t=t[1] - t[0], x_dot=dX)
     # print("\nRecovered model:")
     # model.print()
-    problem, res, obj_space, solutions, coeff_matrices, alphas = identify(
+    problem, res, obj_space, solutions, coeff_matrices, alphas, models, theta_matrices = identify(
         x_train = x_noisy,
         x_raw=x_noisy,
         x_dot=x_dot,

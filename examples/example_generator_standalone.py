@@ -59,7 +59,7 @@ if __name__ == "__main__":
                                            crossover=SBX(eta=15, prob=0.9),  # default
                                            mutation=PM(eta=20))              # default
     
-    termination_settings = TerminationSettings(n_gen=15)
+    termination_settings = TerminationSettings(n_gen=10)
 
     ga_settings = GASettings(problem=problem_settings,
                              algorithm=algorithm_settings,
@@ -81,15 +81,19 @@ if __name__ == "__main__":
                           solver_parameters=solver_settings.solver_parameters)
 
     identification = identify(data_instance=training_data,
+                              formulation="strong",
                               ga_settings=ga_settings,
                               solver_instance=solver_settings)
     
-    problem = identification[0]
-    res = identification[1]
-    obj_space = identification[2]
-    solutions = identification[3]
-    coeff_matrices = identification[4]
-    alphas = identification[5]
-    sindy_model = identification[6]
+    (
+        problem,
+        res,
+        obj_space,
+        solutions,
+        coeff_matrices,
+        alphas,
+        sindy_model,
+        theta_matrices,
+    ) = identification
 
     print(alphas)

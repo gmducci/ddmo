@@ -30,7 +30,7 @@ Usage:
 """
 
 from collections.abc import Callable
-from typing import Any, Mapping
+from typing import Any, Mapping, Optional
 
 import numpy as np
 from pymoo.algorithms.moo.nsga2 import NSGA2
@@ -85,7 +85,7 @@ def identify(data_instance: DataConstructor,
              solver_instance: BaseSolver,
              objective_functions: dict = None,
              formulation: Formulation | str | None = None,
-             formulation_options: Mapping[str, Any] | None = None):
+             formulation_options: Optional[Mapping[str, Any]] = None):
     
     """
     Run sparse identification on provided data x(t).

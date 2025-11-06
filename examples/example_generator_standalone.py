@@ -41,9 +41,9 @@ if __name__ == "__main__":
 
     # Create a DataConstructor instance
     training_data = DataConstructor(
-        x_train=x_train[40:-40,:],
+        x_train=x_raw[40:-40, :],
         time_array=time_array,
-        x_dot=x_dot_hat[40:-40,:],
+        x_dot=x_dot_hat[40:-40, :],
         library_object=get_base_functions,
         x_0=x_0,
         x_raw=x_raw)
@@ -51,10 +51,10 @@ if __name__ == "__main__":
     # Define all the optimization settings in a constructor
     problem_settings = ProblemSettings(n_var=2,
                                        n_obj=2, 
-                                       xl=np.array([1.0, 1.0]),
-                                       xu=np.array([10.0, 10.0]))
+                                       xl=np.array([8.4, 1.0]),
+                                       xu=np.array([9.6, 10.0]))
     
-    algorithm_settings = AlgorithmSettings(pop_size=20,
+    algorithm_settings = AlgorithmSettings(pop_size=1000,
                                            sampling=FloatRandomSampling(),   # default
                                            crossover=SBX(eta=15, prob=0.9),  # default
                                            mutation=PM(eta=20))              # default
@@ -71,7 +71,8 @@ if __name__ == "__main__":
     solver_settings = SolverSettings(solver_name="pysindy",
                                     optimizer="STLSQ",
                                     solver_parameters={
-                                    "threshold": 0.05
+                                    "alpha": 0.01,
+                                    "threshold": 0.1
                                     })
 
     solver_class = SOLVER_REGISTRY[solver_settings.solver_name]
@@ -81,7 +82,12 @@ if __name__ == "__main__":
                           solver_parameters=solver_settings.solver_parameters)
 
     identification = identify(data_instance=training_data,
-                              formulation="strong",
+                              formulation="weak",
+                              formulation_options={"time_array": time_array,
+                                "x_train": x_train[40:-40, :],
+                                  "window_length": 501,
+                                  "stride": 200
+                              },
                               ga_settings=ga_settings,
                               solver_instance=solver_settings)
     

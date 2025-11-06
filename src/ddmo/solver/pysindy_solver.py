@@ -14,6 +14,8 @@ from ddmo.utils.data_constructor import DataConstructor
 from ddmo.solver.base import BaseSolver
 from scipy.integrate import solve_ivp
 from pysindy.utils import AxesArray
+from sklearn.preprocessing import StandardScaler
+
 
 
 class Pysindy_Solver(BaseSolver):
@@ -65,27 +67,9 @@ class Pysindy_Solver(BaseSolver):
             "EnsembleOptimizer": EnsembleOptimizer,
             "Lasso": Lasso}
 
-        if named_funcs is None:
-            named_funcs = self.data_instance.library_object([*opt_vars])
-
-        functions = [func for func, _ in named_funcs]
-        raw_names = [name for _, name in named_funcs]
-        function_names = [self._ensure_callable_name(name) for name in raw_names]
-
         x_matrix = self._stack_state_matrix(self.data_instance.x_train)
 
-        if lib_custom is None:
-            lib_custom = ps.CustomLibrary(
-                library_functions=functions,
-                function_names=function_names
-            )
-
-        lib_custom.fit(x_matrix)
-
-        if theta is None:
-            theta = np.asarray(lib_custom.transform(x_matrix))
-        else:
-            theta = np.asarray(theta)
+        theta = np.asarray(theta)
 
         params_dict = self.solver_parameters
         base_optimizer = _optimizers[self.optimizer](**params_dict)
@@ -94,12 +78,21 @@ class Pysindy_Solver(BaseSolver):
 
         theta_axes = AxesArray(theta, {"ax_sample": 0, "ax_coord": 1})
         lhs_axes = AxesArray(np.asarray(lhs_matrix), {"ax_sample": 0, "ax_coord": 1})
+        scaler_X = StandardScaler()
+        scaler_y = StandardScaler()
+
+        theta_axes = scaler_X.fit_transform(theta_axes)
+        lhs_axes = scaler_y.fit_transform(lhs_axes)
+        sx = np.asarray(scaler_X.scale_)   # length P
+        sy = np.asarray(scaler_y.scale_)   # length d
 
         # Increase threshold to enforce more sparsity
         try:
             fitted_optimizer = sindy_optimizer.fit(theta_axes, lhs_axes)
             raw_coefficients = fitted_optimizer.coef_
-            regression_coeff = raw_coefficients.T
+            # regression_coeff = raw_coefficients.T
+            regression_coeff   = (raw_coefficients * sy[:, None]) / sx[None, :]
+            regression_coeff = regression_coeff.T
 
             solver_kwargs = {
                 "method": "BDF",

@@ -49,6 +49,7 @@ class Pysindy_Solver(BaseSolver):
                 theta = rhs_payload.get("theta")
                 lib_custom = rhs_payload.get("library")
                 named_funcs = rhs_payload.get("named_funcs")
+                mask = rhs_payload.get("colmask")
             else:
                 optimization_vars = rhs_payload
         else:
@@ -104,6 +105,7 @@ class Pysindy_Solver(BaseSolver):
                 coefficients=regression_coeff,
                 optimizer=fitted_optimizer.optimizer,
                 solver_kwargs=solver_kwargs,
+                active_mask=mask
             )
 
             sol_list = []
@@ -181,11 +183,24 @@ class _ManualSINDyModel:
         coefficients: np.ndarray,
         optimizer: Any,
         solver_kwargs: dict[str, Any] | None = None,
+        active_mask: np.ndarray | None = None,
     ) -> None:
+        """
+        coefficients: shape (n_active_features, n_states)
+        active_mask: boolean array of shape (n_all_features,) indicating
+                     which columns of the full library output were kept.
+        """
         self.feature_library = feature_library
         self._coefficients = coefficients
         self.optimizer = optimizer
         self._solver_kwargs = dict(solver_kwargs or {})
+        self.active_mask = active_mask
+
+        if self.active_mask is not None:
+            n_active = np.count_nonzero(self.active_mask)
+            assert (
+                n_active == self._coefficients.shape[0]
+            ), "active_mask must match coefficients shape."
 
     def coefficients(self) -> np.ndarray:
         return self._coefficients
@@ -204,5 +219,14 @@ class _ManualSINDyModel:
         return solution.y.T
 
     def _rhs(self, t: float, state: np.ndarray) -> np.ndarray:
-        theta = self.feature_library.transform(np.atleast_2d(state))
+        # shape: (1, n_features_full)
+        theta_full = self.feature_library.transform(np.atleast_2d(state))
+
+        if self.active_mask is not None:
+            # same trimming as during training
+            theta = theta_full[:, self.active_mask]
+        else:
+            theta = theta_full
+
+        # coefficients: (n_active_features, n_states)
         return (theta @ self._coefficients).ravel()

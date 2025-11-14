@@ -101,6 +101,9 @@ class WeakFormulation(Formulation):
         )
         lib_custom.fit(x_matrix)
         theta = lib_custom.transform(x_matrix)
+        colmask = ~np.isnan(theta).any(axis=0)
+
+        theta = theta[:, colmask] 
 
         rhs = np.zeros((self.M, theta.shape[1]))
         for m, c in enumerate(self.centers):
@@ -113,6 +116,7 @@ class WeakFormulation(Formulation):
             "library": lib_custom,
             "opt_vars": opt_vars,
             "named_funcs": named_funcs,
+            "colmask": colmask,
         }
     
 def _extract_rhs_inputs(*args: Any, **kwargs: Any) -> tuple[Any, tuple[float, ...]]:

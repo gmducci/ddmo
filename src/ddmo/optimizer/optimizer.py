@@ -74,9 +74,6 @@ class Optimizer(Problem):
 
         if self.formulation is not None:
             self.formulation.stride = optimization_variables[-1]
-            win_length = 2 * optimization_variables[-2] +1
-            self.formulation.window_length = int(round(win_length))
-            print("length:", self.formulation.window_length)
             lhs = self.formulation.get_lhs(self.data_instance, optimization_variables)
             rhs = self.formulation.get_rhs(self.data_instance, optimization_variables)
             solver_args = (lhs, rhs)

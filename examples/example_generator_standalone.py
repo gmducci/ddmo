@@ -84,10 +84,10 @@ if __name__ == "__main__":
         x_raw=x_raw)
     
     # Define all the optimization settings in a constructor
-    problem_settings = ProblemSettings(n_var=4,
+    problem_settings = ProblemSettings(n_var=3,
                                        n_obj=2, 
-                                       xl=np.array([8.4, 1.0, 50, 10]),
-                                       xu=np.array([9.6, 10.0, 500, 200]))
+                                       xl=np.array([8.4, 1.0, 10]),
+                                       xu=np.array([9.6, 10.0, 200]))
     
     algorithm_settings = AlgorithmSettings(pop_size=60,
                                            sampling=FloatRandomSampling(),   # default
@@ -121,7 +121,7 @@ if __name__ == "__main__":
                               solver_instance=solver_settings,                              
                               formulation="weak",
                               formulation_options={
-                                "function_class": None,
+                                # "function_class": None,
                                 "time_array": time_array,
                                 "x_train": x_train[:, :],
                                 "window_length": 151,

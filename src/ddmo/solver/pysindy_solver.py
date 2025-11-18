@@ -2,13 +2,7 @@ import numpy as np
 import pysindy as ps
 from collections.abc import Sequence
 from typing import Any
-from pysindy.optimizers import (
-    SR3,
-    STLSQ,
-    ConstrainedSR3,
-    EnsembleOptimizer,
-    SINDyOptimizer,
-)
+from pysindy.optimizers import SINDyOptimizer
 from sklearn.linear_model import Lasso
 from ddmo.utils.data_constructor import DataConstructor
 from ddmo.solver.base import BaseSolver
@@ -16,6 +10,39 @@ from scipy.integrate import solve_ivp
 from pysindy.utils import AxesArray
 from sklearn.preprocessing import StandardScaler
 
+
+# Optimizer dispatch logic
+def get_optimizer(optimizer_name: str):
+    """
+    Get optimizer class by name.
+
+    Args:
+        optimizer_name: Name of the optimizer to retrieve
+
+    Returns:
+        Optimizer class
+
+    Raises:
+        ValueError: If optimizer name is not recognized
+    """
+
+    if optimizer_name == "STLSQ":
+        from pysindy.optimizers import STLSQ
+        return STLSQ
+    elif optimizer_name == "SR3":
+        from pysindy.optimizers import SR3
+        return SR3
+    elif optimizer_name == "ConstrainedSR3":
+        from pysindy.optimizers import ConstrainedSR3
+        return ConstrainedSR3
+    elif optimizer_name == "EnsembleOptimizer":
+        from pysindy.optimizers import EnsembleOptimizer
+        return EnsembleOptimizer
+    elif optimizer_name == "Lasso":
+        from sklearn.linear_model import Lasso
+        return Lasso
+    else:
+        raise ValueError(f"Unknown optimizer: {optimizer_name}")
 
 
 class Pysindy_Solver(BaseSolver):
@@ -60,20 +87,12 @@ class Pysindy_Solver(BaseSolver):
 
         opt_vars = self._normalize_opt_vars(optimization_vars)
 
-        # Optimizer dispatch logic
-        _optimizers = {
-            "STLSQ": STLSQ,
-            "SR3": SR3,
-            "ConstrainedSR3": ConstrainedSR3,
-            "EnsembleOptimizer": EnsembleOptimizer,
-            "Lasso": Lasso}
-
         x_matrix = self._stack_state_matrix(self.data_instance.x_train)
 
         theta = np.asarray(theta)
 
         params_dict = self.solver_parameters
-        base_optimizer = _optimizers[self.optimizer](**params_dict)
+        base_optimizer = get_optimizer(self.optimizer)(**params_dict)
         unbias_flag = getattr(base_optimizer, "unbias", True)
         sindy_optimizer = SINDyOptimizer(base_optimizer, unbias=unbias_flag)
 

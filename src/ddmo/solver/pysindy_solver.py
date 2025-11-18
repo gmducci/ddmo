@@ -3,7 +3,6 @@ import pysindy as ps
 from collections.abc import Sequence
 from typing import Any
 from pysindy.optimizers import SINDyOptimizer
-from sklearn.linear_model import Lasso
 from ddmo.utils.data_constructor import DataConstructor
 from ddmo.solver.base import BaseSolver
 from scipy.integrate import solve_ivp

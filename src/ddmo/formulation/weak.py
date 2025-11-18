@@ -104,7 +104,7 @@ class WeakFormulation(Formulation):
         colmask = ~np.isnan(theta).any(axis=0)
 
         theta = theta[:, colmask] 
-
+        print(theta)
         rhs = np.zeros((self.M, theta.shape[1]))
         for m, c in enumerate(self.centers):
             slice_range = slice(c - self.window_length // 2, c + self.window_length // 2 + 1)

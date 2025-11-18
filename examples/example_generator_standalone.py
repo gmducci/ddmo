@@ -60,36 +60,36 @@ if __name__ == "__main__":
             #X[:, 0] = X[:, 0] + noise * rng.standard_normal(X.shape[0])
         return t, X
 
-    t, x_train = simulate_goodwin()
+    # t, x_train = simulate_goodwin()
 
     NamedFunc = tuple[Callable[[float, float], float], str]
     def get_base_functions(params: list[float]) -> list[NamedFunc]:
-        alpha, beta = params
+        alpha, beta = params[0:2]
         return [
             (lambda x: x, lambda x: x),
             (lambda x: x**2, lambda x: f"{x}^2"),
             (lambda x: (1 / (1 + x**alpha)), lambda x: f"1 / 1 + {x}^{alpha}"),
-            # (lambda x: np.exp(- beta * x), lambda x: f"exp( {-beta} {x} )")
+            (lambda x: np.exp(- beta * x), lambda x: f"exp( {-beta} {x} )")
         ]
 
     x_0 = [x_0_train]
 
     # Create a DataConstructor instance
     training_data = DataConstructor(
-        x_train=x_train[40:-40, :],
+        x_train=x_raw[:, :],
         time_array=time_array,
-        x_dot=x_dot_hat[40:-40, :],
+        x_dot=x_dot_hat[:, :],
         library_object=get_base_functions,
         x_0=x_0,
         x_raw=x_raw)
     
     # Define all the optimization settings in a constructor
-    problem_settings = ProblemSettings(n_var=2,
+    problem_settings = ProblemSettings(n_var=4,
                                        n_obj=2, 
-                                       xl=np.array([8.4, 1.0]),
-                                       xu=np.array([9.6, 10.0]))
+                                       xl=np.array([8.4, 1.0, 50, 10]),
+                                       xu=np.array([9.6, 10.0, 500, 200]))
     
-    algorithm_settings = AlgorithmSettings(pop_size=30,
+    algorithm_settings = AlgorithmSettings(pop_size=60,
                                            sampling=FloatRandomSampling(),   # default
                                            crossover=SBX(eta=15, prob=0.9),  # default
                                            mutation=PM(eta=20))              # default
@@ -106,7 +106,7 @@ if __name__ == "__main__":
     solver_settings = SolverSettings(solver_name="pysindy",
                                     optimizer="STLSQ",
                                     solver_parameters={
-                                    "alpha": 0.01,
+                                    "alpha": 0.05,
                                     "threshold": 0.1
                                     })
 
@@ -117,17 +117,19 @@ if __name__ == "__main__":
                           solver_parameters=solver_settings.solver_parameters)
 
     identification = identify(data_instance=training_data,
-                              formulation="weak",
-                              formulation_options={"time_array": time_array,
-                                "x_train": x_train[40:-40, :],
-                                  "window_length": 301,
-                                  "stride": 100
-                              },
                               ga_settings=ga_settings,
-                              solver_instance=solver_settings)
-    
-    (
-        problem,
+                              solver_instance=solver_settings,                              
+                              formulation="weak",
+                              formulation_options={
+                                "function_class": None,
+                                "time_array": time_array,
+                                "x_train": x_train[:, :],
+                                "window_length": 151,
+                                "stride": 75
+                              },
+                              )
+
+    (problem,
         res,
         obj_space,
         solutions,

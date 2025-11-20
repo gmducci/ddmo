@@ -36,4 +36,3 @@ class HannWindow(FunctionClass):
 
     def __call__(self, length) -> np.ndarray:
         return self.evaluate(length)
-

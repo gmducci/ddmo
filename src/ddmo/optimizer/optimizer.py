@@ -73,7 +73,9 @@ class Optimizer(Problem):
         }
 
         if self.formulation is not None:
-            self.formulation.stride = optimization_variables[-1]
+            #self.formulation.stride = optimization_variables[-1]
+            self.formulation.stride = optimization_variables[self.mapi_label['stride']]  
+            
             lhs = self.formulation.get_lhs(self.data_instance, optimization_variables)
             rhs = self.formulation.get_rhs(self.data_instance, optimization_variables)
             solver_args = (lhs, rhs)

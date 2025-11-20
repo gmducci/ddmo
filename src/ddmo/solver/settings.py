@@ -13,8 +13,9 @@ class SolverSettings:
         test_functions_class (Optional[Any]): Optional class for test functions.
     """
     solver_name: str
-    optimizer: Optional[str] = None
-    solver_parameters: dict[str, Any] = field(default_factory=dict)
+    regularization: Optional[str] = None
+    regularization_parameters: dict[str, Any] = field(default_factory=dict)
+    formulation: Optional[str] = 'strong'
     test_functions_class: Optional[Any] = None
 
     def update(self, **kwargs) -> None:

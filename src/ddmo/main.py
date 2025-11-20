@@ -113,18 +113,27 @@ def identify(data_instance: DataConstructor,
     problem = Optimizer(
         data_instance=data_instance,
         # library_factory=library_factory,
-        # formution=formution,
         solver=solver_instance.solve,
         objectives=None,
         objective_functions=objective_functions,
         formulation=resolved_formulation
     )
-    
+
+    map_label = { i:n for i, n in enumerate(ga_settings.problem.xl_dict) }
+    problem.map_label = map_label
+    mapi_label = { n:i for i, n in enumerate(ga_settings.problem.xl_dict) }
+    problem.mapi_label = mapi_label
+
+    #xl_dict
+    xl = np.array([item for key, item in ga_settings.problem.xl_dict.items() ], dtype=float)
+    xu = np.array([item for key, item in ga_settings.problem.xu_dict.items()  ], dtype=float)
+
     problem.n_var = ga_settings.problem.n_var
     problem.n_obj = ga_settings.problem.n_obj
-    
-    problem.xl = ga_settings.problem.xl
-    problem.xu = ga_settings.problem.xu  
+    print(xl, xu)
+    problem.xl = xl
+    problem.xu = xu
+
     from pymoo.util.ref_dirs import get_reference_directions
 
     algorithm = NSGA2(pop_size=ga_settings.algorithm.pop_size,

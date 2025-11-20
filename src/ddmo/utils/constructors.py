@@ -26,8 +26,8 @@ class ProblemSettings:
     """
     n_var: int
     n_obj: int
-    xl: Any = 0.0
-    xu: Any = 1.0
+    xl_dict: Any = 0.0
+    xu_dict: Any = 1.0
     n_ieq_constr: int = 0
     n_eq_constr: int = 0
     vtype: Optional[type] = float

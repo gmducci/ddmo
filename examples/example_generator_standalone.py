@@ -64,12 +64,12 @@ if __name__ == "__main__":
 
     NamedFunc = tuple[Callable[[float, float], float], str]
     def get_base_functions(params: list[float]) -> list[NamedFunc]:
-        alpha, beta = params[0:2]
+        gamma_1, gamma_2 = params[0:2]
         return [
             (lambda x: x, lambda x: x),
             (lambda x: x**2, lambda x: f"{x}^2"),
-            (lambda x: (1 / (1 + x**alpha)), lambda x: f"1 / 1 + {x}^{alpha}"),
-            (lambda x: np.exp(- beta * x), lambda x: f"exp( {-beta} {x} )")
+            (lambda x: (1 / (1 + x**gamma_1)), lambda x: f"1 / 1 + {x}^{gamma_1}"),
+            (lambda x: np.exp(- gamma_2 * x), lambda x: f"exp( {-gamma_2} {x} )")
         ]
 
     x_0 = [x_0_train]
@@ -84,10 +84,22 @@ if __name__ == "__main__":
         x_raw=x_raw)
     
     # Define all the optimization settings in a constructor
+
+    # Definition of opt boundaries
+    lower_bounds = {
+        'gamma_1': 8.4,
+        'gamma_2': 1.0,
+        'stride': 10
+    }
+    upper_bounds = {
+        'gamma_1': 9.6,
+        'gamma_2': 10.0,
+        'stride': 200
+    }
     problem_settings = ProblemSettings(n_var=3,
                                        n_obj=2, 
-                                       xl=np.array([8.4, 1.0, 10]),
-                                       xu=np.array([9.6, 10.0, 200]))
+                                       xl_dict= lower_bounds,
+                                       xu_dict= upper_bounds)
     
     algorithm_settings = AlgorithmSettings(pop_size=60,
                                            sampling=FloatRandomSampling(),   # default
@@ -104,17 +116,20 @@ if __name__ == "__main__":
 
 
     solver_settings = SolverSettings(solver_name="pysindy",
-                                    optimizer="STLSQ",
-                                    solver_parameters={
+                                    regularization="STLSQ",
+                                    regularization_parameters={
                                     "alpha": 0.05,
                                     "threshold": 0.1
-                                    })
+                                    },
+                                    formulation = 'weak',
+                                    test_functions_class='HannWindow')
+    
 
     solver_class = SOLVER_REGISTRY[solver_settings.solver_name]
 
     solver_settings = solver_class(data_instance=training_data,
-                          optimizer=solver_settings.optimizer,
-                          solver_parameters=solver_settings.solver_parameters)
+                          optimizer=solver_settings.regularization,
+                          solver_parameters=solver_settings.regularization_parameters)
 
     identification = identify(data_instance=training_data,
                               ga_settings=ga_settings,

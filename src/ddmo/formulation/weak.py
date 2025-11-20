@@ -11,21 +11,27 @@ from .base import Formulation
 
 IntegralSolver = Callable[..., np.ndarray]
 
-def _hann_window(L: int) -> np.ndarray:
-    if L % 2 == 0 or L < 3:
-        raise ValueError("Window length L must be an odd integer ≥ 3.")
-    n = np.arange(L)
-    w = 0.5 - 0.5 * np.cos(2 * np.pi * n / (L - 1))
-    w[0] = 0.0
-    w[-1] = 0.0
-    return w
+def get_test_function_class(test_function_class: str):
+    """
+    Get test function class by name.
 
-def _window_derivative(phi: np.ndarray, dt: float) -> np.ndarray:
-    dphi = np.empty_like(phi)
-    dphi[1:-1] = (phi[2:] - phi[:-2]) / (2.0 * dt)
-    dphi[0] = 0.0
-    dphi[-1] = 0.0
-    return dphi
+    Args:
+        test_function_factory: Name of the optimizer to retrieve
+
+    Returns:
+        Optimizer class
+
+    Raises:
+        ValueError: If optimizer name is not recognized
+    """
+
+    if test_function_class.lower() == "hannwindow":
+        from ddmo.test_function_factory.hann_window import  HannWindow
+        return HannWindow
+    else:
+        raise ValueError(f"Unknown test function: {test_function_class}")
+
+
 
 @dataclass
 class WeakFormulation(Formulation):
@@ -40,21 +46,25 @@ class WeakFormulation(Formulation):
     def __init__(self, time_array: np.ndarray,
                  x_train: np.ndarray,
                  window_length: int,
-                 stride: int):
-        
+                 stride: int,
+                 test_function_class
+                 ):
         self.window_length = window_length
-        self.stride = stride
+        self.test_function_class = test_function_class
         self.dt = time_array[1] - time_array[0]
         self.N = len(x_train)
-        self.test_function = _hann_window(window_length)
-        self_derivative_test_function = _window_derivative(self.test_function, self.dt)
+        self.test_function = test_function_class.evaluate(window_length)
+        self.test_function_derivatives = test_function_class.evaluate_derivative(self.test_function, self.dt)
+        #self_derivative_test_function = _window_derivative(self.test_function, self.dt)
         # normalization factor for the integral approximation
         self.alpha = 1 / np.sum(self.test_function) * self.dt
+
         self.phi = self.test_function * self.alpha
-        self.dphi = self_derivative_test_function * self.alpha
+        self.dphi = self.test_function_derivatives * self.alpha
         self.half = window_length // 2
         self.centers = np.arange(self.half, self.N - self.half, stride)
-        
+
+
         self.M = len(self.centers)
     
     integral_solver: IntegralSolver | None = None
@@ -104,7 +114,6 @@ class WeakFormulation(Formulation):
         colmask = ~np.isnan(theta).any(axis=0)
 
         theta = theta[:, colmask] 
-        print(theta)
         rhs = np.zeros((self.M, theta.shape[1]))
         for m, c in enumerate(self.centers):
             slice_range = slice(c - self.window_length // 2, c + self.window_length // 2 + 1)

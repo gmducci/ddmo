@@ -10,6 +10,7 @@ from ddmo.utils.constructors import (
     GASettings)
 from ddmo.solver.registry import SOLVER_REGISTRY
 from ddmo.solver.settings import SolverSettings
+from ddmo.formulation.formulation_settings import FormulationSettings
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
@@ -89,19 +90,19 @@ if __name__ == "__main__":
     lower_bounds = {
         'gamma_1': 8.4,
         'gamma_2': 1.0,
-        'stride': 10
+        'stride': 50
     }
     upper_bounds = {
         'gamma_1': 9.6,
         'gamma_2': 10.0,
-        'stride': 200
+        'stride': 90
     }
     problem_settings = ProblemSettings(n_var=3,
                                        n_obj=2, 
                                        xl_dict= lower_bounds,
                                        xu_dict= upper_bounds)
     
-    algorithm_settings = AlgorithmSettings(pop_size=60,
+    algorithm_settings = AlgorithmSettings(pop_size=30,
                                            sampling=FloatRandomSampling(),   # default
                                            crossover=SBX(eta=15, prob=0.9),  # default
                                            mutation=PM(eta=20))              # default
@@ -115,33 +116,35 @@ if __name__ == "__main__":
                              verbose=True)
 
 
+
     solver_settings = SolverSettings(solver_name="pysindy",
                                     regularization="STLSQ",
                                     regularization_parameters={
-                                    "alpha": 0.05,
+                                    "alpha": 0.045,
                                     "threshold": 0.1
-                                    },
-                                    formulation = 'weak',
-                                    test_functions_class='HannWindow')
-    
+                                    },)
+        
 
     solver_class = SOLVER_REGISTRY[solver_settings.solver_name]
+
+
 
     solver_settings = solver_class(data_instance=training_data,
                           optimizer=solver_settings.regularization,
                           solver_parameters=solver_settings.regularization_parameters)
+    
+    formulation_settings = FormulationSettings(formulation_name="weak",
+                                               test_functions_class="HannWindow",
+                                               formulation_parameters={
+                                                   "window_length": 451,
+                                                   "stride": 50
+                                               })
+
 
     identification = identify(data_instance=training_data,
                               ga_settings=ga_settings,
-                              solver_instance=solver_settings,                              
-                              formulation="weak",
-                              formulation_options={
-                                # "function_class": None,
-                                "time_array": time_array,
-                                "x_train": x_train[:, :],
-                                "window_length": 151,
-                                "stride": 75
-                              },
+                              solver_instance=solver_settings,
+                              formulation_instance=formulation_settings
                               )
 
     (problem,

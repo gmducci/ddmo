@@ -15,9 +15,24 @@ class SolverSettings:
     solver_name: str
     regularization: Optional[str] = None
     regularization_parameters: dict[str, Any] = field(default_factory=dict)
-    formulation: Optional[str] = 'strong'
+    formulation: Optional[str] = "strong"
     test_functions_class: Optional[Any] = None
 
     def update(self, **kwargs) -> None:
         """Update internal solver_parameters dictionary with new values."""
         self.solver_parameters.update(kwargs)
+        
+    def __post_init__(self) -> None:
+        """Normalize formulation names and enforce weak-form requirements."""
+        if self.formulation is None:
+            self.formulation = "strong"
+
+        normalized = self.formulation.lower()
+        if normalized not in {"strong", "weak"}:
+            msg = f"Unknown formulation '{self.formulation}'. Choose 'strong' or 'weak'."
+            raise ValueError(msg)
+
+        self.formulation = normalized
+        if normalized == "weak" and self.test_functions_class is None:
+            msg = "Weak formulation requires 'test_functions_class'."
+            raise ValueError(msg)

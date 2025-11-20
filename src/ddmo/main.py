@@ -40,6 +40,7 @@ from ddmo.utils.data_constructor import DataConstructor
 from ddmo.utils.constructors import GASettings
 from ddmo.solver.base import BaseSolver
 from ddmo.formulation import Formulation, WeakFormulation, StrongFormulation
+from ddmo.test_function_factory.hann_window import HannWindow
 
 # from ddmo.optimizer.optimizer import Optimizer
 # from ddmo.optimizer.Scipy_Solver import Scipy_Solver
@@ -60,33 +61,11 @@ NamedFunc = tuple[Callable[..., float], str]
 # -----------------------------------------------------------------------------# Main identification function
 # -----------------------------------------------------------------------------
 
-
-def _build_formulation(formulation: Formulation | str | None,
-                       formulation_options: Mapping[str, Any] | None) -> Formulation | None:
-    if formulation is None:
-        return None
-    if isinstance(formulation, Formulation):
-        return formulation
-    if isinstance(formulation, str):
-        kind = formulation.lower()
-        options = dict(formulation_options or {})
-        if kind == "weak":
-            return WeakFormulation(**options)
-        if kind == "strong":
-            return StrongFormulation(**options)
-        msg = f"Unknown formulation: {formulation}"
-        raise ValueError(msg)
-    msg = f"Unsupported formulation type: {type(formulation)!r}"
-    raise TypeError(msg)
-
-
 def identify(data_instance: DataConstructor,
              ga_settings: GASettings,
              solver_instance: BaseSolver,
-             objective_functions: dict = None,
-             formulation: Formulation | str | None = None,
-             formulation_options: Optional[Mapping[str, Any]] = None):
-    
+             formulation_instance: Formulation | None = None,
+             objective_functions: dict = None):    
     """
     Run sparse identification on provided data x(t).
 
@@ -109,10 +88,22 @@ def identify(data_instance: DataConstructor,
     """
     # ===== begin opt =====    
     from ddmo.optimizer.optimizer import Optimizer
-    resolved_formulation = _build_formulation(formulation, formulation_options)
+
+    print(f"Using formulation: {formulation_instance.formulation_name}")
+    if formulation_instance.formulation_name == "weak":
+        resolved_formulation = WeakFormulation(
+            time_array=data_instance.time_array,
+            x_train=data_instance.x_train,
+            window_length=formulation_instance.formulation_parameters["window_length"],
+            stride=formulation_instance.formulation_parameters["stride"],
+            test_function_class=formulation_instance.test_functions_class)
+    else:
+        formulation_options = None
+      
+
+    # resolved_formulation = _build_formulation(formulation, formulation_options)
     problem = Optimizer(
         data_instance=data_instance,
-        # library_factory=library_factory,
         solver=solver_instance.solve,
         objectives=None,
         objective_functions=objective_functions,
@@ -126,7 +117,7 @@ def identify(data_instance: DataConstructor,
 
     #xl_dict
     xl = np.array([item for key, item in ga_settings.problem.xl_dict.items() ], dtype=float)
-    xu = np.array([item for key, item in ga_settings.problem.xu_dict.items()  ], dtype=float)
+    xu = np.array([item for key, item in ga_settings.problem.xu_dict.items() ], dtype=float)
 
     problem.n_var = ga_settings.problem.n_var
     problem.n_obj = ga_settings.problem.n_obj

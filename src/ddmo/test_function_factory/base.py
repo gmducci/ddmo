@@ -2,89 +2,79 @@
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, Sequence
 import numpy as np
 
+Array = np.ndarray
 
-class TestFunctionBase(ABC):
+
+class TestFunctionFamily(ABC):
     """
-    Abstract template class for generic test functions (windows) and their derivatives.
+    Abstract base class for test-function families on a regular grid.
 
-    Subclasses only need to implement:
-        • the construction of the base function φ via `evaluate`
-        • any function-specific parameters (length, stride, etc.)
-
-    This class provides:
-        • storage for φ and its derivative
-        • a generic finite-difference derivative
-        • automatic scaling by α
+    It does NOT assume any particular parameterisation (window length, stride, etc.).
+    Subclasses decide their own parameters, but must be able to:
+      • build test functions on a given grid
+      • report where those tests are centred.
     """
 
-    name: str = "TestFunctionBase"
+    name: str = "TestFunctionFamily"
 
     def __init__(self, dt: float = 1.0, alpha: float = 1.0) -> None:
         self.dt = float(dt)
         self.alpha = float(alpha)
+        self._centers: Optional[Array] = None  # shape (K, ndim) or (K,)
 
-        self.test_function: Optional[np.ndarray] = None
-        self.derivative_test_function: Optional[np.ndarray] = None
-
-        self.phi: Optional[np.ndarray] = None
-        self.dphi: Optional[np.ndarray] = None
+    # ---- core abstract interface --------------------------------------
 
     @abstractmethod
-    def evaluate(self, length: int) -> np.ndarray:
+    def build_tests(self, grid_shape: tuple[int, ...]) -> list[Array]:
         """
-        Return the unscaled test function φ of size `length`.
-        Subclasses must override this method.
+        Build and return the list of test functions on a grid.
+
+        Parameters
+        ----------
+        grid_shape : tuple[int, ...]
+            Shape of the grid on which data live, e.g.
+              • (M,)       for 1D (time or space)
+              • (M_x, M_t) for 1D space × time
+              • (M_x, M_y) for 2D space, etc.
+
+        Returns
+        -------
+        list of ndarray
+            Each test has shape `grid_shape`.
         """
-        raise NotImplementedError
+        ...
+
+    @property
+    @abstractmethod
+    def centers(self) -> Array:
+        """
+        Integer grid indices of the centres of each test function.
+
+        Shape (K,) for 1D grids, or (K, ndim) for multi-D.
+        """
+        ...
+
+    # ---- optional generic helpers -------------------------------------
 
     @staticmethod
-    def evaluate_derivative(phi: np.ndarray, dt: float) -> np.ndarray:
+    def finite_difference(phi: Array, dt: float, axis: int = -1) -> Array:
         """
-        Central finite-difference approximation of dφ/dt.
+        Central finite-difference derivative along a given axis.
 
-        dφ[i] ≈ (φ[i+1] − φ[i−1]) / (2 dt)
-        Endpoints are set to zero.
+        Endpoints are set to zero; intended as a utility, not a requirement.
         """
-        dphi = np.empty_like(phi)
+        if phi.shape[axis] < 3:
+            return np.zeros_like(phi)
 
-        if phi.size < 3:
-            dphi.fill(0.0)
-            return dphi
+        # roll axis to the end
+        phi_r = np.moveaxis(phi, axis, -1)
+        dphi_r = np.empty_like(phi_r)
 
-        dphi[1:-1] = (phi[2:] - phi[:-2]) / (2.0 * dt)
-        dphi[0] = 0.0
-        dphi[-1] = 0.0
-        return dphi
+        dphi_r[..., 1:-1] = (phi_r[..., 2:] - phi_r[..., :-2]) / (2.0 * dt)
+        dphi_r[..., 0] = 0.0
+        dphi_r[..., -1] = 0.0
 
-    def build(self, length: int) -> None:
-        """
-        Build and store:
-            • self.test_function  (unscaled φ)
-            • self.derivative_test_function  (unscaled dφ/dt)
-            • self.phi  = α φ
-            • self.dphi = α dφ/dt
-        """
-        self.test_function = self.evaluate(length)
-        self.derivative_test_function = self.evaluate_derivative(
-            self.test_function, self.dt
-        )
-
-        self.phi = self.test_function * self.alpha
-        self.dphi = self.derivative_test_function * self.alpha
-
-    def __call__(self, length: int) -> np.ndarray:
-        """
-        Allow calling the object as a function: f(L) = φ(L) unscaled.
-        """
-        return self.evaluate(length)
-
-
-def window_derivative(phi: np.ndarray, dt: float) -> np.ndarray:
-    """
-    Optional helper that exposes the derivative function with
-    the signature previously used by HannWindow.
-    """
-    return TestFunctionBase.evaluate_derivative(phi, dt)
+        return np.moveaxis(dphi_r, -1, axis)

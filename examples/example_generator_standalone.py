@@ -90,12 +90,12 @@ if __name__ == "__main__":
     lower_bounds = {
         'gamma_1': 8.4,
         'gamma_2': 1.0,
-        'stride': 50
+        'stride': 200
     }
     upper_bounds = {
         'gamma_1': 9.6,
         'gamma_2': 10.0,
-        'stride': 90
+        'stride': 500
     }
     problem_settings = ProblemSettings(n_var=3,
                                        n_obj=2, 
@@ -136,7 +136,7 @@ if __name__ == "__main__":
     formulation_settings = FormulationSettings(formulation_name="weak",
                                                test_functions_class="HannWindow",
                                                formulation_parameters={
-                                                   "window_length": 451,
+                                                   "window_length": 601,
                                                    "stride": 50
                                                })
 

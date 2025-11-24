@@ -3,79 +3,94 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Callable
 from collections.abc import Sequence
-import pysindy as ps
 
 import numpy as np
+import pysindy as ps
 
-from .base import Formulation
+from ddmo.formulation.base import Formulation
+from ddmo.test_function_factory.base import TestFunctionFamily  # abstract base
 
 IntegralSolver = Callable[..., np.ndarray]
-
-def get_test_function_class(test_function_class: str):
-    """
-    Get test function class by name.
-
-    Args:
-        test_function_factory: Name of the optimizer to retrieve
-
-    Returns:
-        Optimizer class
-
-    Raises:
-        ValueError: If optimizer name is not recognized
-    """
-
-    if test_function_class.lower() == "hannwindow":
-        from ddmo.test_function_factory.hann_window import  HannWindow
-        return HannWindow
-    else:
-        raise ValueError(f"Unknown test function: {test_function_class}")
-
+Array = np.ndarray
 
 
 @dataclass
 class WeakFormulation(Formulation):
     """
-    Weak formulation helper that delegates integral evaluation to a solver.
+    Weak formulation using a test-function family.
 
-    The default behaviour mirrors the sketch in the design notes: both sides of
-    the equation use the same integral, but the left-hand side carries a minus
-    sign.
+    This class does not own window_length or stride; those belong to the
+    concrete TestFunctionFamily (e.g. HannWindow). It only queries the family
+    for:
+      • φ (prototype window, scaled)
+      • dφ/dt (its time derivative, scaled)
+      • centres on the time grid
+
+    The integral computation in get_lhs/get_rhs is kept exactly as in the
+    original implementation (slice + sum).
     """
-    
-    def __init__(self, time_array: np.ndarray,
-                 x_train: np.ndarray,
-                 window_length: int,
-                 stride: int,
-                 test_function_class
-                 ):
-        self.window_length = window_length
-        self.test_function_class = test_function_class
-        self.dt = time_array[1] - time_array[0]
-        self.N = len(x_train)
-        self.test_function = test_function_class.evaluate(window_length)
-        self.test_function_derivatives = test_function_class.evaluate_derivative(self.test_function, self.dt)
-        #self_derivative_test_function = _window_derivative(self.test_function, self.dt)
-        # normalization factor for the integral approximation
-        self.alpha = 1 / np.sum(self.test_function) * self.dt
 
-        self.phi = self.test_function * self.alpha
-        self.dphi = self.test_function_derivatives * self.alpha
-        self.half = window_length // 2
-        self.centers = np.arange(self.half, self.N - self.half, stride)
-
-
-        self.M = len(self.centers)
-    
+    time_array: Array
+    x_train: Array
+    test_family: TestFunctionFamily
     integral_solver: IntegralSolver | None = None
 
-    # def solve_integral(self, *args: Any, **kwargs: Any) -> np.ndarray:
-    #     if self.integral_solver is None:
-    #         msg = "An integral_solver callable must be provided for weak formulations."
-    #         raise ValueError(msg)
-        
-    #     return self.integral_solver(*args, **kwargs)
+    def __post_init__(self) -> None:
+        # Basic grid info
+        if self.time_array.ndim != 1:
+            raise ValueError("time_array must be 1-D.")
+        if self.x_train.ndim != 2:
+            raise ValueError("x_train must be 2-D (M_time, n_var).")
 
+        self.dt = float(self.time_array[1] - self.time_array[0])
+        self.N = self.x_train.shape[0]          # number of time points
+
+        # Ask the test family for its prototype window properties.
+        # We assume the family has been instantiated with the right dt, window_length, stride, etc.
+        try:
+            self.window_length = int(self.test_family.window_length)   # e.g. 601
+        except AttributeError as exc:
+            raise AttributeError(
+                "test_family must provide a `window_length` attribute."
+            ) from exc
+
+        # prototype window (φ) and its time derivative (dφ/dt),
+        # already scaled according to the family's alpha/normalisation
+        try:
+            self.phi = np.asarray(self.test_family.phi, float)
+            self.dphi = np.asarray(self.test_family.dphi, float)
+        except AttributeError as exc:
+            raise AttributeError(
+                "test_family must provide `phi` and `dphi` attributes "
+                "(prototype window and its derivative)."
+            ) from exc
+
+        if self.phi.shape[0] != self.window_length or self.dphi.shape[0] != self.window_length:
+            raise ValueError(
+                "test_family.phi and test_family.dphi must have length "
+                f"window_length={self.window_length}."
+            )
+
+        # half-width for slicing
+        self.half = self.window_length // 2
+
+        # centres on the time grid: ask the family to compute them
+        try:
+            # this should create/refresh centres for the given grid length
+            # you can name this method `grid_centers` or similar in HannWindow
+            centers = self.test_family.grid_centers(self.N)
+        except AttributeError as exc:
+            raise AttributeError(
+                "test_family must implement `grid_centers(M: int) -> np.ndarray` "
+                "to provide window centres."
+            ) from exc
+
+        self.centers = np.asarray(centers, dtype=int)
+        self.M = self.centers.shape[0]          # number of test windows
+
+    # ------------------------------------------------------------------
+    # Left-hand side (unchanged integral logic)
+    # ------------------------------------------------------------------
     def get_lhs(self, *args: Any, **kwargs: Any) -> np.ndarray:
 
         targets = {}
@@ -88,14 +103,16 @@ class WeakFormulation(Formulation):
             xi = data_instance.x_train[:, i]
             for m, c in enumerate(self.centers):
                 slice_range = slice(c - self.half, c + self.half + 1)
-                
                 B[m, i] = -np.sum(xi[slice_range] * self.dphi) * self.dt
             # targets[f"var_{vn}"] = b
 
         return B
 
-    def get_rhs(self, *args: Any, **kwargs: Any) -> np.ndarray:
-        
+    # ------------------------------------------------------------------
+    # Right-hand side (unchanged integral logic)
+    # ------------------------------------------------------------------
+    def get_rhs(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
+
         data_instance, opt_vars = _extract_rhs_inputs(*args, **kwargs)
 
         named_funcs = data_instance.library_object([*opt_vars])
@@ -107,16 +124,19 @@ class WeakFormulation(Formulation):
 
         lib_custom = ps.CustomLibrary(
             library_functions=functions,
-            function_names=function_names
+            function_names=function_names,
         )
         lib_custom.fit(x_matrix)
         theta = lib_custom.transform(x_matrix)
         colmask = ~np.isnan(theta).any(axis=0)
 
-        theta = theta[:, colmask] 
+        theta = theta[:, colmask]
         rhs = np.zeros((self.M, theta.shape[1]))
         for m, c in enumerate(self.centers):
-            slice_range = slice(c - self.window_length // 2, c + self.window_length // 2 + 1)
+            slice_range = slice(
+                c - self.window_length // 2,
+                c + self.window_length // 2 + 1,
+            )
             for j, G in enumerate(theta.T):
                 rhs[m, j] = np.sum(G[slice_range] * self.phi) * self.dt
 
@@ -127,7 +147,11 @@ class WeakFormulation(Formulation):
             "named_funcs": named_funcs,
             "colmask": colmask,
         }
-    
+
+
+# ----------------------------------------------------------------------
+# Helpers (unchanged)
+# ----------------------------------------------------------------------
 def _extract_rhs_inputs(*args: Any, **kwargs: Any) -> tuple[Any, tuple[float, ...]]:
     data_instance = None
     opt_vars = None

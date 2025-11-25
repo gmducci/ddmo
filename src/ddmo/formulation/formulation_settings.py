@@ -56,6 +56,52 @@ class FormulationSettings:
         # Ignore test_functions_class for strong formulation
         if self.formulation_name == "strong":
             self.test_functions_class = None
+    
+    def build_formulation(self, data_instance) -> "Formulation":
+        """
+        Factory that builds a concrete Formulation object
+        (e.g. WeakFormulation) from these settings and the data.
+        """
+        from ddmo.formulation.base import Formulation
+        from ddmo.formulation.weak import WeakFormulation
+
+        dt = float(data_instance.time_array[1] - data_instance.time_array[0])
+
+        if self.formulation_name == "weak":
+            # test-function family class (e.g. HannWindow)
+            family_cls = self.test_functions_class
+            if family_cls is None:
+                raise ValueError(
+                    "Weak formulation requires a test_functions_class."
+                )
+
+            # base parameters, e.g. window_length, maybe a default stride
+            base_params = dict(self.test_function_parameters)
+
+            # initial family instance (used before GA evaluation starts)
+            test_family = family_cls(dt=dt, **base_params)
+
+            # family_builder: map opt_vars -> concrete TestFunctionFamily
+            def family_builder(opt_vars: tuple[float, ...]):
+                # current semantics: last optimisation variable controls stride
+                stride_val = int(round(opt_vars[-1]))
+                params = dict(base_params)
+                params["stride"] = stride_val
+                return family_cls(dt=dt, **params)
+
+            return WeakFormulation(
+                time_array=data_instance.time_array,
+                x_train=data_instance.x_train,
+                test_family=test_family,
+                family_builder=family_builder,
+            )
+
+        elif self.formulation_name == "strong":
+            # Placeholder; you can later build a StrongFormulation here
+            raise NotImplementedError("Strong formulation construction not implemented yet.")
+
+        else:
+            raise ValueError(f"Unknown formulation_name={self.formulation_name!r}")
 
     def update(self, **kwargs) -> None:
         """Update internal formulation_parameters dictionary with new values."""

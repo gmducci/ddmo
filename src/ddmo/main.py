@@ -41,7 +41,7 @@ from ddmo.utils.constructors import GASettings
 from ddmo.solver.base import BaseSolver
 from ddmo.formulation import Formulation, WeakFormulation, StrongFormulation
 from ddmo.test_function_factory.hann_window import HannWindow
-
+from ddmo.test_function_factory.base import TestFunctionFamily
 # from ddmo.optimizer.optimizer import Optimizer
 # from ddmo.optimizer.Scipy_Solver import Scipy_Solver
 
@@ -90,27 +90,12 @@ def identify(data_instance: DataConstructor,
     from ddmo.optimizer.optimizer import Optimizer
 
     print(f"Using formulation: {formulation_instance.formulation_name}")
-    if formulation_instance.formulation_name == "weak":
-        # 1. Get the test-function family class (e.g. HannWindow)
-        family_cls = formulation_instance.test_functions_class   # already normalized by FormulationSettings
 
-        # 2. Build a configured family instance using formulation_parameters
-        dt = float(data_instance.time_array[1] - data_instance.time_array[0])
-        test_family = family_cls(
-            dt=dt,
-            **formulation_instance.test_function_parameters,  # e.g. window_length=601, stride=50
-        )
-
-        # 3. Pass the family instance into WeakFormulation
-        resolved_formulation = WeakFormulation(
-            time_array=data_instance.time_array,
-            x_train=data_instance.x_train,
-            test_family=test_family,
-        )
+    if formulation_instance is not None:
+        resolved_formulation = formulation_instance.build_formulation(data_instance)
     else:
-          formulation_options = None
+        resolved_formulation = None
         
-
     # resolved_formulation = _build_formulation(formulation, formulation_options)
     problem = Optimizer(
         data_instance=data_instance,

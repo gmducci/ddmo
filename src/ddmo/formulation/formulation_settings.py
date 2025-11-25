@@ -37,7 +37,8 @@ class FormulationSettings:
     """
     formulation_name: FormulationName = "strong"
     test_functions_class: Optional[Type[TestFunctionFamily]] = None
-    formulation_parameters: dict[str, Any] = field(default_factory=dict)
+    test_function_parameters: dict[str, Any] = field(default_factory=dict)
+
 
     def __post_init__(self) -> None:
         # Normalize test_functions_class: allow passing a string or a class
@@ -78,5 +79,5 @@ class FormulationSettings:
         return cls(
             formulation_name="weak",
             test_functions_class=test_functions_class,
-            formulation_parameters=formulation_parameters,
+            test_function_parameters=formulation_parameters,
         )

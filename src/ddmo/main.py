@@ -98,7 +98,7 @@ def identify(data_instance: DataConstructor,
         dt = float(data_instance.time_array[1] - data_instance.time_array[0])
         test_family = family_cls(
             dt=dt,
-            **formulation_instance.formulation_parameters,  # e.g. window_length=601, stride=50
+            **formulation_instance.test_function_parameters,  # e.g. window_length=601, stride=50
         )
 
         # 3. Pass the family instance into WeakFormulation

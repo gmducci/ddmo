@@ -78,3 +78,9 @@ class TestFunctionFamily(ABC):
         dphi_r[..., -1] = 0.0
 
         return np.moveaxis(dphi_r, -1, axis)
+    
+
+    @abstractmethod
+    def grid_centers(self, M: int) -> Array:
+        """Return integer centres of test functions on a 1D grid of length M."""
+        pass

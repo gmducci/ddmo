@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 from collections.abc import Sequence
 
 import numpy as np
@@ -11,74 +11,69 @@ from ddmo.formulation.base import Formulation
 from ddmo.test_function_factory.base import TestFunctionFamily  # abstract base
 
 IntegralSolver = Callable[..., np.ndarray]
+FamilyBuilder = Callable[[tuple[float, ...]], TestFunctionFamily]
+
 Array = np.ndarray
 
 
 @dataclass
 class WeakFormulation(Formulation):
-    """
-    Weak formulation using a test-function family.
-
-    This class does not own window_length or stride; those belong to the
-    concrete TestFunctionFamily (e.g. HannWindow). It only queries the family
-    for:
-      • φ (prototype window, scaled)
-      • dφ/dt (its time derivative, scaled)
-      • centres on the time grid
-
-    The integral computation in get_lhs/get_rhs is kept exactly as in the
-    original implementation (slice + sum).
-    """
-
     time_array: Array
     x_train: Array
     test_family: TestFunctionFamily
     integral_solver: IntegralSolver | None = None
+    family_builder: Optional[FamilyBuilder] = None
 
     def __post_init__(self) -> None:
-        # Basic grid info
         if self.time_array.ndim != 1:
             raise ValueError("time_array must be 1-D.")
         if self.x_train.ndim != 2:
             raise ValueError("x_train must be 2-D (M_time, n_var).")
 
         self.dt = float(self.time_array[1] - self.time_array[0])
-        self.N = self.x_train.shape[0]          # number of time points
+        self.N = self.x_train.shape[0]
 
-        # Ask the test family for its prototype window properties.
-        # We assume the family has been instantiated with the right dt, window_length, stride, etc.
-        try:
-            self.window_length = int(self.test_family.window_length)   # e.g. 601
-        except AttributeError as exc:
-            raise AttributeError(
-                "test_family must provide a `window_length` attribute."
-            ) from exc
+        # new helper
+        self._configure_from_family(self.test_family)
 
-        # prototype window (φ) and its time derivative (dφ/dt),
-        # already scaled according to the family's alpha/normalisation
+    def _configure_from_family(self, family: TestFunctionFamily) -> None:
+        """
+        Read all necessary information from a TestFunctionFamily instance
+        and cache it in this WeakFormulation.
+
+        This is the only place where we touch family-specific attributes
+        like `phi`, `dphi`, `grid_centers`. We do NOT rely on parameter
+        names such as window_length, stride, sigma, etc.
+        """
+        self.test_family = family
+
+        # 1) Get prototype window and its derivative (generic arrays)
         try:
-            self.phi = np.asarray(self.test_family.phi, float)
-            self.dphi = np.asarray(self.test_family.dphi, float)
+            phi = np.asarray(family.phi, float)
+            dphi = np.asarray(family.dphi, float)
         except AttributeError as exc:
             raise AttributeError(
                 "test_family must provide `phi` and `dphi` attributes "
-                "(prototype window and its derivative)."
+                "(prototype test function and its derivative)."
             ) from exc
 
-        if self.phi.shape[0] != self.window_length or self.dphi.shape[0] != self.window_length:
+        if phi.shape != dphi.shape or phi.ndim != 1:
             raise ValueError(
-                "test_family.phi and test_family.dphi must have length "
-                f"window_length={self.window_length}."
+                "test_family.phi and test_family.dphi must be 1-D arrays "
+                "of the same length."
             )
 
-        # half-width for slicing
-        self.half = self.window_length // 2
+        # 2) Derive window length from phi itself (no attribute name needed)
+        window_length = phi.shape[0]
 
-        # centres on the time grid: ask the family to compute them
+        self.window_length = window_length
+        self.phi = phi
+        self.dphi = dphi
+        self.half = window_length // 2
+
+        # 3) Centres on the time grid: generic method from the base class
         try:
-            # this should create/refresh centres for the given grid length
-            # you can name this method `grid_centers` or similar in HannWindow
-            centers = self.test_family.grid_centers(self.N)
+            centers = family.grid_centers(self.N)   # implemented by each subclass
         except AttributeError as exc:
             raise AttributeError(
                 "test_family must implement `grid_centers(M: int) -> np.ndarray` "
@@ -86,34 +81,39 @@ class WeakFormulation(Formulation):
             ) from exc
 
         self.centers = np.asarray(centers, dtype=int)
-        self.M = self.centers.shape[0]          # number of test windows
-
-    # ------------------------------------------------------------------
-    # Left-hand side (unchanged integral logic)
-    # ------------------------------------------------------------------
+        self.M = self.centers.shape[0]
+        
+        # ------------------------------------------------------------------
+        # Left-hand side (unchanged integral logic)
+        # ------------------------------------------------------------------
     def get_lhs(self, *args: Any, **kwargs: Any) -> np.ndarray:
-
-        targets = {}
         data_instance, opt_vars = _extract_rhs_inputs(*args, **kwargs)
+
+        # NEW: if a builder is provided, rebuild the family for this candidate
+        if self.family_builder is not None:
+            new_family = self.family_builder(opt_vars)
+            self._configure_from_family(new_family)
+
         var_numbers = data_instance.x_train.shape[-1]
         B = np.zeros((self.M, var_numbers))
 
-        for i, vn in enumerate(range(var_numbers)):
-            b = np.zeros(self.M)
+        for i in range(var_numbers):
             xi = data_instance.x_train[:, i]
             for m, c in enumerate(self.centers):
                 slice_range = slice(c - self.half, c + self.half + 1)
                 B[m, i] = -np.sum(xi[slice_range] * self.dphi) * self.dt
-            # targets[f"var_{vn}"] = b
 
         return B
-
     # ------------------------------------------------------------------
     # Right-hand side (unchanged integral logic)
     # ------------------------------------------------------------------
     def get_rhs(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
-
         data_instance, opt_vars = _extract_rhs_inputs(*args, **kwargs)
+
+        # NEW: same hook here
+        if self.family_builder is not None:
+            new_family = self.family_builder(opt_vars)
+            self._configure_from_family(new_family)
 
         named_funcs = data_instance.library_object([*opt_vars])
         functions = [func for func, _ in named_funcs]
@@ -147,7 +147,6 @@ class WeakFormulation(Formulation):
             "named_funcs": named_funcs,
             "colmask": colmask,
         }
-
 
 # ----------------------------------------------------------------------
 # Helpers (unchanged)

@@ -15,7 +15,6 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
 from scipy.integrate import solve_ivp
-
 from ddmo import BENCHMARK_FOLDER, identify
 import warnings
 
@@ -116,7 +115,6 @@ if __name__ == "__main__":
                              verbose=True)
 
 
-
     solver_settings = SolverSettings(solver_name="pysindy",
                                     regularization="STLSQ",
                                     regularization_parameters={
@@ -127,19 +125,16 @@ if __name__ == "__main__":
 
     solver_class = SOLVER_REGISTRY[solver_settings.solver_name]
 
-
-
     solver_settings = solver_class(data_instance=training_data,
                           optimizer=solver_settings.regularization,
                           solver_parameters=solver_settings.regularization_parameters)
     
     formulation_settings = FormulationSettings(formulation_name="weak",
                                                test_functions_class="HannWindow",
-                                               formulation_parameters={
+                                               test_function_parameters={
                                                    "window_length": 601,
                                                    "stride": 50
                                                })
-
 
     identification = identify(data_instance=training_data,
                               ga_settings=ga_settings,

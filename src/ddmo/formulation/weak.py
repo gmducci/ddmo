@@ -89,9 +89,11 @@ class WeakFormulation(Formulation):
     def get_lhs(self, *args: Any, **kwargs: Any) -> np.ndarray:
         data_instance, opt_vars = _extract_rhs_inputs(*args, **kwargs)
 
-        # NEW: if a builder is provided, rebuild the family for this candidate
-        if self.family_builder is not None:
-            new_family = self.family_builder(opt_vars)
+        param_dict = kwargs.get("opt_param_dict", None)
+
+        # If a builder exists and dict is provided, rebuild family
+        if self.family_builder is not None and param_dict is not None:
+            new_family = self.family_builder(param_dict)
             self._configure_from_family(new_family)
 
         var_numbers = data_instance.x_train.shape[-1]
@@ -110,9 +112,9 @@ class WeakFormulation(Formulation):
     def get_rhs(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
         data_instance, opt_vars = _extract_rhs_inputs(*args, **kwargs)
 
-        # NEW: same hook here
-        if self.family_builder is not None:
-            new_family = self.family_builder(opt_vars)
+        param_dict = kwargs.get("opt_param_dict", None)
+        if self.family_builder is not None and param_dict is not None:
+            new_family = self.family_builder(param_dict)
             self._configure_from_family(new_family)
 
         named_funcs = data_instance.library_object([*opt_vars])

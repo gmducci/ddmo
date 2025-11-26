@@ -86,16 +86,31 @@ if __name__ == "__main__":
     # Define all the optimization settings in a constructor
 
     # Definition of opt boundaries
-    lower_bounds = {
-        'gamma_1': 8.4,
-        'gamma_2': 1.0,
-        'stride': 49
+    # --- 1) library parameters (used by get_base_functions) --------------
+    library_lower_bounds = {
+        "gamma_1": 8.4,
+        "gamma_2": 1.0,
     }
-    upper_bounds = {
-        'gamma_1': 9.6,
-        'gamma_2': 10.0,
-        'stride': 51
+
+    library_upper_bounds = {
+        "gamma_1": 9.6,
+        "gamma_2": 10.0,
     }
+
+    # --- 2) formulation / test-function parameters -----------------------
+    formulation_lower_bounds = {
+        "stride": 45,
+    }
+
+    formulation_upper_bounds = {
+        "stride": 50,
+    }
+    library_param_names = list(library_lower_bounds.keys())
+    formulation_param_names = list(formulation_lower_bounds.keys())
+
+    # --- 3) combined bounds passed to ProblemSettings (backward compatible)
+    lower_bounds = {**library_lower_bounds, **formulation_lower_bounds}
+    upper_bounds = {**library_upper_bounds, **formulation_upper_bounds}
     problem_settings = ProblemSettings(n_var=3,
                                        n_obj=2, 
                                        xl_dict= lower_bounds,
@@ -129,12 +144,14 @@ if __name__ == "__main__":
                           optimizer=solver_settings.regularization,
                           solver_parameters=solver_settings.regularization_parameters)
     
+    
     formulation_settings = FormulationSettings(formulation_name="weak",
                                                test_functions_class="HannWindow",
                                                test_function_parameters={
-                                                   "window_length": 601,
+                                                   "window_length": 501,
                                                    "stride": 50
-                                               })
+                                               },
+                                               formulation_opt_param_names=formulation_param_names)
 
     identification = identify(data_instance=training_data,
                               ga_settings=ga_settings,

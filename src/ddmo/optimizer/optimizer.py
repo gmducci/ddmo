@@ -73,12 +73,26 @@ class Optimizer(Problem):
         }
 
         if self.formulation is not None:
-            lhs = self.formulation.get_lhs(self.data_instance, optimization_variables)
-            rhs = self.formulation.get_rhs(self.data_instance, optimization_variables)
+            # vector -> dict with names (using your existing mapi_label)
+            param_dict = {
+                name: optimization_variables[idx]
+                for name, idx in self.mapi_label.items()
+            }
+
+            lhs = self.formulation.get_lhs(
+                self.data_instance,
+                optimization_variables,
+                opt_param_dict=param_dict,
+            )
+            rhs = self.formulation.get_rhs(
+                self.data_instance,
+                optimization_variables,
+                opt_param_dict=param_dict,
+            )
             solver_args = (lhs, rhs)
         else:
             solver_args = (optimization_variables,)
-
+            
         solver_output = self.solver(*solver_args)
 
         if solver_output is None:

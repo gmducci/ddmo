@@ -2,7 +2,9 @@ from dataclasses import dataclass, field
 from typing import Any, Optional, Literal, Type
 
 from ddmo.test_function_factory.base import TestFunctionFamily  # abstract base
+from typing import Callable
 
+TestParamMapper = Callable[[tuple[float, ...], dict[str, Any]], dict[str, Any]]
 
 FormulationName = Literal["strong", "weak"]
 
@@ -30,6 +32,7 @@ def get_test_function_class(test_function_class: Any) -> Type[TestFunctionFamily
     return test_function_class
 
 
+
 @dataclass
 class FormulationSettings:
     """
@@ -39,6 +42,8 @@ class FormulationSettings:
     test_functions_class: Optional[Type[TestFunctionFamily]] = None
     test_function_parameters: dict[str, Any] = field(default_factory=dict)
 
+    # NEW: names of optimisation variables that belong to the formulation
+    formulation_opt_param_names: list[str] | None = None
 
     def __post_init__(self) -> None:
         # Normalize test_functions_class: allow passing a string or a class
@@ -56,37 +61,37 @@ class FormulationSettings:
         # Ignore test_functions_class for strong formulation
         if self.formulation_name == "strong":
             self.test_functions_class = None
-    
-    def build_formulation(self, data_instance) -> "Formulation":
-        """
-        Factory that builds a concrete Formulation object
-        (e.g. WeakFormulation) from these settings and the data.
-        """
-        from ddmo.formulation.base import Formulation
+            self.test_function_parameters.clear()
+
+    def build_formulation(self, data_instance):
         from ddmo.formulation.weak import WeakFormulation
 
         dt = float(data_instance.time_array[1] - data_instance.time_array[0])
 
         if self.formulation_name == "weak":
-            # test-function family class (e.g. HannWindow)
             family_cls = self.test_functions_class
             if family_cls is None:
-                raise ValueError(
-                    "Weak formulation requires a test_functions_class."
-                )
+                raise ValueError("Weak formulation requires a test_functions_class.")
 
-            # base parameters, e.g. window_length, maybe a default stride
             base_params = dict(self.test_function_parameters)
-
-            # initial family instance (used before GA evaluation starts)
             test_family = family_cls(dt=dt, **base_params)
 
-            # family_builder: map opt_vars -> concrete TestFunctionFamily
-            def family_builder(opt_vars: tuple[float, ...]):
-                # current semantics: last optimisation variable controls stride
-                stride_val = int(round(opt_vars[-1]))
+            def family_builder(param_dict: dict[str, float]):
+                """
+                Update test-function parameters from *named* optimisation variables.
+                Uses formulation_opt_param_names as a filter.
+                """
                 params = dict(base_params)
-                params["stride"] = stride_val
+
+                names = self.formulation_opt_param_names or []
+                for name in names:
+                    if name in param_dict:
+                        val = param_dict[name]
+                        if name == "stride":
+                            params[name] = int(round(val))
+                        else:
+                            params[name] = float(val)
+
                 return family_cls(dt=dt, **params)
 
             return WeakFormulation(
@@ -97,16 +102,7 @@ class FormulationSettings:
             )
 
         elif self.formulation_name == "strong":
-            # Placeholder; you can later build a StrongFormulation here
             raise NotImplementedError("Strong formulation construction not implemented yet.")
-
-        else:
-            raise ValueError(f"Unknown formulation_name={self.formulation_name!r}")
-
-    def update(self, **kwargs) -> None:
-        """Update internal formulation_parameters dictionary with new values."""
-        self.formulation_parameters.update(kwargs)
-
     # Optional convenience constructors
     @classmethod
     def strong(cls, **formulation_parameters: Any) -> "FormulationSettings":

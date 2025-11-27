@@ -9,22 +9,39 @@ import pysindy as ps
 
 from ddmo.formulation.base import Formulation
 from ddmo.test_function_factory.base import TestFunctionFamily  # abstract base
+from ddmo.test_function_factory.registry import WEAK_TEST_FAMILY_REGISTRY
 
 IntegralSolver = Callable[..., np.ndarray]
-FamilyBuilder = Callable[[tuple[float, ...]], TestFunctionFamily]
+FamilyBuilder = Callable[[dict[str, float]], TestFunctionFamily]  # <- dict, not tuple
 
 Array = np.ndarray
 
 
 @dataclass
 class WeakFormulation(Formulation):
+    """
+    Weak formulation driven by a test-function family chosen from a registry.
+
+    Parameters
+    ----------
+    time_array : (M,)
+        Time grid.
+    x_train : (M, n_var)
+        Training state trajectory.
+    class_attributes : dict
+        Dictionary that must at least contain:
+            - "test_functions_class": name in WEAK_TEST_FAMILY_REGISTRY
+        and may contain any other keyword arguments for that test-family
+        (e.g. "window_length", "stride", ...).
+    """
     time_array: Array
     x_train: Array
-    test_family: TestFunctionFamily
+    class_attributes: dict[str, Any]
     integral_solver: IntegralSolver | None = None
     family_builder: Optional[FamilyBuilder] = None
 
     def __post_init__(self) -> None:
+        # Basic shape checks
         if self.time_array.ndim != 1:
             raise ValueError("time_array must be 1-D.")
         if self.x_train.ndim != 2:
@@ -33,21 +50,65 @@ class WeakFormulation(Formulation):
         self.dt = float(self.time_array[1] - self.time_array[0])
         self.N = self.x_train.shape[0]
 
-        # new helper
-        self._configure_from_family(self.test_family)
+        # ------------------------------------------------------------------
+        # Build initial test-family from the registry
+        # ------------------------------------------------------------------
+        family_name = self.class_attributes.get("test_functions_class")
+        if family_name is None:
+            raise ValueError(
+                "class_attributes must contain key 'test_functions_class'."
+            )
 
+        try:
+            family_cls = WEAK_TEST_FAMILY_REGISTRY[family_name]
+        except KeyError as exc:
+            raise ValueError(
+                f"Unknown test-function family '{family_name}'. "
+                f"Available: {sorted(WEAK_TEST_FAMILY_REGISTRY)}"
+            ) from exc
+
+        # All other entries in class_attributes are treated as parameters
+        base_params = {
+            k: v for k, v in self.class_attributes.items()
+            if k != "test_functions_class"
+        }
+
+        # Build the initial family and configure the formulation
+        initial_family = family_cls(dt=self.dt, **base_params)
+        self._configure_from_family(initial_family)
+
+        # ------------------------------------------------------------------
+        # Build a family_builder closure for later updates (GA, etc.)
+        # ------------------------------------------------------------------
+        def builder(param_dict: dict[str, float]) -> TestFunctionFamily:
+            """
+            Create a new test-family instance from updated optimisation parameters.
+
+            param_dict maps parameter names (e.g. 'gamma_1', 'stride') to floats.
+            """
+            params = dict(base_params)
+
+            for name, val in param_dict.items():
+                if name not in params:
+                    # ignore optimisation variables that do not correspond
+                    # to test-family parameters
+                    continue
+
+                if name == "stride":
+                    params[name] = int(round(val))
+                else:
+                    params[name] = float(val)
+
+            return family_cls(dt=self.dt, **params)
+
+        self.family_builder = builder
+
+    # ------------------------------------------------------------------
+    # Configuration from a TestFunctionFamily (unchanged)
+    # ------------------------------------------------------------------
     def _configure_from_family(self, family: TestFunctionFamily) -> None:
-        """
-        Read all necessary information from a TestFunctionFamily instance
-        and cache it in this WeakFormulation.
-
-        This is the only place where we touch family-specific attributes
-        like `phi`, `dphi`, `grid_centers`. We do NOT rely on parameter
-        names such as window_length, stride, sigma, etc.
-        """
         self.test_family = family
 
-        # 1) Get prototype window and its derivative (generic arrays)
         try:
             phi = np.asarray(family.phi, float)
             dphi = np.asarray(family.dphi, float)
@@ -63,7 +124,6 @@ class WeakFormulation(Formulation):
                 "of the same length."
             )
 
-        # 2) Derive window length from phi itself (no attribute name needed)
         window_length = phi.shape[0]
 
         self.window_length = window_length
@@ -71,9 +131,8 @@ class WeakFormulation(Formulation):
         self.dphi = dphi
         self.half = window_length // 2
 
-        # 3) Centres on the time grid: generic method from the base class
         try:
-            centers = family.grid_centers(self.N)   # implemented by each subclass
+            centers = family.grid_centers(self.N)
         except AttributeError as exc:
             raise AttributeError(
                 "test_family must implement `grid_centers(M: int) -> np.ndarray` "
@@ -82,16 +141,15 @@ class WeakFormulation(Formulation):
 
         self.centers = np.asarray(centers, dtype=int)
         self.M = self.centers.shape[0]
-        
-        # ------------------------------------------------------------------
-        # Left-hand side (unchanged integral logic)
-        # ------------------------------------------------------------------
+
+    # ------------------------------------------------------------------
+    # Left-hand side (unchanged integral logic)
+    # ------------------------------------------------------------------
     def get_lhs(self, *args: Any, **kwargs: Any) -> np.ndarray:
         data_instance, opt_vars = _extract_rhs_inputs(*args, **kwargs)
 
         param_dict = kwargs.get("opt_param_dict", None)
 
-        # If a builder exists and dict is provided, rebuild family
         if self.family_builder is not None and param_dict is not None:
             new_family = self.family_builder(param_dict)
             self._configure_from_family(new_family)
@@ -106,6 +164,7 @@ class WeakFormulation(Formulation):
                 B[m, i] = -np.sum(xi[slice_range] * self.dphi) * self.dt
 
         return B
+
     # ------------------------------------------------------------------
     # Right-hand side (unchanged integral logic)
     # ------------------------------------------------------------------

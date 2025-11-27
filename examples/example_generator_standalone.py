@@ -15,6 +15,7 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
 from scipy.integrate import solve_ivp
+from ddmo.formulation.registry import FORMULATION_REGISTRY
 from ddmo import BENCHMARK_FOLDER, identify
 import warnings
 
@@ -83,8 +84,6 @@ if __name__ == "__main__":
         x_0=x_0,
         x_raw=x_raw)
     
-    # Define all the optimization settings in a constructor
-
     # Definition of opt boundaries
     # --- 1) library parameters (used by get_base_functions) --------------
     library_lower_bounds = {
@@ -105,6 +104,7 @@ if __name__ == "__main__":
     formulation_upper_bounds = {
         "stride": 50,
     }
+
     library_param_names = list(library_lower_bounds.keys())
     formulation_param_names = list(formulation_lower_bounds.keys())
 
@@ -129,14 +129,12 @@ if __name__ == "__main__":
                              seed=None,
                              verbose=True)
 
-
     solver_settings = SolverSettings(solver_name="pysindy",
                                     regularization="STLSQ",
                                     regularization_parameters={
                                     "alpha": 0.045,
                                     "threshold": 0.1
                                     },)
-        
 
     solver_class = SOLVER_REGISTRY[solver_settings.solver_name]
 
@@ -145,18 +143,31 @@ if __name__ == "__main__":
                           solver_parameters=solver_settings.regularization_parameters)
     
     
-    formulation_settings = FormulationSettings(formulation_name="weak",
-                                               test_functions_class="HannWindow",
-                                               test_function_parameters={
-                                                   "window_length": 501,
-                                                   "stride": 50
-                                               },
-                                               formulation_opt_param_names=formulation_param_names)
+    formulation_settings = FormulationSettings(
+        formulation_name="weak",
+        formulation_attributes={
+            "test_functions_class": "HannWindow",
+            "window_length": 601,
+            "stride": 50,
+        },
+    )
+
+    # Load the formulation class from the registry (should be handled in the main)
+    formulation_class = FORMULATION_REGISTRY[formulation_settings.formulation_name]
+
+    # Not agnostic right now!
+    weak_formulation = formulation_class(
+    time_array=training_data.time_array,
+    x_train=training_data.x_train,
+    class_attributes=formulation_settings.formulation_attributes,
+)
+
+    # Load the test-function family class from the registry
 
     identification = identify(data_instance=training_data,
                               ga_settings=ga_settings,
                               solver_instance=solver_settings,
-                              formulation_instance=formulation_settings
+                              formulation_instance=weak_formulation,
                               )
 
     (problem,

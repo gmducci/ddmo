@@ -88,13 +88,17 @@ def identify(data_instance: DataConstructor,
     """
     # ===== begin opt =====    
     from ddmo.optimizer.optimizer import Optimizer
+# formulation_instance is now the actual formulation object, e.g. WeakFormulation
+    if formulation_instance is None:
+        raise ValueError("identify requires a formulation instance (e.g. WeakFormulation).")
 
-    print(f"Using formulation: {formulation_instance.formulation_name}")
-
-    if formulation_instance is not None:
-        resolved_formulation = formulation_instance.build_formulation(data_instance)
     else:
         resolved_formulation = None
+    
+    print(f"Using formulation object: {type(formulation_instance).__name__}")
+
+    resolved_formulation = formulation_instance
+
         
     # resolved_formulation = _build_formulation(formulation, formulation_options)
     problem = Optimizer(

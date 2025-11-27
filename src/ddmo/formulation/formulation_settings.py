@@ -1,68 +1,23 @@
+# ddmo/formulation/formulation_settings.py
 from dataclasses import dataclass, field
-from typing import Any, Optional, Literal, Type
-
-from ddmo.test_function_factory.base import TestFunctionFamily  # abstract base
-from typing import Callable
-
-TestParamMapper = Callable[[tuple[float, ...], dict[str, Any]], dict[str, Any]]
-
-FormulationName = Literal["strong", "weak"]
-
-
-def get_test_function_class(test_function_class: Any) -> Type[TestFunctionFamily]:
-    """
-    Normalize a test-function class specification.
-
-    Accepts either a string (registered name) or a class object.
-    """
-    # string → look up
-    if isinstance(test_function_class, str):
-        name = test_function_class.lower()
-        if name == "hannwindow":
-            from ddmo.test_function_factory.hann_window import HannWindow
-            return HannWindow
-        raise ValueError(f"Unknown test function: {test_function_class!r}")
-
-    # already a class → just return, but enforce subclass if desired
-    if not issubclass(test_function_class, TestFunctionFamily):
-        raise TypeError(
-            f"test_functions_class must inherit from TestFunctionFamily, "
-            f"got {test_function_class!r}"
-        )
-    return test_function_class
-
+from typing import Mapping, Any
 
 
 @dataclass
 class FormulationSettings:
     """
-    Settings for the formulation of the identification problem.
+    Generic settings for a formulation.
+
+    Attributes
+    ----------
+    formulation_name : str
+        Name used in the global FORMULATION_REGISTRY.
+    formulation_parameters : Mapping[str, Any]
+        Arbitrary kwargs passed to the formulation (interpreted by that formulation).
     """
-    formulation_name: FormulationName = "strong"
-    test_functions_class: Optional[Type[TestFunctionFamily]] = None
-    test_function_parameters: dict[str, Any] = field(default_factory=dict)
-
-    # NEW: names of optimisation variables that belong to the formulation
-    formulation_opt_param_names: list[str] | None = None
-
-    def __post_init__(self) -> None:
-        # Normalize test_functions_class: allow passing a string or a class
-        if self.test_functions_class is not None:
-            self.test_functions_class = get_test_function_class(
-                self.test_functions_class
-            )
-
-        # Enforce that weak formulation must have test_functions_class
-        if self.formulation_name == "weak" and self.test_functions_class is None:
-            raise ValueError(
-                "For 'weak' formulation, 'test_functions_class' must be provided."
-            )
-
-        # Ignore test_functions_class for strong formulation
-        if self.formulation_name == "strong":
-            self.test_functions_class = None
-            self.test_function_parameters.clear()
-
+    formulation_name: str
+    formulation_attributes: Mapping[str, Any] = field(default_factory=dict)
+    
     def build_formulation(self, data_instance):
         from ddmo.formulation.weak import WeakFormulation
 

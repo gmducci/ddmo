@@ -58,10 +58,10 @@ if __name__ == "__main__":
             rng = np.random.default_rng(seed)
             scale = np.abs(X)  # magnitude of the signal
             X = X + noise  * rng.standard_normal(X.shape)
-            #X[:, 0] = X[:, 0] + noise * rng.standard_normal(X.shape[0])
+            X[:, 0] = X[:, 0] + noise * rng.standard_normal(X.shape[0])
         return t, X
 
-    # t, x_train = simulate_goodwin()
+    t, x_train = simulate_goodwin()
 
     NamedFunc = tuple[Callable[[float, float], float], str]
     def get_base_functions(params: list[float]) -> list[NamedFunc]:
@@ -77,7 +77,7 @@ if __name__ == "__main__":
 
     # Create a DataConstructor instance
     training_data = DataConstructor(
-        x_train=x_raw[:, :],
+        x_train=x_train[:, :],
         time_array=time_array,
         x_dot=x_dot_hat[:, :],
         library_object=get_base_functions,
@@ -98,12 +98,12 @@ if __name__ == "__main__":
 
     # --- 2) formulation / test-function parameters -----------------------
     formulation_lower_bounds = {
-        "sigma": 50,
+        "degree": 2,
         "stride": 30,
     }
 
     formulation_upper_bounds = {
-        "sigma": 100,
+        "degree": 6,
         "stride": 90,
     }
 
@@ -148,10 +148,10 @@ if __name__ == "__main__":
     formulation_settings = FormulationSettings(
         formulation_name="weak",
         formulation_attributes={
-            "test_functions_class": "GaussianWindow",
+            "test_functions_class": "PolynomialWindow",
             "window_length": 601,
             "stride": 50,
-            "sigma": 50.0,
+            "degree": 6,      # for example: cubic bump
         },
     )
     # Load the formulation class from the registry (should be handled in the main)

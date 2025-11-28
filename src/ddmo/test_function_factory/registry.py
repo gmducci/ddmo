@@ -1,10 +1,9 @@
-# ddmo/formulation/weak_test_registry.py
-from typing import Dict, Type
-from ddmo.test_function_factory.base import TestFunctionFamily
 from ddmo.test_function_factory.hann_window import HannWindow
 from ddmo.test_function_factory.gaussian_window import GaussianWindow
+from ddmo.test_function_factory.polynomial_window import PolynomialWindow
 
-WEAK_TEST_FAMILY_REGISTRY: Dict[str, Type[TestFunctionFamily]] = {
+WEAK_TEST_FAMILY_REGISTRY = {
     "HannWindow": HannWindow,
     "GaussianWindow": GaussianWindow,
+    "PolynomialWindow": PolynomialWindow,
 }

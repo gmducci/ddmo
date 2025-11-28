@@ -98,11 +98,13 @@ if __name__ == "__main__":
 
     # --- 2) formulation / test-function parameters -----------------------
     formulation_lower_bounds = {
-        "stride": 45,
+        "sigma": 50,
+        "stride": 30,
     }
 
     formulation_upper_bounds = {
-        "stride": 50,
+        "sigma": 100,
+        "stride": 90,
     }
 
     library_param_names = list(library_lower_bounds.keys())
@@ -111,12 +113,12 @@ if __name__ == "__main__":
     # --- 3) combined bounds passed to ProblemSettings (backward compatible)
     lower_bounds = {**library_lower_bounds, **formulation_lower_bounds}
     upper_bounds = {**library_upper_bounds, **formulation_upper_bounds}
-    problem_settings = ProblemSettings(n_var=3,
+    problem_settings = ProblemSettings(n_var=4,
                                        n_obj=2, 
                                        xl_dict= lower_bounds,
                                        xu_dict= upper_bounds)
     
-    algorithm_settings = AlgorithmSettings(pop_size=30,
+    algorithm_settings = AlgorithmSettings(pop_size=50,
                                            sampling=FloatRandomSampling(),   # default
                                            crossover=SBX(eta=15, prob=0.9),  # default
                                            mutation=PM(eta=20))              # default
@@ -132,7 +134,7 @@ if __name__ == "__main__":
     solver_settings = SolverSettings(solver_name="pysindy",
                                     regularization="STLSQ",
                                     regularization_parameters={
-                                    "alpha": 0.045,
+                                    "alpha": 0.05,
                                     "threshold": 0.1
                                     },)
 
@@ -146,12 +148,12 @@ if __name__ == "__main__":
     formulation_settings = FormulationSettings(
         formulation_name="weak",
         formulation_attributes={
-            "test_functions_class": "HannWindow",
+            "test_functions_class": "GaussianWindow",
             "window_length": 601,
             "stride": 50,
+            "sigma": 50.0,
         },
     )
-
     # Load the formulation class from the registry (should be handled in the main)
     formulation_class = FORMULATION_REGISTRY[formulation_settings.formulation_name]
 

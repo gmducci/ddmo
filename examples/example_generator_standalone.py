@@ -44,7 +44,7 @@ if __name__ == "__main__":
             k5 * y - k6 * z
         ])
 
-    def simulate_goodwin(tmax=150.0, dt=0.01, x0=(0, 1, 1.),
+    def simulate_goodwin(tmax=150.0, dt=0.025, x0=(0, 1, 1.),
                         n=9.5, k1=1.0, k2=0.2, k3=1.0, k4=0.15, k5=1.0, k6=0.1,
                         noise=0.02, seed=0):
         t = np.arange(0.0, tmax + dt, dt)
@@ -61,7 +61,7 @@ if __name__ == "__main__":
             X[:, 0] = X[:, 0] + noise * rng.standard_normal(X.shape[0])
         return t, X
 
-    t, x_train = simulate_goodwin()
+    # t, x_train = simulate_goodwin()
 
     NamedFunc = tuple[Callable[[float, float], float], str]
     def get_base_functions(params: list[float]) -> list[NamedFunc]:
@@ -77,12 +77,12 @@ if __name__ == "__main__":
 
     # Create a DataConstructor instance
     training_data = DataConstructor(
-        x_train=x_train[:, :],
-        time_array=time_array,
-        x_dot=x_dot_hat[:, :],
+        x_train=x_train[::20, :],
+        time_array=time_array[::20],
+        x_dot=x_dot_hat[::20, :],
         library_object=get_base_functions,
         x_0=x_0,
-        x_raw=x_raw)
+        x_raw=x_raw[::20, :])
     
     # Definition of opt boundaries
     # --- 1) library parameters (used by get_base_functions) --------------
@@ -98,13 +98,13 @@ if __name__ == "__main__":
 
     # --- 2) formulation / test-function parameters -----------------------
     formulation_lower_bounds = {
-        "degree": 2,
         "stride": 30,
+        "sigma": 10,
     }
 
     formulation_upper_bounds = {
-        "degree": 6,
-        "stride": 90,
+        "stride": 60,
+        "sigma": 60,
     }
 
     library_param_names = list(library_lower_bounds.keys())
@@ -148,10 +148,10 @@ if __name__ == "__main__":
     formulation_settings = FormulationSettings(
         formulation_name="weak",
         formulation_attributes={
-            "test_functions_class": "PolynomialWindow",
-            "window_length": 601,
+            "test_functions_class": "GaussianWindow",
+            "window_length": 101,
             "stride": 50,
-            "degree": 6,      # for example: cubic bump
+            "sigma": 6,      # for example: cubic bump
         },
     )
     # Load the formulation class from the registry (should be handled in the main)

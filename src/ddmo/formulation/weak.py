@@ -130,6 +130,20 @@ class WeakFormulation(Formulation):
         self.phi = phi
         self.dphi = dphi
         self.half = window_length // 2
+        # 1) quadrature weights (currently: trapezoidal rule)
+        q = np.full(window_length, self.dt)  # q_k = dt for all k
+        q[0] = q[-1] = 0.5 * self.dt   # end points have half weight
+
+
+        # precompute weights for this family (current rectangle rule)
+        # 2) combine quadrature with test function
+        self.w_rhs = q * self.phi      # ∫ f φ dt
+        self.w_lhs = _build_lhs_weights_with_interpolation(
+            dphi=self.dphi,
+            dt=self.dt,
+            refinement=15,  # you can expose this as a parameter later
+        )
+
 
         try:
             centers = family.grid_centers(self.N)
@@ -149,7 +163,6 @@ class WeakFormulation(Formulation):
         data_instance, opt_vars = _extract_rhs_inputs(*args, **kwargs)
 
         param_dict = kwargs.get("opt_param_dict", None)
-
         if self.family_builder is not None and param_dict is not None:
             new_family = self.family_builder(param_dict)
             self._configure_from_family(new_family)
@@ -159,12 +172,9 @@ class WeakFormulation(Formulation):
 
         for i in range(var_numbers):
             xi = data_instance.x_train[:, i]
-            for m, c in enumerate(self.centers):
-                slice_range = slice(c - self.half, c + self.half + 1)
-                B[m, i] = -np.sum(xi[slice_range] * self.dphi) * self.dt
+            B[:, i] = _sliding_integral(xi, self.centers, self.w_lhs)
 
         return B
-
     # ------------------------------------------------------------------
     # Right-hand side (unchanged integral logic)
     # ------------------------------------------------------------------
@@ -193,13 +203,9 @@ class WeakFormulation(Formulation):
 
         theta = theta[:, colmask]
         rhs = np.zeros((self.M, theta.shape[1]))
-        for m, c in enumerate(self.centers):
-            slice_range = slice(
-                c - self.window_length // 2,
-                c + self.window_length // 2 + 1,
-            )
-            for j, G in enumerate(theta.T):
-                rhs[m, j] = np.sum(G[slice_range] * self.phi) * self.dt
+
+        for j, G in enumerate(theta.T):
+            rhs[:, j] = _sliding_integral(G, self.centers, self.w_rhs)
 
         return {
             "theta": rhs,
@@ -208,7 +214,7 @@ class WeakFormulation(Formulation):
             "named_funcs": named_funcs,
             "colmask": colmask,
         }
-
+    
 # ----------------------------------------------------------------------
 # Helpers (unchanged)
 # ----------------------------------------------------------------------
@@ -276,3 +282,109 @@ def _ensure_callable_name(name: Any) -> Callable[..., str]:
 
     label = str(name)
     return lambda *_, label=label: label
+
+def _sliding_integral(
+    signal: np.ndarray,
+    centers: np.ndarray,
+    weights: np.ndarray,
+) -> np.ndarray:
+    """
+    Compute windowed integrals using precomputed weights.
+
+    signal  : shape (N,)
+    centers : shape (M,), integer indices of window centres
+    weights : shape (L,), precomputed weights on a reference window
+
+    Returns
+    -------
+    out : shape (M,)
+        out[m] = sum_{k=0}^{L-1} signal[c_m - h + k] * weights[k]
+    """
+    L = weights.shape[0]
+    h = L // 2
+    out = np.empty(centers.shape[0], dtype=float)
+
+    for m, c in enumerate(centers):
+        sl = slice(c - h, c + h + 1)
+        out[m] = np.dot(signal[sl], weights)
+
+    return out
+
+def _build_lhs_weights_with_interpolation(
+    dphi: np.ndarray,
+    dt: float,
+    refinement: int = 4,
+) -> np.ndarray:
+    """
+    Build left-hand-side weak weights w_lhs for one window, using
+    piecewise-linear interpolation in time and a refined quadrature.
+
+    Parameters
+    ----------
+    dphi : (L,)
+        Discrete samples of φ'(t) on the window (prototype test function derivative).
+    dt : float
+        Coarse time step between consecutive samples t_n.
+    refinement : int, optional
+        Number of fine evaluation points per coarse interval [t_n, t_{n+1}].
+        Must be >= 2. refinement=2 reduces to a coarse trapezoid-like rule.
+
+    Returns
+    -------
+    w_lhs : (L,)
+        Weights such that, for a windowed signal x[n],
+            ∫ x_t(t) φ(t) dt  ≈  sum_k x_k * w_lhs[k]
+        (over that window).
+    """
+    dphi = np.asarray(dphi, dtype=float)
+    L = dphi.shape[0]
+
+    if L < 2:
+        raise ValueError("Window length must be at least 2 to build LHS weights.")
+
+    if refinement < 2:
+        raise ValueError("refinement must be >= 2.")
+
+    w = np.zeros(L, dtype=float)
+
+    # Loop over coarse intervals [n, n+1] within the window
+    for n in range(L - 1):
+        dphi_n = dphi[n]
+        dphi_np1 = dphi[n + 1]
+
+        # Fine grid over local coordinate s ∈ [0, 1]
+        s = np.linspace(0.0, 1.0, refinement)
+
+        # Piecewise-linear interpolation of φ' between dphi_n and dphi_np1
+        dphi_fine = (1.0 - s) * dphi_n + s * dphi_np1
+
+        # Assume x(t) is linear between x_n and x_{n+1}:
+        #   x(t(s)) = x_n(1 - s) + x_{n+1} s
+        #
+        # Then for the weak derivative:
+        #   ∫ x_t φ dt = -∫ x φ' dt
+        #
+        # Contribution of this interval to the integral -∫ x φ' dt can be written as
+        #   I_n ≈ A_n x_n + B_n x_{n+1}
+        #
+        # with
+        #   A_n = -∫ (1 - s) φ'(t(s)) dt
+        #   B_n = -∫ s       φ'(t(s)) dt
+        #
+        # Change of variable t = t_n + s dt ⇒ dt = dt * ds,
+        # so we just integrate over s with dx = dt / (refinement - 1).
+
+        integrand_left = (1.0 - s) * dphi_fine
+        integrand_right = s * dphi_fine
+
+        # Numerical quadrature on the fine grid (trapezoidal)
+        dx_fine = dt / (refinement - 1)
+
+        A_n = -np.trapz(integrand_left, dx=dx_fine)   # coefficient for x_n
+        B_n = -np.trapz(integrand_right, dx=dx_fine)  # coefficient for x_{n+1}
+
+        # Accumulate these interval contributions into nodal weights
+        w[n] += A_n
+        w[n + 1] += B_n
+
+    return w

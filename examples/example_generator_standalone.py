@@ -29,38 +29,6 @@ if __name__ == "__main__":
     time_array = np.load(BENCHMARK_FOLDER / 'time.npy')
     x_dot_gt = np.load(BENCHMARK_FOLDER / 'x_dot_gt.npy')
 
-    def goodwin(t, X, n=9.5, k1=1.0, k2=0.2, k3=1.0, k4=0.15, k5=1.0, k6=0.1):
-        """
-        Canonical 3-variable Goodwin oscillator:
-            dx/dt = k1 * (1 / (1 + z^n)) - k2 * x
-            dy/dt = k3 * x - k4 * y
-            dz/dt = k5 * y - k6 * z
-        """
-        x, y, z = X
-        hill = 1.0 / (1.0 + z**n)
-        return np.array([
-            k1 * hill - k2 * x,
-            k3 * x - k4 * y,
-            k5 * y - k6 * z
-        ])
-
-    def simulate_goodwin(tmax=150.0, dt=0.025, x0=(0, 1, 1.),
-                        n=9.5, k1=1.0, k2=0.2, k3=1.0, k4=0.15, k5=1.0, k6=0.1,
-                        noise=0.02, seed=0):
-        t = np.arange(0.0, tmax + dt, dt)
-
-        def f(t, X): return goodwin(t, X, n, k1, k2, k3, k4, k5, k6)
-
-        sol = solve_ivp(f, (t[0], t[-1]), np.array(x0, dtype=float),
-                        t_eval=t, rtol=1e-9, atol=1e-12)
-        X = sol.y.T
-        if noise > 0:
-            rng = np.random.default_rng(seed)
-            scale = np.abs(X)  # magnitude of the signal
-            X = X + noise  * rng.standard_normal(X.shape)
-            X[:, 0] = X[:, 0] + noise * rng.standard_normal(X.shape[0])
-        return t, X
-
     # t, x_train = simulate_goodwin()
 
     NamedFunc = tuple[Callable[[float, float], float], str]
@@ -77,12 +45,12 @@ if __name__ == "__main__":
 
     # Create a DataConstructor instance
     training_data = DataConstructor(
-        x_train=x_train[::20, :],
-        time_array=time_array[::20],
-        x_dot=x_dot_hat[::20, :],
+        x_train=x_train[::5, :],
+        time_array=time_array[::5],
+        x_dot=x_dot_hat[::5, :],
         library_object=get_base_functions,
         x_0=x_0,
-        x_raw=x_raw[::20, :])
+        x_raw=x_raw[::5, :])
     
     # Definition of opt boundaries
     # --- 1) library parameters (used by get_base_functions) --------------
@@ -98,13 +66,13 @@ if __name__ == "__main__":
 
     # --- 2) formulation / test-function parameters -----------------------
     formulation_lower_bounds = {
-        "stride": 30,
-        "sigma": 10,
+        "stride": 5,
+        "sigma": 20,
     }
 
     formulation_upper_bounds = {
-        "stride": 60,
-        "sigma": 60,
+        "stride": 120,
+        "sigma": 35,
     }
 
     library_param_names = list(library_lower_bounds.keys())
@@ -123,7 +91,7 @@ if __name__ == "__main__":
                                            crossover=SBX(eta=15, prob=0.9),  # default
                                            mutation=PM(eta=20))              # default
     
-    termination_settings = TerminationSettings(n_gen=10)
+    termination_settings = TerminationSettings(n_gen=15)
 
     ga_settings = GASettings(problem=problem_settings,
                              algorithm=algorithm_settings,
@@ -134,7 +102,7 @@ if __name__ == "__main__":
     solver_settings = SolverSettings(solver_name="pysindy",
                                     regularization="STLSQ",
                                     regularization_parameters={
-                                    "alpha": 0.05,
+                                    "alpha": 0.03,
                                     "threshold": 0.1
                                     },)
 
@@ -149,9 +117,9 @@ if __name__ == "__main__":
         formulation_name="weak",
         formulation_attributes={
             "test_functions_class": "GaussianWindow",
-            "window_length": 101,
+            "window_length": 201,
             "stride": 50,
-            "sigma": 6,      # for example: cubic bump
+            "sigma": 20,      # for example: cubic bump
         },
     )
     # Load the formulation class from the registry (should be handled in the main)

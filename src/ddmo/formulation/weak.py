@@ -137,13 +137,18 @@ class WeakFormulation(Formulation):
 
         # precompute weights for this family (current rectangle rule)
         # 2) combine quadrature with test function
-        self.w_rhs = q * self.phi      # ∫ f φ dt
+        refinement = getattr(family, "refinement", 16)
+
+        self.w_rhs = _build_rhs_weights_with_interpolation(
+            phi=self.phi,
+            dt=self.dt,
+            refinement=refinement,
+        )
         self.w_lhs = _build_lhs_weights_with_interpolation(
             dphi=self.dphi,
             dt=self.dt,
-            refinement=15,  # you can expose this as a parameter later
+            refinement=refinement,
         )
-
 
         try:
             centers = family.grid_centers(self.N)
@@ -384,6 +389,78 @@ def _build_lhs_weights_with_interpolation(
         B_n = -np.trapz(integrand_right, dx=dx_fine)  # coefficient for x_{n+1}
 
         # Accumulate these interval contributions into nodal weights
+        w[n] += A_n
+        w[n + 1] += B_n
+
+    return w
+
+def _build_rhs_weights_with_interpolation(
+    phi: np.ndarray,
+    dt: float,
+    refinement: int = 4,
+) -> np.ndarray:
+    """
+    Build right-hand-side weak weights w_rhs for one window, using
+    piecewise-linear interpolation in time and a refined quadrature.
+
+    Parameters
+    ----------
+    phi : (L,)
+        Discrete samples of φ(t) on the window (prototype test function).
+    dt : float
+        Coarse time step between consecutive samples t_n.
+    refinement : int, optional
+        Number of fine evaluation points per coarse interval [t_n, t_{n+1}].
+        Must be >= 2.
+
+    Returns
+    -------
+    w_rhs : (L,)
+        Weights such that, for a windowed signal x[n],
+            ∫ x(t) φ(t) dt  ≈  sum_k x_k * w_rhs[k]
+        (over that window).
+    """
+    phi = np.asarray(phi, dtype=float)
+    L = phi.shape[0]
+
+    if L < 2:
+        raise ValueError("Window length must be at least 2 to build RHS weights.")
+
+    if refinement < 2:
+        raise ValueError("refinement must be >= 2.")
+
+    w = np.zeros(L, dtype=float)
+
+    # Loop over coarse intervals [n, n+1] within the window
+    for n in range(L - 1):
+        phi_n = phi[n]
+        phi_np1 = phi[n + 1]
+
+        # Fine grid over s ∈ [0, 1]
+        s = np.linspace(0.0, 1.0, refinement)
+
+        # Piecewise-linear interpolation of φ
+        phi_fine = (1.0 - s) * phi_n + s * phi_np1
+
+        # Assume x(t) is linear between x_n and x_{n+1}:
+        #   x(t(s)) = x_n(1 - s) + x_{n+1} s
+        #
+        # Then
+        #   ∫ x φ dt ≈ A_n x_n + B_n x_{n+1}
+        # with
+        #   A_n = ∫ (1 - s) φ(t(s)) dt
+        #   B_n = ∫ s       φ(t(s)) dt
+        #
+        # t = t_n + s dt ⇒ dt = dt * ds
+
+        integrand_left = (1.0 - s) * phi_fine
+        integrand_right = s * phi_fine
+
+        dx_fine = dt / (refinement - 1)
+
+        A_n = np.trapz(integrand_left, dx=dx_fine)
+        B_n = np.trapz(integrand_right, dx=dx_fine)
+
         w[n] += A_n
         w[n + 1] += B_n
 

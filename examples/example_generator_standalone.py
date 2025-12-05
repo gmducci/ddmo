@@ -19,6 +19,7 @@ from ddmo.formulation.registry import FORMULATION_REGISTRY
 from ddmo import BENCHMARK_FOLDER, identify
 import warnings
 
+
 warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":

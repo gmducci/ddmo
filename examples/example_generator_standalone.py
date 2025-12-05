@@ -19,7 +19,6 @@ from ddmo.formulation.registry import FORMULATION_REGISTRY
 from ddmo import BENCHMARK_FOLDER, identify
 import warnings
 
-
 warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
@@ -46,7 +45,7 @@ if __name__ == "__main__":
 
     # Create a DataConstructor instance
     training_data = DataConstructor(
-        x_train=x_raw[::5, :],
+        x_train=x_train[::5, :],
         time_array=time_array[::5],
         x_dot=x_dot_hat[::5, :],
         library_object=get_base_functions,
@@ -103,7 +102,7 @@ if __name__ == "__main__":
     solver_settings = SolverSettings(solver_name="pysindy",
                                     regularization="STLSQ",
                                     regularization_parameters={
-                                    "alpha": 0.05,
+                                    "alpha": 0.03,
                                     "threshold": 0.1
                                     },)
 

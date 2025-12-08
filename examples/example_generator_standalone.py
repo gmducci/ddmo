@@ -91,7 +91,7 @@ if __name__ == "__main__":
                                            crossover=SBX(eta=15, prob=0.9),  # default
                                            mutation=PM(eta=20))              # default
     
-    termination_settings = TerminationSettings(n_gen=15)
+    termination_settings = TerminationSettings(n_gen=3)
 
     ga_settings = GASettings(problem=problem_settings,
                              algorithm=algorithm_settings,
@@ -114,30 +114,20 @@ if __name__ == "__main__":
     
     
     formulation_settings = FormulationSettings(
-        formulation_name="weak",
-        formulation_attributes={
-            "test_functions_class": "GaussianWindow",
-            "window_length": 201,
-            "stride": 50,
-            "sigma": 20,      # for example: cubic bump
-        },
+        formulation_name="strong"
     )
     # Load the formulation class from the registry (should be handled in the main)
     formulation_class = FORMULATION_REGISTRY[formulation_settings.formulation_name]
 
     # Not agnostic right now!
-    weak_formulation = formulation_class(
-    time_array=training_data.time_array,
-    x_train=training_data.x_train,
-    class_attributes=formulation_settings.formulation_attributes,
-)
+    formulation = formulation_class()
 
     # Load the test-function family class from the registry
 
     identification = identify(data_instance=training_data,
                               ga_settings=ga_settings,
                               solver_instance=solver_settings,
-                              formulation_instance=weak_formulation,
+                              formulation_instance=formulation,
                               )
 
     (problem,

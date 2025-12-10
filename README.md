@@ -64,7 +64,7 @@ Clone the repository and install the package using pip:
 ```bash
 git clone https://github.com/FHI-theory/ddmo.git
 cd ddmo
-pip install .
+pip install -e .
 ```
 
 ## Running examples

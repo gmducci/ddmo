@@ -29,9 +29,10 @@ if __name__ == "__main__":
     time_array = np.load(BENCHMARK_FOLDER / 'time.npy')
     x_dot_gt = np.load(BENCHMARK_FOLDER / 'x_dot_gt.npy')
 
-    # t, x_train = simulate_goodwin()
 
     NamedFunc = tuple[Callable[[float, float], float], str]
+
+    # Define here the library of functions
     def get_base_functions(params: list[float]) -> list[NamedFunc]:
         gamma_1, gamma_2 = params[0:2]
         return [
@@ -44,15 +45,16 @@ if __name__ == "__main__":
     x_0 = [x_0_train]
 
     # Create a DataConstructor instance
+    skip = 5
     training_data = DataConstructor(
-        x_train=x_train[::5, :],
-        time_array=time_array[::5],
-        x_dot=x_dot_hat[::5, :],
+        x_train=x_train[::skip, :], # Skipping data every 5 points -> downsampled data
+        time_array=time_array[::skip],
+        x_dot=x_dot_hat[::skip, :],
         library_object=get_base_functions,
         x_0=x_0,
         x_raw=x_raw[::5, :])
     
-    # Definition of opt boundaries
+    # Definition of opt boundaries of the optimization variables
     # --- 1) library parameters (used by get_base_functions) --------------
     library_lower_bounds = {
         "gamma_1": 8.4,
@@ -67,12 +69,14 @@ if __name__ == "__main__":
     # --- 2) formulation / test-function parameters -----------------------
     formulation_lower_bounds = {
         "stride": 5,
-        "sigma": 20,
+        "degree": 3,
+        "window_length": 51,
     }
 
     formulation_upper_bounds = {
         "stride": 120,
-        "sigma": 35,
+        "degree": 7,
+        "window_length": 401,
     }
 
     library_param_names = list(library_lower_bounds.keys())
@@ -81,7 +85,7 @@ if __name__ == "__main__":
     # --- 3) combined bounds passed to ProblemSettings (backward compatible)
     lower_bounds = {**library_lower_bounds, **formulation_lower_bounds}
     upper_bounds = {**library_upper_bounds, **formulation_upper_bounds}
-    problem_settings = ProblemSettings(n_var=4,
+    problem_settings = ProblemSettings(n_var=5,
                                        n_obj=2, 
                                        xl_dict= lower_bounds,
                                        xu_dict= upper_bounds)
@@ -91,8 +95,9 @@ if __name__ == "__main__":
                                            crossover=SBX(eta=15, prob=0.9),  # default
                                            mutation=PM(eta=20))              # default
     
-    termination_settings = TerminationSettings(n_gen=3)
+    termination_settings = TerminationSettings(n_gen=10)
 
+    # GA setting, do not touch, to be moved to the main
     ga_settings = GASettings(problem=problem_settings,
                              algorithm=algorithm_settings,
                              termination=termination_settings, 
@@ -106,28 +111,40 @@ if __name__ == "__main__":
                                     "threshold": 0.1
                                     },)
 
+    # Solver setting, do not touch, to be moved to the main
     solver_class = SOLVER_REGISTRY[solver_settings.solver_name]
 
+    # Solver setting, do not touch, to be moved to the main
     solver_settings = solver_class(data_instance=training_data,
                           optimizer=solver_settings.regularization,
                           solver_parameters=solver_settings.regularization_parameters)
     
     
     formulation_settings = FormulationSettings(
-        formulation_name="strong"
+        formulation_name="weak",
+        formulation_attributes={
+            "test_functions_class": "PolynomialWindow",
+            "window_length": 201,
+            "stride": 50,
+            "degree": 3,
+        },
     )
     # Load the formulation class from the registry (should be handled in the main)
     formulation_class = FORMULATION_REGISTRY[formulation_settings.formulation_name]
 
     # Not agnostic right now!
-    formulation = formulation_class()
+    weak_formulation = formulation_class(
+    time_array=training_data.time_array,
+    x_train=training_data.x_train,
+    class_attributes=formulation_settings.formulation_attributes,
+)
 
     # Load the test-function family class from the registry
 
     identification = identify(data_instance=training_data,
                               ga_settings=ga_settings,
                               solver_instance=solver_settings,
-                              formulation_instance=formulation,
+                              formulation_instance=weak_formulation,
                               )
 
     (problem,
@@ -141,3 +158,7 @@ if __name__ == "__main__":
     ) = identification
 
     print(alphas)
+
+    plt.plot(solutions[0])
+    plt.plot(x_raw[::skip], alpha = 0.5)
+    plt.show()

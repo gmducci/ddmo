@@ -29,7 +29,7 @@ dependencies = [
     "seaborn",
     "pynumdiff",
     "jax",
-    "statsmodels@git+https://github.com/statsmodels/statsmodels"
+    "statsmodels"
 ]
 
 [project.optional-dependencies]

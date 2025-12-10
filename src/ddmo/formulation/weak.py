@@ -96,6 +96,8 @@ class WeakFormulation(Formulation):
 
                 if name == "stride":
                     params[name] = int(round(val))
+                elif name == "window_length":
+                    params[name] = int(round(val)) * 2 + 1
                 else:
                     params[name] = float(val)
 

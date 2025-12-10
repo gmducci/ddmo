@@ -8,6 +8,7 @@ from collections.abc import Sequence
 import numpy as np
 import pysindy as ps
 
+from ddmo.utils.data_constructor import DataConstructor
 from .base import Formulation
 
 Builder = Callable[..., Any]
@@ -16,7 +17,8 @@ Builder = Callable[..., Any]
 @dataclass
 class StrongFormulation(Formulation):
     """Strong formulation built from explicit left- and right-hand builders."""
-
+    
+    data_instance: DataConstructor | None = None
     lhs_builder: Builder | None = None
     rhs_builder: Builder | None = None
 

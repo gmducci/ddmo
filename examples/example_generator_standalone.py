@@ -113,12 +113,6 @@ if __name__ == "__main__":
                                     )
 
     # Solver setting, do not touch, to be moved to the main
-    solver_class = SOLVER_REGISTRY[solver_settings.solver_name]
-
-    # Solver setting, do not touch, to be moved to the main
-    solver_settings = solver_class(data_instance=training_data,
-                          optimizer=solver_settings.regularization,
-                          solver_parameters=solver_settings.regularization_parameters)
     
     
     formulation_settings = FormulationSettings(
@@ -131,21 +125,15 @@ if __name__ == "__main__":
         },
     )
     # Load the formulation class from the registry (should be handled in the main)
-    formulation_class = FORMULATION_REGISTRY[formulation_settings.formulation_name]
 
     # Not agnostic right now!
-    weak_formulation = formulation_class(
-    time_array=training_data.time_array,
-    x_train=training_data.x_train,
-    class_attributes=formulation_settings.formulation_attributes,
-)
 
     # Load the test-function family class from the registry
 
     identification = identify(data_instance=training_data,
                               ga_settings=ga_settings,
                               solver_instance=solver_settings,
-                              formulation_instance=weak_formulation,
+                              formulation_instance=formulation_settings,
                               )
 
     (problem,

@@ -58,13 +58,18 @@ from collections.abc import Callable
 
 NamedFunc = tuple[Callable[..., float], str]
 
+from ddmo.solver.registry import SOLVER_REGISTRY
+from ddmo.solver.settings import SolverSettings
+from ddmo.formulation.formulation_settings import FormulationSettings
+from ddmo.formulation.registry import FORMULATION_REGISTRY
+
 # -----------------------------------------------------------------------------# Main identification function
 # -----------------------------------------------------------------------------
 
 def identify(data_instance: DataConstructor,
              ga_settings: GASettings,
-             solver_instance: BaseSolver,
-             formulation_instance: Formulation | None = None,
+             solver_instance: SolverSettings,
+             formulation_instance: FormulationSettings | None = None,
              objective_functions: dict = None):    
     """
     Run sparse identification on provided data x(t).
@@ -88,22 +93,29 @@ def identify(data_instance: DataConstructor,
     """
     # ===== begin opt =====    
     from ddmo.optimizer.optimizer import Optimizer
-# formulation_instance is now the actual formulation object, e.g. WeakFormulation
-    if formulation_instance is None:
-        raise ValueError("identify requires a formulation instance (e.g. WeakFormulation).")
-
-    else:
-        resolved_formulation = None
     
-    print(f"Using formulation object: {type(formulation_instance).__name__}")
+    # Instantiate Solver
+    solver_class = SOLVER_REGISTRY[solver_instance.solver_name]
+    solver = solver_class(data_instance=data_instance,
+                          optimizer=solver_instance.regularization,
+                          solver_parameters=solver_instance.regularization_parameters)
 
-    resolved_formulation = formulation_instance
+    # Instantiate Formulation
+    if formulation_instance is None:
+        raise ValueError("identify requires a formulation instance (FormulationSettings).")
 
-        
+    formulation_class = FORMULATION_REGISTRY[formulation_instance.formulation_name]
+    print(f"Using formulation: {formulation_instance.formulation_name}")
+    
+    resolved_formulation = formulation_class(
+        data_instance=data_instance,
+        class_attributes=formulation_instance.formulation_attributes
+    )
+    
     # resolved_formulation = _build_formulation(formulation, formulation_options)
     problem = Optimizer(
         data_instance=data_instance,
-        solver=solver_instance.solve,
+        solver=solver.solve,
         objectives=None,
         objective_functions=objective_functions,
         formulation=resolved_formulation

@@ -7,6 +7,7 @@ from collections.abc import Sequence
 import numpy as np
 import pysindy as ps
 
+from ddmo.utils.data_constructor import DataConstructor
 from ddmo.formulation.base import Formulation
 from ddmo.test_function_factory.base import TestFunctionFamily  # abstract base
 from ddmo.test_function_factory.registry import WEAK_TEST_FAMILY_REGISTRY
@@ -24,23 +25,23 @@ class WeakFormulation(Formulation):
 
     Parameters
     ----------
-    time_array : (M,)
-        Time grid.
-    x_train : (M, n_var)
-        Training state trajectory.
+    data_instance: DataConstructor
+        Object containing time_array and x_train.
     class_attributes : dict
         Dictionary that must at least contain:
             - "test_functions_class": name in WEAK_TEST_FAMILY_REGISTRY
         and may contain any other keyword arguments for that test-family
         (e.g. "window_length", "stride", ...).
     """
-    time_array: Array
-    x_train: Array
+    data_instance: DataConstructor
     class_attributes: dict[str, Any]
     integral_solver: IntegralSolver | None = None
     family_builder: Optional[FamilyBuilder] = None
 
     def __post_init__(self) -> None:
+        self.time_array = self.data_instance.time_array
+        self.x_train = self.data_instance.x_train
+        
         # Basic shape checks
         if self.time_array.ndim != 1:
             raise ValueError("time_array must be 1-D.")

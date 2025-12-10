@@ -45,14 +45,14 @@ if __name__ == "__main__":
     x_0 = [x_0_train]
 
     # Create a DataConstructor instance
-    skip = 2
+    skip = 1
     training_data = DataConstructor(
-        x_train=x_train[::skip, :], # Skipping data every 5 points -> downsampled data
-        time_array=time_array[::skip],
-        x_dot=x_dot_hat[::skip, :],
+        x_train=x_train[20:-20, :], # Skipping data every 5 points -> downsampled data
+        time_array=time_array[20:-20],
+        x_dot=x_dot_hat[20:-20, :],
         library_object=get_base_functions,
         x_0=x_0,
-        x_raw=x_raw[::skip, :])
+        x_raw=x_raw[20:-20, :])
     
     # Definition of opt boundaries of the optimization variables
     # --- 1) library parameters (used by get_base_functions) --------------
@@ -68,15 +68,15 @@ if __name__ == "__main__":
 
     # --- 2) formulation / test-function parameters -----------------------
     formulation_lower_bounds = {
-        "stride": 5,
-        "degree": 3,
-        "window_length": 51,
+        # "stride": 5,
+        # "degree": 3,
+        # "window_length": 51,
     }
 
     formulation_upper_bounds = {
-        "stride": 120,
-        "degree": 7,
-        "window_length": 401,
+        # "stride": 120,
+        # "degree": 7,
+        # "window_length": 401,
     }
 
     library_param_names = list(library_lower_bounds.keys())
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     # --- 3) combined bounds passed to ProblemSettings (backward compatible)
     lower_bounds = {**library_lower_bounds, **formulation_lower_bounds}
     upper_bounds = {**library_upper_bounds, **formulation_upper_bounds}
-    problem_settings = ProblemSettings(n_var=5,
+    problem_settings = ProblemSettings(n_var=len(lower_bounds),
                                        n_obj=2, 
                                        xl_dict= lower_bounds,
                                        xu_dict= upper_bounds)
@@ -107,8 +107,8 @@ if __name__ == "__main__":
     solver_settings = SolverSettings(solver_name="pysindy",
                                     regularization="STLSQ",
                                     regularization_parameters={
-                                        "alpha": 0.05,
-                                        "threshold": 0.1
+                                        "alpha": 0.15, 
+                                        "threshold": 0.2,
                                     },
                                     )
 
@@ -116,13 +116,13 @@ if __name__ == "__main__":
     
     
     formulation_settings = FormulationSettings(
-        formulation_name="weak",
+        formulation_name="strong",
         formulation_attributes={
-            "test_functions_class": "PolynomialWindow",
-            "window_length": 201,
-            "stride": 50,
-            "degree": 3,
-        },
+            # "test_functions_class": "PolynomialWindow",
+            # "degree": 3,
+            # "window_length": 51,
+            # "stride": 5
+            }
     )
     # Load the formulation class from the registry (should be handled in the main)
 

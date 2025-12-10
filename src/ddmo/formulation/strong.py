@@ -19,6 +19,7 @@ class StrongFormulation(Formulation):
     """Strong formulation built from explicit left- and right-hand builders."""
     
     data_instance: DataConstructor | None = None
+    class_attributes: dict[str, Any] | None = None
     lhs_builder: Builder | None = None
     rhs_builder: Builder | None = None
 

@@ -45,14 +45,14 @@ if __name__ == "__main__":
     x_0 = [x_0_train]
 
     # Create a DataConstructor instance
-    skip = 5
+    skip = 2
     training_data = DataConstructor(
         x_train=x_train[::skip, :], # Skipping data every 5 points -> downsampled data
         time_array=time_array[::skip],
         x_dot=x_dot_hat[::skip, :],
         library_object=get_base_functions,
         x_0=x_0,
-        x_raw=x_raw[::5, :])
+        x_raw=x_raw[::skip, :])
     
     # Definition of opt boundaries of the optimization variables
     # --- 1) library parameters (used by get_base_functions) --------------
@@ -107,9 +107,10 @@ if __name__ == "__main__":
     solver_settings = SolverSettings(solver_name="pysindy",
                                     regularization="STLSQ",
                                     regularization_parameters={
-                                    "alpha": 0.03,
-                                    "threshold": 0.1
-                                    },)
+                                        "alpha": 0.05,
+                                        "threshold": 0.1
+                                    },
+                                    )
 
     # Solver setting, do not touch, to be moved to the main
     solver_class = SOLVER_REGISTRY[solver_settings.solver_name]

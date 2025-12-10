@@ -34,9 +34,9 @@ def get_optimizer(optimizer_name: str):
     elif optimizer_name == "ConstrainedSR3":
         from pysindy.optimizers import ConstrainedSR3
         return ConstrainedSR3
-    elif optimizer_name == "EnsembleOptimizer":
-        from pysindy.optimizers import EnsembleOptimizer
-        return EnsembleOptimizer
+    elif optimizer_name == "FROLS":
+        from pysindy.optimizers import FROLS
+        return FROLS
     elif optimizer_name == "Lasso":
         from sklearn.linear_model import Lasso
         return Lasso

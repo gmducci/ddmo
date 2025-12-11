@@ -1,4 +1,3 @@
-from collections.abc import Callable
 from pprint import pprint as pp
 import matplotlib.pyplot as plt
 import numpy as np
@@ -6,6 +5,7 @@ from ddmo.utils.data_constructor import DataConstructor
 from ddmo.utils.constructors import OptimizerSettings
 from ddmo.solver.settings import SolverSettings
 from ddmo.formulation.formulation_settings import FormulationSettings
+from ddmo.library_functions import LibraryBuilder
 from ddmo import BENCHMARK_FOLDER, identify
 import warnings
 
@@ -18,19 +18,13 @@ if __name__ == "__main__":
     x_train = np.load(BENCHMARK_FOLDER / 'x_train.npy')
     x_dot_hat = np.load(BENCHMARK_FOLDER / 'x_dot_train.npy')
     time_array = np.load(BENCHMARK_FOLDER / 'time.npy')
-
-    NamedFunc = tuple[Callable[[float, float], float], str]
-
-    # Define the library of functions - now uses dict for safe named access!
-    def get_base_functions(params: dict[str, float]) -> list[NamedFunc]:
-        gamma_1 = params["gamma_1"]  # Named access - order independent!
-        gamma_2 = params["gamma_2"]
-        return [
-            (lambda x: x, lambda x: x),
-            (lambda x: x**2, lambda x: f"{x}^2"),
-            (lambda x: (1 / (1 + x**gamma_1)), lambda x: f"1 / 1 + {x}^{gamma_1}"),
-            (lambda x: np.exp(- gamma_2 * x), lambda x: f"exp( {-gamma_2} {x} )")
-        ]
+    # Define the function library using the fluent API
+    library = (
+        LibraryBuilder()
+        .add_polynomial(max_degree=2)                # x, x²
+        .add_hill(exponent_param="gamma_1")          # 1/(1+x^γ₁)
+        .add_exponential(rate_param="gamma_2")       # exp(-γ₂·x)
+    )
 
     x_0 = [x_0_train]
 
@@ -40,7 +34,7 @@ if __name__ == "__main__":
         x_train=x_train[::skip, :],
         time_array=time_array[::skip],
         x_dot=x_dot_hat[::skip, :],
-        library_object=get_base_functions,
+        library_object=library.build,  # Pass the build method
         x_0=x_0,
         x_raw=x_raw[::skip, :]
     )

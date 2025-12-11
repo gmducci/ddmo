@@ -5,9 +5,8 @@ from typing import Any
 from pysindy.optimizers import SINDyOptimizer
 from ddmo.utils.data_constructor import DataConstructor
 from ddmo.solver.base import BaseSolver
+from ddmo.utils.array_helpers import normalize_opt_vars, stack_state_matrix, ensure_callable_name
 from scipy.integrate import solve_ivp
-from pysindy.utils import AxesArray
-from sklearn.preprocessing import StandardScaler
 
 
 # Optimizer dispatch logic
@@ -63,13 +62,13 @@ class Pysindy_Solver(BaseSolver):
         lib_custom = None
         named_funcs = None
 
-        lhs_matrix = self._stack_state_matrix(self.data_instance.x_dot)
+        lhs_matrix = stack_state_matrix(self.data_instance.x_dot)
 
         if len(args) == 1:
             optimization_vars = args[0]
         elif len(args) == 2:
             lhs_payload, rhs_payload = args
-            lhs_matrix = self._stack_state_matrix(lhs_payload)
+            lhs_matrix = stack_state_matrix(lhs_payload)
             if isinstance(rhs_payload, dict):
                 optimization_vars = rhs_payload.get("opt_vars")
                 theta = rhs_payload.get("theta")
@@ -84,11 +83,14 @@ class Pysindy_Solver(BaseSolver):
         if optimization_vars is None:
             raise ValueError("Optimization variables are required for Pysindy solver.")
 
-        opt_vars = self._normalize_opt_vars(optimization_vars)
+        opt_vars = normalize_opt_vars(optimization_vars)
 
-        x_matrix = self._stack_state_matrix(self.data_instance.x_train)
+        x_matrix = stack_state_matrix(self.data_instance.x_train)
 
         theta = np.asarray(theta)
+
+        from pysindy.utils import AxesArray
+        from sklearn.preprocessing import StandardScaler
 
         params_dict = self.solver_parameters
         base_optimizer = get_optimizer(self.optimizer)(**params_dict)
@@ -139,60 +141,6 @@ class Pysindy_Solver(BaseSolver):
         except Exception as e:
             print(f"Error during solver execution: {e}")
             return None, None, None, None, None
-
-    @staticmethod
-    def _normalize_opt_vars(opt_vars: Any) -> tuple[float, ...]:
-        if np.isscalar(opt_vars):
-            return (float(opt_vars),)
-
-        if isinstance(opt_vars, np.ndarray):
-            flattened = opt_vars.astype(float).ravel()
-            return tuple(float(value) for value in flattened)
-
-        if isinstance(opt_vars, Sequence) and not isinstance(opt_vars, (str, bytes)):
-            return tuple(float(value) for value in opt_vars)
-
-        try:
-            return (float(opt_vars),)
-        except (TypeError, ValueError) as exc:
-            msg = "Cannot normalize optimization variables into a tuple of floats."
-            raise TypeError(msg) from exc
-
-    @staticmethod
-    def _stack_state_matrix(values: Any) -> np.ndarray:
-        if isinstance(values, np.ndarray):
-            if values.ndim == 1:
-                return values.reshape(-1, 1)
-            if values.ndim == 3:
-                n_samples = values.shape[0] * values.shape[1]
-                return values.reshape(n_samples, values.shape[-1])
-            return values
-
-        if isinstance(values, Sequence) and not isinstance(values, (str, bytes)):
-            stacked = [np.atleast_2d(np.asarray(block)) for block in values]
-            return np.vstack(stacked)
-
-        return np.atleast_2d(np.asarray(values))
-
-    @staticmethod
-    def _ensure_callable_name(name: Any):
-        if callable(name):
-            return name
-
-        label = str(name)
-        return lambda *_, label=label: label
-    
-    @staticmethod
-    def _get_rhs(t, ssp, matrices):
-        # This implementation needs to be revised for non-autonomous systems!!!
-        lib_custom = matrices[0]
-        coeff_matrix = matrices[1]
-        # No need to recompute theta!!! Take raw-wise elements from build_theta output!!!
-        theta = lib_custom.transform(np.atleast_2d(ssp))
-        rhs = theta @ coeff_matrix
-
-        return rhs.ravel()
-
 
 class _ManualSINDyModel:
     def __init__(

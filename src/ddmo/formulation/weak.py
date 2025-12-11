@@ -11,6 +11,7 @@ from ddmo.utils.data_constructor import DataConstructor
 from ddmo.formulation.base import Formulation
 from ddmo.test_function_factory.base import TestFunctionFamily  # abstract base
 from ddmo.test_function_factory.registry import WEAK_TEST_FAMILY_REGISTRY
+from ddmo.utils.array_helpers import normalize_opt_vars, stack_state_matrix, ensure_callable_name
 
 IntegralSolver = Callable[..., np.ndarray]
 FamilyBuilder = Callable[[dict[str, float]], TestFunctionFamily]  # <- dict, not tuple
@@ -197,9 +198,9 @@ class WeakFormulation(Formulation):
         named_funcs = data_instance.library_object([*opt_vars])
         functions = [func for func, _ in named_funcs]
         raw_names = [name for _, name in named_funcs]
-        function_names = [_ensure_callable_name(name) for name in raw_names]
+        function_names = [ensure_callable_name(name) for name in raw_names]
 
-        x_matrix = _stack_state_matrix(data_instance.x_train)
+        x_matrix = stack_state_matrix(data_instance.x_train)
 
         lib_custom = ps.CustomLibrary(
             library_functions=functions,
@@ -239,57 +240,16 @@ def _extract_rhs_inputs(*args: Any, **kwargs: Any) -> tuple[Any, tuple[float, ..
     opt_vars = kwargs.get("optimization_variables", opt_vars)
 
     if data_instance is None:
-        msg = "StrongFormulation.get_rhs requires a data_instance."
+        msg = "WeakFormulation.get_rhs requires a data_instance."
         raise ValueError(msg)
 
     if opt_vars is None:
-        msg = "StrongFormulation.get_rhs requires optimization variables."
+        msg = "WeakFormulation.get_rhs requires optimization variables."
         raise ValueError(msg)
 
-    normalized_opt_vars = _normalize_opt_vars(opt_vars)
+    normalized_opt_vars = normalize_opt_vars(opt_vars)
     return data_instance, normalized_opt_vars
 
-
-def _normalize_opt_vars(opt_vars: Any) -> tuple[float, ...]:
-    if np.isscalar(opt_vars):
-        return (float(opt_vars),)
-
-    if isinstance(opt_vars, np.ndarray):
-        flattened = opt_vars.astype(float).ravel()
-        return tuple(float(value) for value in flattened)
-
-    if isinstance(opt_vars, Sequence) and not isinstance(opt_vars, (str, bytes)):
-        return tuple(float(value) for value in opt_vars)
-
-    try:
-        return (float(opt_vars),)
-    except (TypeError, ValueError) as exc:
-        msg = "Cannot normalize optimization variables into a tuple of floats."
-        raise TypeError(msg) from exc
-
-
-def _stack_state_matrix(values: Any) -> np.ndarray:
-    if isinstance(values, np.ndarray):
-        if values.ndim == 1:
-            return values.reshape(-1, 1)
-        if values.ndim == 3:
-            n_samples = values.shape[0] * values.shape[1]
-            return values.reshape(n_samples, values.shape[-1])
-        return values
-
-    if isinstance(values, Sequence) and not isinstance(values, (str, bytes)):
-        stacked = [np.atleast_2d(np.asarray(block)) for block in values]
-        return np.vstack(stacked)
-
-    return np.atleast_2d(np.asarray(values))
-
-
-def _ensure_callable_name(name: Any) -> Callable[..., str]:
-    if callable(name):
-        return name
-
-    label = str(name)
-    return lambda *_, label=label: label
 
 def _sliding_integral(
     signal: np.ndarray,

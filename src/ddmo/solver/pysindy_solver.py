@@ -171,17 +171,52 @@ class _ManualSINDyModel:
     def coefficients(self) -> np.ndarray:
         return self._coefficients
 
-    def simulate(self, x0: np.ndarray, time_array: np.ndarray) -> np.ndarray:
+    def simulate(self, x0: np.ndarray, time_array: np.ndarray, timeout: int = 10) -> np.ndarray:
+        import signal
+        
         t_eval = np.asarray(time_array, dtype=float)
-        solution = solve_ivp(
-            self._rhs,
-            (t_eval[0], t_eval[-1]),
-            np.asarray(x0, dtype=float),
-            t_eval=t_eval,
-            **self._solver_kwargs,
-        )
-        if not solution.success:
-            raise RuntimeError("Manual SINDy simulation failed")
+        
+        # Divergence detection event - stops integration if values explode
+        def divergence_event(t, y):
+            MAX_VALUE = 1e10
+            return MAX_VALUE - np.max(np.abs(y))
+        divergence_event.terminal = True
+        divergence_event.direction = -1
+        
+        # Timeout handler
+        def timeout_handler(signum, frame):
+            raise TimeoutError(f"Simulation timed out after {timeout} seconds")
+        
+        # Set up timeout (Unix/Mac only)
+        old_handler = None
+        try:
+            old_handler = signal.signal(signal.SIGALRM, timeout_handler)
+            signal.alarm(timeout)
+        except (AttributeError, ValueError):
+            # signal.SIGALRM not available on Windows
+            pass
+        
+        try:
+            solution = solve_ivp(
+                self._rhs,
+                (t_eval[0], t_eval[-1]),
+                np.asarray(x0, dtype=float),
+                t_eval=t_eval,
+                events=divergence_event,
+                **self._solver_kwargs,
+            )
+        finally:
+            # Cancel timeout
+            try:
+                signal.alarm(0)
+                if old_handler is not None:
+                    signal.signal(signal.SIGALRM, old_handler)
+            except (AttributeError, ValueError):
+                pass
+        
+        if not solution.success or len(solution.t) < len(t_eval):
+            # Failed or terminated early due to divergence
+            raise RuntimeError("Simulation failed or diverged")
         return solution.y.T
 
     def _rhs(self, t: float, state: np.ndarray) -> np.ndarray:

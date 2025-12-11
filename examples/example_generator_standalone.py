@@ -85,21 +85,19 @@ if __name__ == "__main__":
     )
     
     formulation_settings = FormulationSettings(
-        formulation_name="weak",
-        formulation_attributes={
-            "test_functions_class": "PolynomialWindow",
-            "degree": 3,  
-            "window_length": 51,
-            "stride": 5           
-        }   
+        formulation="weak",
+        test_function="PolynomialWindow",
+        degree=3,
+        window_length=51,
+        stride=5
     )
 
     # Run identification
     result = identify(
         data_instance=training_data,
         optimizer_settings=optimizer_settings,
-        solver_instance=solver_settings,
-        formulation_instance=formulation_settings,
+        solver_settings=solver_settings,
+        formulation_settings=formulation_settings,
     )
 
     # Access results via named attributes

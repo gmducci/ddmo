@@ -19,8 +19,8 @@ Usage:
   >>> problem, res, ... = identify(
   ...     data_instance=training_data,
   ...     optimizer_settings=optimizer_settings,
-  ...     solver_instance=solver_settings,
-  ...     formulation_instance=formulation_settings
+  ...     solver_settings=solver_settings,
+  ...     formulation_settings=formulation_settings
   ... )
 """
 
@@ -64,8 +64,8 @@ NamedFunc = tuple[Func, str]
 
 def identify(data_instance: DataConstructor,
              optimizer_settings: OptimizerSettings,
-             solver_instance: SolverSettings,
-             formulation_instance: FormulationSettings | None = None,
+             solver_settings: SolverSettings,
+             formulation_settings: FormulationSettings | None = None,
              objective_functions: dict = None):    
     """
     Run sparse identification on provided data x(t).
@@ -84,23 +84,23 @@ def identify(data_instance: DataConstructor,
     from ddmo.optimizer.optimizer import Optimizer
     
     # Instantiate Solver
-    solver_class = SOLVER_REGISTRY[solver_instance.solver_name]
+    solver_class = SOLVER_REGISTRY[solver_settings.solver_name]
     solver = solver_class(
         data_instance=data_instance,
-        optimizer=solver_instance.regularization,
-        solver_parameters=solver_instance.regularization_parameters
+        optimizer=solver_settings.regularization,
+        solver_parameters=solver_settings.regularization_parameters
     )
 
     # Instantiate Formulation
-    if formulation_instance is None:
+    if formulation_settings is None:
         raise ValueError("identify requires a formulation instance (FormulationSettings).")
 
-    formulation_class = FORMULATION_REGISTRY[formulation_instance.formulation_name]
-    print(f"Using formulation: {formulation_instance.formulation_name}")
+    formulation_class = FORMULATION_REGISTRY[formulation_settings.formulation]
+    print(f"Using formulation: {formulation_settings.formulation}")
     
     resolved_formulation = formulation_class(
         data_instance=data_instance,
-        class_attributes=formulation_instance.formulation_attributes
+        class_attributes=formulation_settings.to_attributes_dict()
     )
     
     # Build the optimization problem

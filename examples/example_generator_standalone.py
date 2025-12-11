@@ -6,8 +6,7 @@ from ddmo.utils.data_constructor import DataConstructor
 from ddmo.utils.constructors import (
     ProblemSettings,
     AlgorithmSettings,
-    TerminationSettings,
-    GASettings)
+    TerminationSettings)
 from ddmo.solver.registry import SOLVER_REGISTRY
 from ddmo.solver.settings import SolverSettings
 from ddmo.formulation.formulation_settings import FormulationSettings
@@ -47,12 +46,12 @@ if __name__ == "__main__":
     # Create a DataConstructor instance
     skip = 1
     training_data = DataConstructor(
-        x_train=x_train[20:-20, :], # Skipping data every 5 points -> downsampled data
-        time_array=time_array[20:-20],
-        x_dot=x_dot_hat[20:-20, :],
+        x_train=x_train[::skip, :], # Skipping data every 5 points -> downsampled data
+        time_array=time_array[::skip],
+        x_dot=x_dot_hat[::skip, :],
         library_object=get_base_functions,
         x_0=x_0,
-        x_raw=x_raw[20:-20, :])
+        x_raw=x_raw[::skip, :])
     
     # Definition of opt boundaries of the optimization variables
     # --- 1) library parameters (used by get_base_functions) --------------
@@ -68,15 +67,15 @@ if __name__ == "__main__":
 
     # --- 2) formulation / test-function parameters -----------------------
     formulation_lower_bounds = {
-        # "stride": 5,
-        # "degree": 3,
-        # "window_length": 51,
+        "stride": 5,
+        "degree": 3,
+        "window_length": 51,
     }
 
     formulation_upper_bounds = {
-        # "stride": 120,
-        # "degree": 7,
-        # "window_length": 401,
+        "stride": 120,
+        "degree": 7,
+        "window_length": 401,
     }
 
     library_param_names = list(library_lower_bounds.keys())
@@ -97,13 +96,6 @@ if __name__ == "__main__":
     
     termination_settings = TerminationSettings(n_gen=10)
 
-    # GA setting, do not touch, to be moved to the main
-    ga_settings = GASettings(problem=problem_settings,
-                             algorithm=algorithm_settings,
-                             termination=termination_settings, 
-                             seed=None,
-                             verbose=True)
-
     solver_settings = SolverSettings(solver_name="pysindy",
                                     regularization="STLSQ",
                                     regularization_parameters={
@@ -111,30 +103,27 @@ if __name__ == "__main__":
                                         "threshold": 0.2,
                                     },
                                     )
-
-    # Solver setting, do not touch, to be moved to the main
-    
     
     formulation_settings = FormulationSettings(
-        formulation_name="strong",
+        formulation_name="weak",
         formulation_attributes={
-            # "test_functions_class": "PolynomialWindow",
-            # "degree": 3,
-            # "window_length": 51,
-            # "stride": 5
-            }
+            "test_functions_class": "PolynomialWindow",
+            "degree": 3,  
+            "window_length": 51,
+            "stride": 5           
+            }   
     )
-    # Load the formulation class from the registry (should be handled in the main)
 
-    # Not agnostic right now!
-
-    # Load the test-function family class from the registry
-
-    identification = identify(data_instance=training_data,
-                              ga_settings=ga_settings,
-                              solver_instance=solver_settings,
-                              formulation_instance=formulation_settings,
-                              )
+    identification = identify(
+        data_instance=training_data,
+        problem_settings=problem_settings,
+        algorithm_settings=algorithm_settings,
+        termination_settings=termination_settings,
+        solver_instance=solver_settings,
+        formulation_instance=formulation_settings,
+        seed=None,
+        verbose=True
+    )
 
     (problem,
         res,

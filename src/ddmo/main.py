@@ -37,7 +37,12 @@ from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.algorithms.moo.nsga3 import NSGA3
 from pymoo.optimize import minimize
 from ddmo.utils.data_constructor import DataConstructor
-from ddmo.utils.constructors import GASettings
+from ddmo.utils.constructors import (
+    GASettings,
+    ProblemSettings,
+    AlgorithmSettings,
+    TerminationSettings
+)
 from ddmo.solver.base import BaseSolver
 from ddmo.formulation import Formulation, WeakFormulation, StrongFormulation
 from ddmo.test_function_factory.hann_window import HannWindow
@@ -67,10 +72,14 @@ from ddmo.formulation.registry import FORMULATION_REGISTRY
 # -----------------------------------------------------------------------------
 
 def identify(data_instance: DataConstructor,
-             ga_settings: GASettings,
+             problem_settings: ProblemSettings,
+             algorithm_settings: AlgorithmSettings,
+             termination_settings: TerminationSettings,
              solver_instance: SolverSettings,
              formulation_instance: FormulationSettings | None = None,
-             objective_functions: dict = None):    
+             objective_functions: dict = None,
+             seed: int | None = None,
+             verbose: bool = True):    
     """
     Run sparse identification on provided data x(t).
 
@@ -91,7 +100,16 @@ def identify(data_instance: DataConstructor,
         - solutions: optimized parameter sets
         - coeff_matrices, alphas, dw_stats
     """
-    # ===== begin opt =====    
+    # ===== begin opt =====
+    # Construct GASettings from component settings
+    ga_settings = GASettings(
+        problem=problem_settings,
+        algorithm=algorithm_settings,
+        termination=termination_settings,
+        seed=seed,
+        verbose=verbose
+    )
+    
     from ddmo.optimizer.optimizer import Optimizer
     
     # Instantiate Solver

@@ -71,37 +71,18 @@ class PolynomialFactory(LibraryFactory):
             name = self._make_power_name(degree)
             funcs.append((func, name))
         
-        # Generate cross-product / interaction terms
+        # Generate two-variable cross-product terms algorithmically
+        # For total degree d, generate all (px, py) where px + py = d and px >= 1, py >= 1
         if self.include_interactions:
-            # x*y (degree 2)
-            if self.max_degree >= 2:
-                funcs.append((lambda x, y: x * y, lambda x, y: f"{x}*{y}"))
-            
-            # x²*y, x*y² (degree 3)
-            if self.max_degree >= 3:
-                funcs.append((
-                    self._make_power_cross_func(2, 1),
-                    self._make_power_cross_name(2, 1)
-                ))
-                funcs.append((
-                    self._make_power_cross_func(1, 2),
-                    self._make_power_cross_name(1, 2)
-                ))
-            
-            # x³*y, x²*y², x*y³ (degree 4)
-            if self.max_degree >= 4:
-                funcs.append((
-                    self._make_power_cross_func(3, 1),
-                    self._make_power_cross_name(3, 1)
-                ))
-                funcs.append((
-                    self._make_power_cross_func(2, 2),
-                    self._make_power_cross_name(2, 2)
-                ))
-                funcs.append((
-                    self._make_power_cross_func(1, 3),
-                    self._make_power_cross_name(1, 3)
-                ))
+            for total_degree in range(2, self.max_degree + 1):
+                for px in range(1, total_degree):
+                    py = total_degree - px
+                    # Only include if both powers are >= 1 (true cross-products)
+                    if py >= 1:
+                        funcs.append((
+                            self._make_power_cross_func(px, py),
+                            self._make_power_cross_name(px, py)
+                        ))
         
         return funcs
     

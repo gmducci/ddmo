@@ -30,7 +30,7 @@ if __name__ == "__main__":
     x_0 = [x_0_train]
 
     # Create a DataConstructor instance
-    skip = 1
+    skip = 10
     training_data = DataConstructor(
         x_train=x_train[::skip, :],
         time_array=time_array[::skip],
@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
     # Formulation parameters (for weak formulation)
     formulation_bounds = {
-        "stride": (5, 120),
+        "stride": (5, 50),
         "degree": (3, 7),
         "window_length": (51, 401),
     }
@@ -58,7 +58,7 @@ if __name__ == "__main__":
         library_bounds=library_bounds,
         formulation_bounds=formulation_bounds,
         n_obj=2,
-        n_gen=2,
+        n_gen=10,
         algorithm="NSGA2",
         pop_size=50
     )

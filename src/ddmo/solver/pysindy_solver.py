@@ -1,12 +1,16 @@
+from typing import Any
+
 import numpy as np
 import pysindy as ps
-from collections.abc import Sequence
-from typing import Any
 from pysindy.optimizers import SINDyOptimizer
-from ddmo.utils.data_constructor import DataConstructor
-from ddmo.solver.base import BaseSolver
-from ddmo.utils.array_helpers import normalize_opt_vars, stack_state_matrix, ensure_callable_name
 from scipy.integrate import solve_ivp
+
+from ddmo.solver.base import BaseSolver
+from ddmo.utils.array_helpers import (
+    normalize_opt_vars,
+    stack_state_matrix,
+)
+from ddmo.utils.data_constructor import DataConstructor
 
 
 # Optimizer dispatch logic
@@ -26,29 +30,32 @@ def get_optimizer(optimizer_name: str):
 
     if optimizer_name == "STLSQ":
         from pysindy.optimizers import STLSQ
+
         return STLSQ
     elif optimizer_name == "SR3":
         from pysindy.optimizers import SR3
+
         return SR3
     elif optimizer_name == "ConstrainedSR3":
         from pysindy.optimizers import ConstrainedSR3
+
         return ConstrainedSR3
     elif optimizer_name == "FROLS":
         from pysindy.optimizers import FROLS
+
         return FROLS
     elif optimizer_name == "Lasso":
         from sklearn.linear_model import Lasso
+
         return Lasso
     else:
         raise ValueError(f"Unknown optimizer: {optimizer_name}")
 
 
 class Pysindy_Solver(BaseSolver):
-    def __init__(self, 
-                 data_instance: DataConstructor,
-                 optimizer: str,
-                 solver_parameters: dict):
-        
+    def __init__(
+        self, data_instance: DataConstructor, optimizer: str, solver_parameters: dict
+    ):
         self.data_instance = data_instance
         self.solver_parameters = solver_parameters
         self.optimizer = optimizer
@@ -57,7 +64,6 @@ class Pysindy_Solver(BaseSolver):
         self.solver_parameters.update(kwargs)
 
     def solve(self, *args):
-
         theta = None
         lib_custom = None
         named_funcs = None
@@ -78,7 +84,9 @@ class Pysindy_Solver(BaseSolver):
             else:
                 optimization_vars = rhs_payload
         else:
-            raise ValueError("Pysindy_Solver.solve expects optimization variables or (lhs, rhs).")
+            raise ValueError(
+                "Pysindy_Solver.solve expects optimization variables or (lhs, rhs)."
+            )
 
         if optimization_vars is None:
             raise ValueError("Optimization variables are required for Pysindy solver.")
@@ -104,15 +112,15 @@ class Pysindy_Solver(BaseSolver):
 
         theta_axes = scaler_X.fit_transform(theta_axes)
         lhs_axes = scaler_y.fit_transform(lhs_axes)
-        sx = np.asarray(scaler_X.scale_)   # length P
-        sy = np.asarray(scaler_y.scale_)   # length d
+        sx = np.asarray(scaler_X.scale_)  # length P
+        sy = np.asarray(scaler_y.scale_)  # length d
 
         # Increase threshold to enforce more sparsity
         try:
             fitted_optimizer = sindy_optimizer.fit(theta_axes, lhs_axes)
             raw_coefficients = fitted_optimizer.coef_
             # regression_coeff = raw_coefficients.T
-            regression_coeff   = (raw_coefficients * sy[:, None]) / sx[None, :]
+            regression_coeff = (raw_coefficients * sy[:, None]) / sx[None, :]
             regression_coeff = regression_coeff.T
 
             solver_kwargs = {
@@ -125,13 +133,15 @@ class Pysindy_Solver(BaseSolver):
                 coefficients=regression_coeff,
                 optimizer=fitted_optimizer.optimizer,
                 solver_kwargs=solver_kwargs,
-                active_mask=mask
+                active_mask=mask,
             )
 
             sol_list = []
 
             for i in range(len(self.data_instance.x_0)):
-                sol_ = model.simulate(self.data_instance.x_0[i], self.data_instance.time_array)
+                sol_ = model.simulate(
+                    self.data_instance.x_0[i], self.data_instance.time_array
+                )
                 sol_list.append(sol_)
             sol = np.vstack(sol_list)
 
@@ -141,6 +151,7 @@ class Pysindy_Solver(BaseSolver):
         except Exception as e:
             print(f"Error during solver execution: {e}")
             return None, None, None, None, None
+
 
 class _ManualSINDyModel:
     def __init__(
@@ -164,29 +175,32 @@ class _ManualSINDyModel:
 
         if self.active_mask is not None:
             n_active = np.count_nonzero(self.active_mask)
-            assert (
-                n_active == self._coefficients.shape[0]
-            ), "active_mask must match coefficients shape."
+            assert n_active == self._coefficients.shape[0], (
+                "active_mask must match coefficients shape."
+            )
 
     def coefficients(self) -> np.ndarray:
         return self._coefficients
 
-    def simulate(self, x0: np.ndarray, time_array: np.ndarray, timeout: int = 10) -> np.ndarray:
+    def simulate(
+        self, x0: np.ndarray, time_array: np.ndarray, timeout: int = 10
+    ) -> np.ndarray:
         import signal
-        
+
         t_eval = np.asarray(time_array, dtype=float)
-        
+
         # Divergence detection event - stops integration if values explode
         def divergence_event(t, y):
             MAX_VALUE = 1e10
             return MAX_VALUE - np.max(np.abs(y))
+
         divergence_event.terminal = True
         divergence_event.direction = -1
-        
+
         # Timeout handler
         def timeout_handler(signum, frame):
             raise TimeoutError(f"Simulation timed out after {timeout} seconds")
-        
+
         # Set up timeout (Unix/Mac only)
         old_handler = None
         try:
@@ -195,7 +209,7 @@ class _ManualSINDyModel:
         except (AttributeError, ValueError):
             # signal.SIGALRM not available on Windows
             pass
-        
+
         try:
             solution = solve_ivp(
                 self._rhs,
@@ -213,7 +227,7 @@ class _ManualSINDyModel:
                     signal.signal(signal.SIGALRM, old_handler)
             except (AttributeError, ValueError):
                 pass
-        
+
         if not solution.success or len(solution.t) < len(t_eval):
             # Failed or terminated early due to divergence
             raise RuntimeError("Simulation failed or diverged")

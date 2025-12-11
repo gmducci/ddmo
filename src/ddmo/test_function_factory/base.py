@@ -1,8 +1,11 @@
 # ddmo/test_function_factory/base.py
 
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import Optional, Mapping, Any, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
+
 import numpy as np
 
 Array = np.ndarray
@@ -10,13 +13,13 @@ Array = np.ndarray
 
 class TestFunctionFamily(ABC):
     name: str = "TestFunctionFamily"
-    allowed_params: Optional[set[str]] = None
+    allowed_params: set[str] | None = None
 
     def __init__(
         self,
         dt: float | Sequence[float] = 1.0,
         alpha: float = 1.0,
-        params: Optional[Mapping[str, Any]] = None,
+        params: Mapping[str, Any] | None = None,
         **extra_params: Any,
     ) -> None:
         self.dt = np.array(dt, dtype=float) if np.ndim(dt) else float(dt)
@@ -30,7 +33,7 @@ class TestFunctionFamily(ABC):
         self._validate_param_names(merged)
         self.params: Mapping[str, Any] = merged
 
-        self._centers: Optional[Array] = None
+        self._centers: Array | None = None
 
         self._validate_params()
 
@@ -48,13 +51,11 @@ class TestFunctionFamily(ABC):
         return
 
     @abstractmethod
-    def build_tests(self, grid_shape: tuple[int, ...]) -> list[Array]:
-        ...
+    def build_tests(self, grid_shape: tuple[int, ...]) -> list[Array]: ...
 
     @property
     @abstractmethod
-    def centers(self) -> Array:
-        ...
+    def centers(self) -> Array: ...
 
     @staticmethod
     def finite_difference(phi: Array, dt: float, axis: int = -1) -> Array:

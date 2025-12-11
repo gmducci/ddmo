@@ -1,17 +1,21 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable, Optional
-from collections.abc import Sequence
+from typing import Any
 
 import numpy as np
 import pysindy as ps
 
-from ddmo.utils.data_constructor import DataConstructor
 from ddmo.formulation.base import Formulation
 from ddmo.test_function_factory.base import TestFunctionFamily  # abstract base
 from ddmo.test_function_factory.registry import WEAK_TEST_FAMILY_REGISTRY
-from ddmo.utils.array_helpers import normalize_opt_vars, stack_state_matrix, ensure_callable_name
+from ddmo.utils.array_helpers import (
+    ensure_callable_name,
+    normalize_opt_vars,
+    stack_state_matrix,
+)
+from ddmo.utils.data_constructor import DataConstructor
 
 IntegralSolver = Callable[..., np.ndarray]
 FamilyBuilder = Callable[[dict[str, float]], TestFunctionFamily]  # <- dict, not tuple
@@ -34,15 +38,16 @@ class WeakFormulation(Formulation):
         and may contain any other keyword arguments for that test-family
         (e.g. "window_length", "stride", ...).
     """
+
     data_instance: DataConstructor
     class_attributes: dict[str, Any]
     integral_solver: IntegralSolver | None = None
-    family_builder: Optional[FamilyBuilder] = None
+    family_builder: FamilyBuilder | None = None
 
     def __post_init__(self) -> None:
         self.time_array = self.data_instance.time_array
         self.x_train = self.data_instance.x_train
-        
+
         # Basic shape checks
         if self.time_array.ndim != 1:
             raise ValueError("time_array must be 1-D.")
@@ -71,7 +76,8 @@ class WeakFormulation(Formulation):
 
         # All other entries in class_attributes are treated as parameters
         base_params = {
-            k: v for k, v in self.class_attributes.items()
+            k: v
+            for k, v in self.class_attributes.items()
             if k != "test_functions_class"
         }
 
@@ -136,8 +142,7 @@ class WeakFormulation(Formulation):
         self.half = window_length // 2
         # 1) quadrature weights (currently: trapezoidal rule)
         q = np.full(window_length, self.dt)  # q_k = dt for all k
-        q[0] = q[-1] = 0.5 * self.dt   # end points have half weight
-
+        q[0] = q[-1] = 0.5 * self.dt  # end points have half weight
 
         # precompute weights for this family (current rectangle rule)
         # 2) combine quadrature with test function
@@ -184,6 +189,7 @@ class WeakFormulation(Formulation):
             B[:, i] = _sliding_integral(xi, self.centers, self.w_lhs)
 
         return B
+
     # ------------------------------------------------------------------
     # Right-hand side (unchanged integral logic)
     # ------------------------------------------------------------------
@@ -228,7 +234,8 @@ class WeakFormulation(Formulation):
             "named_funcs": named_funcs,
             "colmask": colmask,
         }
-    
+
+
 # ----------------------------------------------------------------------
 # Helpers (unchanged)
 # ----------------------------------------------------------------------
@@ -282,6 +289,7 @@ def _sliding_integral(
         out[m] = np.dot(signal[sl], weights)
 
     return out
+
 
 def _build_lhs_weights_with_interpolation(
     dphi: np.ndarray,
@@ -353,7 +361,7 @@ def _build_lhs_weights_with_interpolation(
         # Numerical quadrature on the fine grid (trapezoidal)
         dx_fine = dt / (refinement - 1)
 
-        A_n = -np.trapz(integrand_left, dx=dx_fine)   # coefficient for x_n
+        A_n = -np.trapz(integrand_left, dx=dx_fine)  # coefficient for x_n
         B_n = -np.trapz(integrand_right, dx=dx_fine)  # coefficient for x_{n+1}
 
         # Accumulate these interval contributions into nodal weights
@@ -361,6 +369,7 @@ def _build_lhs_weights_with_interpolation(
         w[n + 1] += B_n
 
     return w
+
 
 def _build_rhs_weights_with_interpolation(
     phi: np.ndarray,

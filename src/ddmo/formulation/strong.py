@@ -1,15 +1,18 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
-from collections.abc import Sequence
-
-import numpy as np
 import pysindy as ps
 
+from ddmo.utils.array_helpers import (
+    ensure_callable_name,
+    normalize_opt_vars,
+    stack_state_matrix,
+)
 from ddmo.utils.data_constructor import DataConstructor
-from ddmo.utils.array_helpers import normalize_opt_vars, stack_state_matrix, ensure_callable_name
+
 from .base import Formulation
 
 Builder = Callable[..., Any]
@@ -18,7 +21,7 @@ Builder = Callable[..., Any]
 @dataclass
 class StrongFormulation(Formulation):
     """Strong formulation built from explicit left- and right-hand builders."""
-    
+
     data_instance: DataConstructor | None = None
     class_attributes: dict[str, Any] | None = None
     lhs_builder: Builder | None = None
@@ -45,7 +48,7 @@ class StrongFormulation(Formulation):
             return self.rhs_builder(*args, **kwargs)
 
         data_instance, opt_vars = _extract_rhs_inputs(*args, **kwargs)
-        
+
         # Pass dict to library function (safer than positional list)
         param_dict = kwargs.get("opt_param_dict", None)
         if param_dict is not None:
@@ -59,8 +62,7 @@ class StrongFormulation(Formulation):
         x_matrix = stack_state_matrix(data_instance.x_train)
 
         lib_custom = ps.CustomLibrary(
-            library_functions=functions,
-            function_names=function_names
+            library_functions=functions, function_names=function_names
         )
         lib_custom.fit(x_matrix)
         theta = lib_custom.transform(x_matrix)

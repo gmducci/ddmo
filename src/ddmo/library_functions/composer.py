@@ -9,27 +9,27 @@ Example:
         .add_exponential(rate_param="gamma_2")
         .add_custom(lambda x, p: x**p["gamma_3"], "x^γ₃")
     )
-    
+
     # Use in DataConstructor
     training_data = DataConstructor(
         library_object=library.build,
         ...
     )
 """
+
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Callable, Any
 
 from ddmo.library_functions.factories import (
-    LibraryFactory,
-    PolynomialFactory,
-    HillFactory,
-    ExponentialFactory,
-    IdentityFactory,
     CrossProductFactory,
-    PowerCrossProductFactory,
+    ExponentialFactory,
+    HillFactory,
+    IdentityFactory,
+    LibraryFactory,
     NamedFunc,
+    PolynomialFactory,
+    PowerCrossProductFactory,
 )
-
 
 # Type for custom functions: takes (x, params_dict) -> float
 CustomFunc = Callable[[float, dict[str, float]], float]
@@ -40,13 +40,13 @@ CustomNameFunc = Callable[[str, dict[str, float]], str] | str
 class LibraryBuilder:
     """
     Fluent API for building function libraries from composable factories.
-    
+
     Combines reusable factories (polynomial, Hill, exponential) with
     custom parameterized functions into a single library.
-    
+
     The `build` method returns a callable that takes optimizer params
     and returns a list of (function, name) tuples compatible with PySINDy.
-    
+
     Example:
         # Define library structure
         library = (
@@ -54,134 +54,141 @@ class LibraryBuilder:
             .add_polynomial(max_degree=2)
             .add_hill(exponent_param="gamma_1")
         )
-        
+
         # Use in DataConstructor
         training_data = DataConstructor(
             library_object=library.build,
             ...
         )
-        
+
         # Called by optimizer with current params:
         # library.build({"gamma_1": 9.0}) -> [(func, name), ...]
     """
+
     _factories: list[LibraryFactory] = field(default_factory=list)
     _static_funcs: list[tuple[Callable, Callable]] = field(default_factory=list)
     _custom_funcs: list[tuple[CustomFunc, CustomNameFunc]] = field(default_factory=list)
-    
-    def add_polynomial(self, max_degree: int = 2, include_constant: bool = False) -> "LibraryBuilder":
+
+    def add_polynomial(
+        self, max_degree: int = 2, include_constant: bool = False
+    ) -> "LibraryBuilder":
         """
         Add polynomial functions: x, x², x³, ...
-        
+
         Args:
             max_degree: Maximum polynomial degree (e.g., 3 for x, x², x³).
             include_constant: Whether to include constant term (1).
-            
+
         Returns:
             Self for method chaining.
         """
-        self._factories.append(PolynomialFactory(max_degree=max_degree, include_constant=include_constant))
+        self._factories.append(
+            PolynomialFactory(max_degree=max_degree, include_constant=include_constant)
+        )
         return self
-    
+
     def add_identity(self) -> "LibraryBuilder":
         """
         Add identity function: x
-        
+
         Convenience method when you only want x without higher powers.
-        
+
         Returns:
             Self for method chaining.
         """
         self._factories.append(IdentityFactory())
         return self
-    
+
     def add_hill(self, exponent_param: str) -> "LibraryBuilder":
         """
         Add Hill function: 1 / (1 + x^γ)
-        
+
         The exponent γ is read from optimizer parameters at runtime.
-        
+
         Args:
             exponent_param: Name of the optimizer parameter for the exponent.
-            
+
         Returns:
             Self for method chaining.
         """
         self._factories.append(HillFactory(exponent_param=exponent_param))
         return self
-    
+
     def add_exponential(self, rate_param: str) -> "LibraryBuilder":
         """
         Add exponential decay function: exp(-k * x)
-        
+
         The rate k is read from optimizer parameters at runtime.
-        
+
         Args:
             rate_param: Name of the optimizer parameter for the rate.
-            
+
         Returns:
             Self for method chaining.
         """
         self._factories.append(ExponentialFactory(rate_param=rate_param))
         return self
-    
+
     def add_cross_product(self) -> "LibraryBuilder":
         """
         Add cross-product interaction term: x * y
-        
+
         PySINDy will apply this to all pairs of state variables,
         generating terms like x₀*x₁, x₀*x₂, x₁*x₂, etc.
-        
+
         Returns:
             Self for method chaining.
         """
         self._factories.append(CrossProductFactory())
         return self
-    
-    def add_power_cross_product(self, power_x: int = 1, power_y: int = 1) -> "LibraryBuilder":
+
+    def add_power_cross_product(
+        self, power_x: int = 1, power_y: int = 1
+    ) -> "LibraryBuilder":
         """
         Add powered cross-product: x^a * y^b
-        
+
         Args:
             power_x: Power for first variable.
             power_y: Power for second variable.
-        
+
         Returns:
             Self for method chaining.
-            
+
         Example:
             .add_power_cross_product(2, 1)  # Generates x²*y
         """
-        self._factories.append(PowerCrossProductFactory(power_x=power_x, power_y=power_y))
+        self._factories.append(
+            PowerCrossProductFactory(power_x=power_x, power_y=power_y)
+        )
         return self
-    
+
     def add_factory(self, factory: LibraryFactory) -> "LibraryBuilder":
         """
         Add a custom factory instance.
-        
+
         Args:
             factory: Any LibraryFactory subclass instance.
-            
+
         Returns:
             Self for method chaining.
         """
         self._factories.append(factory)
         return self
-    
+
     def add_function(
-        self, 
-        func: Callable[[float], float], 
-        name: str | Callable[[str], str]
+        self, func: Callable[[float], float], name: str | Callable[[str], str]
     ) -> "LibraryBuilder":
         """
         Add a simple static function (doesn't depend on optimizer params).
-        
+
         Args:
             func: Function taking x -> float (e.g., lambda x: np.sin(x)).
             name: String name or callable taking varname -> str.
-            
+
         Returns:
             Self for method chaining.
-            
+
         Example:
             .add_function(lambda x: np.sin(x), "sin")
             .add_function(lambda x: np.cos(x), lambda x: f"cos({x})")
@@ -193,22 +200,18 @@ class LibraryBuilder:
             name_func = name
         self._static_funcs.append((func, name_func))
         return self
-    
-    def add_custom(
-        self, 
-        func: CustomFunc, 
-        name: CustomNameFunc
-    ) -> "LibraryBuilder":
+
+    def add_custom(self, func: CustomFunc, name: CustomNameFunc) -> "LibraryBuilder":
         """
         Add a custom parameterized function (depends on optimizer params).
-        
+
         Args:
             func: Function taking (x, params_dict) -> float.
             name: Either a string or callable taking (varname, params_dict) -> str.
-            
+
         Returns:
             Self for method chaining.
-            
+
         Example:
             .add_custom(
                 lambda x, p: x ** p["gamma_3"],
@@ -217,44 +220,48 @@ class LibraryBuilder:
         """
         self._custom_funcs.append((func, name))
         return self
-    
+
     def build(self, params: dict[str, float]) -> list[NamedFunc]:
         """
         Build the function library with given optimizer parameters.
-        
+
         This method is called by the formulation on each optimizer evaluation.
-        
+
         Args:
             params: Dictionary of current optimizer parameter values.
-            
+
         Returns:
             List of (function, name_generator) tuples for PySINDy.
         """
         result: list[NamedFunc] = []
-        
+
         # Generate from all factories
         for factory in self._factories:
             result.extend(factory.generate(params))
-        
+
         # Add static functions (don't depend on params)
         for func, name_func in self._static_funcs:
             result.append((func, name_func))
-        
+
         # Add custom parameterized functions
         for func, name in self._custom_funcs:
             wrapped_func = self._wrap_custom_func(func, params)
             wrapped_name = self._wrap_custom_name(name, params)
             result.append((wrapped_func, wrapped_name))
-        
+
         return result
-    
+
     @staticmethod
-    def _wrap_custom_func(func: CustomFunc, params: dict[str, float]) -> Callable[[float], float]:
+    def _wrap_custom_func(
+        func: CustomFunc, params: dict[str, float]
+    ) -> Callable[[float], float]:
         """Wrap a custom function to capture params."""
         return lambda x, f=func, p=params: f(x, p)
-    
+
     @staticmethod
-    def _wrap_custom_name(name: CustomNameFunc, params: dict[str, float]) -> Callable[[str], str]:
+    def _wrap_custom_name(
+        name: CustomNameFunc, params: dict[str, float]
+    ) -> Callable[[str], str]:
         """Wrap a custom name to capture params."""
         if isinstance(name, str):
             return lambda x, n=name: n

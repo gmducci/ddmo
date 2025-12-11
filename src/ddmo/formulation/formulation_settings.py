@@ -1,6 +1,6 @@
 # ddmo/formulation/formulation_settings.py
-from dataclasses import dataclass, field
-from typing import Any, Optional
+from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass
@@ -27,23 +27,26 @@ class FormulationSettings:
         window_length: Window length for test functions (weak only).
         stride: Stride between windows (weak only).
     """
+
     formulation: str
-    test_function: Optional[str] = None
-    degree: Optional[int] = None
-    window_length: Optional[int] = None
-    stride: Optional[int] = None
-    
+    test_function: str | None = None
+    degree: int | None = None
+    window_length: int | None = None
+    stride: int | None = None
+
     def __post_init__(self):
         """Validate formulation name."""
         valid = {"weak", "strong"}
         if self.formulation.lower() not in valid:
-            raise ValueError(f"Unknown formulation '{self.formulation}'. Choose from: {valid}")
+            raise ValueError(
+                f"Unknown formulation '{self.formulation}'. Choose from: {valid}"
+            )
         self.formulation = self.formulation.lower()
-        
+
         # Validate weak formulation has required parameters
         if self.formulation == "weak" and self.test_function is None:
             raise ValueError("Weak formulation requires 'test_function' parameter.")
-    
+
     def to_attributes_dict(self) -> dict[str, Any]:
         """Convert to dict format for backward compatibility with formulation classes."""
         attrs = {}

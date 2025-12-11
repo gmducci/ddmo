@@ -2,8 +2,21 @@ import numpy as np
 
 
 class GoodwinModel:
-    def __init__(self, k1=1, k2=0.2, k3=1, k4=0.15, k5=1, k6=0.1,
-                 K1=1, K2=1, K4=1, K6=1, n=9.5, perturbation=False):
+    def __init__(
+        self,
+        k1=1,
+        k2=0.2,
+        k3=1,
+        k4=0.15,
+        k5=1,
+        k6=0.1,
+        K1=1,
+        K2=1,
+        K4=1,
+        K6=1,
+        n=9.5,
+        perturbation=False,
+    ):
         self.k1 = k1
         self.k2 = k2
         self.k3 = k3
@@ -32,8 +45,9 @@ class GoodwinModel:
 
         x, y, z = x0
 
-        dx_dt = self.k1 * (self.K1 ** self.n / (self.K1 ** self.n + z ** self.n)) - \
-                self.k2 * x
+        dx_dt = (
+            self.k1 * (self.K1**self.n / (self.K1**self.n + z**self.n)) - self.k2 * x
+        )
 
         dy_dt = self.k3 * x - self.k4 * y
 

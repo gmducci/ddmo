@@ -1,8 +1,9 @@
 """
 Shared array manipulation utilities used across formulations and solvers.
 """
-from collections.abc import Sequence
-from typing import Any, Callable
+
+from collections.abc import Callable, Sequence
+from typing import Any
 
 import numpy as np
 
@@ -10,13 +11,13 @@ import numpy as np
 def normalize_opt_vars(opt_vars: Any) -> tuple[float, ...]:
     """
     Normalize optimization variables into a tuple of floats.
-    
+
     Args:
         opt_vars: Optimization variables in various formats (scalar, array, sequence).
-        
+
     Returns:
         Tuple of float values.
-        
+
     Raises:
         TypeError: If the input cannot be converted to a tuple of floats.
     """
@@ -40,10 +41,10 @@ def normalize_opt_vars(opt_vars: Any) -> tuple[float, ...]:
 def stack_state_matrix(values: Any) -> np.ndarray:
     """
     Stack and reshape values into a 2D state matrix.
-    
+
     Args:
         values: Input data (1D array, 2D array, 3D array, or sequence of arrays).
-        
+
     Returns:
         2D numpy array with shape (n_samples, n_features).
     """
@@ -65,10 +66,10 @@ def stack_state_matrix(values: Any) -> np.ndarray:
 def ensure_callable_name(name: Any) -> Callable[..., str]:
     """
     Ensure a name is callable (for PySINDy library function names).
-    
+
     Args:
         name: Either a callable or a string/value to wrap.
-        
+
     Returns:
         A callable that returns the name as a string.
     """

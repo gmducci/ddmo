@@ -1,6 +1,5 @@
-
 class Lorenz:
-    def __init__(self, sigma=10, beta=8/3, rho=28):
+    def __init__(self, sigma=10, beta=8 / 3, rho=28):
         self.sigma = sigma
         self.beta = beta
         self.rho = rho

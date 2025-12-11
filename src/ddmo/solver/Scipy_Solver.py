@@ -87,7 +87,7 @@ class Scipy_Solver(Optimizer):
         x_0,
         x_raw,
         solver="lasso",
-        solver_parameters = {},
+        solver_parameters={},
         target="trajectory",
         scale_theta=False,
         objectives=None,
@@ -122,7 +122,9 @@ class Scipy_Solver(Optimizer):
         return objective_funcs, sol, regression_coeff, opt_vars
 
     def solver(self, optimization_vars, regression):
-        opt_vars = optimization_vars[0] if len(optimization_vars) == 1 else optimization_vars
+        opt_vars = (
+            optimization_vars[0] if len(optimization_vars) == 1 else optimization_vars
+        )
         self.alphas.append(opt_vars)
 
         self.library_object.set_base_funcs((opt_vars[0], opt_vars[1]))
@@ -141,7 +143,12 @@ class Scipy_Solver(Optimizer):
             regression_coeff = regression.coef_.T
 
         sol_list = [
-            odeint(self.library_object.get_rhs, x0, self.time_array, args=([opt_vars, regression_coeff],))
+            odeint(
+                self.library_object.get_rhs,
+                x0,
+                self.time_array,
+                args=([opt_vars, regression_coeff],),
+            )
             for x0 in self.initial_values
         ]
         sol = np.vstack(sol_list)
@@ -153,7 +160,9 @@ class Scipy_Solver(Optimizer):
             x = theta @ regression_coeff
             x_ref = self.x_dot
         else:
-            raise ValueError("Invalid target specified. Must be 'trajectory' or 'derivative'.")
+            raise ValueError(
+                "Invalid target specified. Must be 'trajectory' or 'derivative'."
+            )
 
         return x, x_ref, regression_coeff, opt_vars
 
@@ -168,14 +177,12 @@ class Scipy_Solver(Optimizer):
         flat_x = [tuple(row) for row in x]
         f = [self._compute_metrics(xi, self.regression_model) for xi in flat_x]
 
-
         objectives = [fi[0] for fi in f]
         data = [row if row else [np.nan, np.nan] for row in objectives]
         obj_arrays = np.array(data)
         solution = [fi[1] for fi in f]
         coeff_matrix = [fi[2] for fi in f]
         alpha = [fi[3] for fi in f]
-
 
         dw_stats = np.asarray(obj_arrays[:, 1])
 
@@ -198,7 +205,7 @@ class Scipy_Solver(Optimizer):
 
         #     funct_d.append(np.asarray(self.library_object._functions(alpha_)[2]))
 
-        out["F"] = anp.column_stack([obj_arrays[:, 0],  obj_arrays[:, 1]])
+        out["F"] = anp.column_stack([obj_arrays[:, 0], obj_arrays[:, 1]])
 
         solution = np.asanyarray(solution)
         lasso_coeff = np.asanyarray(coeff_matrix)

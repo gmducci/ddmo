@@ -1,9 +1,10 @@
 # ddmo/test_function_factory/hann_window.py
 
 from __future__ import annotations
+
 import numpy as np
 
-from .base import TestFunctionFamily, Array
+from .base import Array, TestFunctionFamily
 
 
 class HannWindow(TestFunctionFamily):

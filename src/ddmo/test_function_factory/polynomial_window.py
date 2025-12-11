@@ -1,9 +1,10 @@
 # ddmo/test_function_factory/polynomial_window.py
 
 from __future__ import annotations
+
 import numpy as np
 
-from .base import TestFunctionFamily, Array
+from .base import Array, TestFunctionFamily
 
 
 class PolynomialWindow(TestFunctionFamily):
@@ -50,7 +51,7 @@ class PolynomialWindow(TestFunctionFamily):
         self.half = self.window_length // 2
 
         # build prototype polynomial bump (unscaled)
-        w = self._poly_bump(self.window_length, self.degree)   # shape (L,)
+        w = self._poly_bump(self.window_length, self.degree)  # shape (L,)
 
         # numerical derivative dw/dt (unscaled)
         dw = self.finite_difference(w, dt=self.dt, axis=-1)
@@ -73,8 +74,8 @@ class PolynomialWindow(TestFunctionFamily):
         if L % 2 == 0 or L < 3:
             raise ValueError("Polynomial length must be an odd integer ≥ 3.")
 
-        x = np.linspace(-1.0, 1.0, L)         # symmetric grid
-        base = 1.0 - np.abs(x)               # in [0, 1], zero at ends
+        x = np.linspace(-1.0, 1.0, L)  # symmetric grid
+        base = 1.0 - np.abs(x)  # in [0, 1], zero at ends
         base[base < 0.0] = 0.0
         w = base**degree if degree > 0 else np.ones_like(base)
         # enforce exact zeros at the boundaries

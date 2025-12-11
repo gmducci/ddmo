@@ -21,9 +21,10 @@ if __name__ == "__main__":
 
     NamedFunc = tuple[Callable[[float, float], float], str]
 
-    # Define the library of functions
-    def get_base_functions(params: list[float]) -> list[NamedFunc]:
-        gamma_1, gamma_2 = params[0:2]
+    # Define the library of functions - now uses dict for safe named access!
+    def get_base_functions(params: dict[str, float]) -> list[NamedFunc]:
+        gamma_1 = params["gamma_1"]  # Named access - order independent!
+        gamma_2 = params["gamma_2"]
         return [
             (lambda x: x, lambda x: x),
             (lambda x: x**2, lambda x: f"{x}^2"),
@@ -44,34 +45,27 @@ if __name__ == "__main__":
         x_raw=x_raw[::skip, :]
     )
     
-    # Define optimization bounds
-    lower_bounds = {
-        "gamma_1": 8.4,
-        "gamma_2": 1.0,
-        "stride": 5,
-        "degree": 3,
-        "window_length": 51,
+    # Library parameters (for SINDy function library) - tuple format: (min, max)
+    library_bounds = {
+        "gamma_1": (8.4, 9.6),
+        "gamma_2": (1.0, 10.0),
     }
 
-    upper_bounds = {
-        "gamma_1": 9.6,
-        "gamma_2": 10.0,
-        "stride": 120,
-        "degree": 7,
-        "window_length": 401,
+    # Formulation parameters (for weak formulation)
+    formulation_bounds = {
+        "stride": (5, 120),
+        "degree": (3, 7),
+        "window_length": (51, 401),
     }
 
-    # Unified optimizer settings - simple and clean!
+    # Unified optimizer settings with separated bounds
     optimizer_settings = OptimizerSettings(
-        xl=lower_bounds,
-        xu=upper_bounds,
+        library_bounds=library_bounds,
+        formulation_bounds=formulation_bounds,
         n_obj=2,
         n_gen=10,
-        algorithm="NSGA2",  # Options: "NSGA2", "NSGA3"
-        pop_size=50,
-        crossover_eta=15, # default 15
-        crossover_prob=0.9, # default 0.9
-        mutation_eta=20 # default 20
+        algorithm="NSGA2",
+        pop_size=50
     )
 
 

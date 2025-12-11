@@ -106,25 +106,35 @@ class OptimizerSettings:
     """
     Unified configuration for the optimization process.
     
-    This is the recommended user-facing API that consolidates problem,
-    algorithm, and termination settings with sensible defaults.
+    Separates library parameters (for function library) from formulation 
+    parameters (for weak/strong formulation) for clarity and safety.
 
     Attributes:
-        xl (dict[str, float]): Lower bounds for optimization variables.
-        xu (dict[str, float]): Upper bounds for optimization variables.
-        n_obj (int): Number of objective functions.
-        n_gen (int): Number of generations to run.
-        algorithm (str): Algorithm name. Options: "NSGA2", "NSGA3". Default: "NSGA2".
-        pop_size (int): Population size. Default: 100.
-        crossover_eta (float): SBX crossover distribution index. Default: 15.0.
-        crossover_prob (float): Crossover probability. Default: 0.9.
-        mutation_eta (float): Polynomial mutation distribution index. Default: 20.0.
-        seed (int | None): Random seed for reproducibility. Default: None.
-        verbose (bool): Whether to print progress. Default: True.
+        library_bounds: Bounds for library parameters as {name: (min, max)}.
+            These parameters are passed to the library function as a dict.
+        formulation_bounds: Bounds for formulation parameters as {name: (min, max)}.
+            These control the weak formulation (stride, degree, window_length).
+        n_obj: Number of objective functions.
+        n_gen: Number of generations to run.
+        algorithm: Algorithm name. Options: "NSGA2", "NSGA3". Default: "NSGA2".
+        pop_size: Population size. Default: 100.
+        crossover_eta: SBX crossover distribution index. Default: 15.0.
+        crossover_prob: Crossover probability. Default: 0.9.
+        mutation_eta: Polynomial mutation distribution index. Default: 20.0.
+        seed: Random seed for reproducibility. Default: None.
+        verbose: Whether to print progress. Default: True.
+
+    Example:
+        OptimizerSettings(
+            library_bounds={"gamma_1": (8.4, 9.6), "gamma_2": (1.0, 10.0)},
+            formulation_bounds={"stride": (5, 120), "degree": (3, 7)},
+            n_obj=2,
+            n_gen=100
+        )
     """
     # Required parameters
-    xl: dict[str, float]
-    xu: dict[str, float]
+    library_bounds: dict[str, tuple[float, float]]
+    formulation_bounds: dict[str, tuple[float, float]]
     n_obj: int
     n_gen: int
     
@@ -138,17 +148,42 @@ class OptimizerSettings:
     verbose: bool = True
     
     def __post_init__(self):
-        """Validate that bounds have matching keys."""
-        if set(self.xl.keys()) != set(self.xu.keys()):
-            raise ValueError("xl and xu must have the same keys")
-        for key in self.xl:
-            if self.xl[key] > self.xu[key]:
-                raise ValueError(f"Lower bound for '{key}' exceeds upper bound")
+        """Validate bounds format."""
+        for name, bounds in {**self.library_bounds, **self.formulation_bounds}.items():
+            if not isinstance(bounds, tuple) or len(bounds) != 2:
+                raise ValueError(f"Bounds for '{name}' must be a (min, max) tuple")
+            if bounds[0] > bounds[1]:
+                raise ValueError(f"Lower bound for '{name}' exceeds upper bound")
     
     @property
     def n_var(self) -> int:
-        """Number of decision variables, inferred from bounds."""
-        return len(self.xl)
+        """Total number of decision variables."""
+        return len(self.library_bounds) + len(self.formulation_bounds)
+    
+    @property
+    def all_bounds(self) -> dict[str, tuple[float, float]]:
+        """Combined bounds dict (library first, then formulation)."""
+        return {**self.library_bounds, **self.formulation_bounds}
+    
+    @property
+    def xl(self) -> dict[str, float]:
+        """Lower bounds as a flat dict."""
+        return {k: v[0] for k, v in self.all_bounds.items()}
+    
+    @property
+    def xu(self) -> dict[str, float]:
+        """Upper bounds as a flat dict."""
+        return {k: v[1] for k, v in self.all_bounds.items()}
+    
+    @property
+    def library_param_names(self) -> list[str]:
+        """Names of library parameters."""
+        return list(self.library_bounds.keys())
+    
+    @property
+    def formulation_param_names(self) -> list[str]:
+        """Names of formulation parameters."""
+        return list(self.formulation_bounds.keys())
 
 
 @dataclass

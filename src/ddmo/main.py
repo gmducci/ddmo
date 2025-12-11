@@ -117,6 +117,9 @@ def identify(data_instance: DataConstructor,
     problem.map_label = map_label
     mapi_label = {n: i for i, n in enumerate(optimizer_settings.xl)}
     problem.mapi_label = mapi_label
+    
+    # Store library param names for dict-based access in formulations
+    problem.library_param_names = optimizer_settings.library_param_names
 
     # Convert bounds dictionaries to arrays
     xl = np.array([optimizer_settings.xl[key] for key in optimizer_settings.xl], dtype=float)

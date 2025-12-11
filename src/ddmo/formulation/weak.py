@@ -195,7 +195,12 @@ class WeakFormulation(Formulation):
             new_family = self.family_builder(param_dict)
             self._configure_from_family(new_family)
 
-        named_funcs = data_instance.library_object([*opt_vars])
+        # Pass dict to library function (safer than positional list)
+        # If param_dict not available, fall back to list for backward compat
+        if param_dict is not None:
+            named_funcs = data_instance.library_object(param_dict)
+        else:
+            named_funcs = data_instance.library_object([*opt_vars])
         functions = [func for func, _ in named_funcs]
         raw_names = [name for _, name in named_funcs]
         function_names = [ensure_callable_name(name) for name in raw_names]

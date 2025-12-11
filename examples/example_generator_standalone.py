@@ -18,14 +18,15 @@ if __name__ == "__main__":
     x_train = np.load(BENCHMARK_FOLDER / 'x_train.npy')
     x_dot_hat = np.load(BENCHMARK_FOLDER / 'x_dot_train.npy')
     time_array = np.load(BENCHMARK_FOLDER / 'time.npy')
+
     # Define the function library using the fluent API
     library = (
         LibraryBuilder()
-        .add_polynomial(max_degree=2)                # x, x²
+        .add_polynomial(max_degree=2)                # x, x², x*y
         .add_hill(exponent_param="gamma_1")          # 1/(1+x^γ₁)
         .add_exponential(rate_param="gamma_2")       # exp(-γ₂·x)
     )
-
+    
     x_0 = [x_0_train]
 
     # Create a DataConstructor instance
@@ -57,18 +58,17 @@ if __name__ == "__main__":
         library_bounds=library_bounds,
         formulation_bounds=formulation_bounds,
         n_obj=2,
-        n_gen=10,
+        n_gen=2,
         algorithm="NSGA2",
         pop_size=50
     )
-
 
     solver_settings = SolverSettings(
         solver_name="pysindy",
         regularization="STLSQ",
         regularization_parameters={
-            "alpha": 0.15, 
-            "threshold": 0.2,
+            "alpha": 0.05, 
+            "threshold": 0.1,
         }
     )
     

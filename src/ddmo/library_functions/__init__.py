@@ -7,6 +7,7 @@ Main API:
     library = (
         LibraryBuilder()
         .add_polynomial(max_degree=3)
+        .add_cross_product()               # x*y interaction terms
         .add_hill(exponent_param="gamma_1")
         .add_exponential(rate_param="gamma_2")
     )
@@ -17,6 +18,8 @@ from ddmo.library_functions.factories import (
     HillFactory,
     ExponentialFactory,
     IdentityFactory,
+    CrossProductFactory,
+    PowerCrossProductFactory,
     NamedFunc,
 )
 from ddmo.library_functions.composer import LibraryBuilder
@@ -30,6 +33,8 @@ __all__ = [
     "HillFactory",
     "ExponentialFactory",
     "IdentityFactory",
+    "CrossProductFactory",
+    "PowerCrossProductFactory",
     # Types
     "NamedFunc",
 ]

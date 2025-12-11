@@ -35,19 +35,27 @@ class LibraryFactory(ABC):
 @dataclass
 class PolynomialFactory(LibraryFactory):
     """
-    Factory for polynomial functions: x, x², x³, ...
+    Factory for polynomial functions including cross-product terms.
     
-    This is a static factory - it does not use optimizer parameters.
+    Generates terms like: x, y, x², y², x*y, x³, x²*y, x*y², y³, ...
+    This matches PySINDy's PolynomialLibrary behavior.
     
     Example:
-        factory = PolynomialFactory(max_degree=3)
-        funcs = factory.generate({})  # Returns x, x², x³
+        factory = PolynomialFactory(max_degree=2)
+        # Generates single-var: x, x²
+        # Plus two-var interactions: x*y (applied by PySINDy to all pairs)
+    
+    Args:
+        max_degree: Maximum total polynomial degree.
+        include_interactions: Whether to include cross-product terms (default True).
+        include_constant: Whether to include constant term 1 (default False).
     """
     max_degree: int = 2
+    include_interactions: bool = True
     include_constant: bool = False
     
     def generate(self, params: dict[str, float]) -> list[NamedFunc]:
-        """Generate polynomial functions up to max_degree."""
+        """Generate polynomial functions up to max_degree with interactions."""
         funcs: list[NamedFunc] = []
         
         # Optionally include constant term
@@ -57,20 +65,50 @@ class PolynomialFactory(LibraryFactory):
                 lambda x: "1"
             ))
         
-        # Generate x, x², x³, ...
+        # Generate single-variable terms: x, x², x³, ...
         for degree in range(1, self.max_degree + 1):
-            # Capture degree in closure properly
             func = self._make_power_func(degree)
             name = self._make_power_name(degree)
             funcs.append((func, name))
+        
+        # Generate cross-product / interaction terms
+        if self.include_interactions:
+            # x*y (degree 2)
+            if self.max_degree >= 2:
+                funcs.append((lambda x, y: x * y, lambda x, y: f"{x}*{y}"))
+            
+            # x²*y, x*y² (degree 3)
+            if self.max_degree >= 3:
+                funcs.append((
+                    self._make_power_cross_func(2, 1),
+                    self._make_power_cross_name(2, 1)
+                ))
+                funcs.append((
+                    self._make_power_cross_func(1, 2),
+                    self._make_power_cross_name(1, 2)
+                ))
+            
+            # x³*y, x²*y², x*y³ (degree 4)
+            if self.max_degree >= 4:
+                funcs.append((
+                    self._make_power_cross_func(3, 1),
+                    self._make_power_cross_name(3, 1)
+                ))
+                funcs.append((
+                    self._make_power_cross_func(2, 2),
+                    self._make_power_cross_name(2, 2)
+                ))
+                funcs.append((
+                    self._make_power_cross_func(1, 3),
+                    self._make_power_cross_name(1, 3)
+                ))
         
         return funcs
     
     @staticmethod
     def _make_power_func(degree: int) -> Callable[[float], float]:
         """Create a power function with captured degree."""
-        # Use closure without default args (PySINDy inspects arity)
-        d = degree  # Capture in closure
+        d = degree
         if d == 1:
             return lambda x: x
         return lambda x: x ** d
@@ -78,10 +116,25 @@ class PolynomialFactory(LibraryFactory):
     @staticmethod
     def _make_power_name(degree: int) -> Callable[[str], str]:
         """Create a name generator for power functions."""
-        d = degree  # Capture in closure
+        d = degree
         if d == 1:
             return lambda x: x
         return lambda x: f"{x}^{d}"
+    
+    @staticmethod
+    def _make_power_cross_func(px: int, py: int) -> Callable[[float, float], float]:
+        """Create a powered cross-product function."""
+        a, b = px, py
+        return lambda x, y: (x ** a) * (y ** b)
+    
+    @staticmethod
+    def _make_power_cross_name(px: int, py: int) -> Callable[[str, str], str]:
+        """Create a name generator for powered cross-product."""
+        a, b = px, py
+        x_part = "x" if a == 1 else f"x^{a}"
+        y_part = "y" if b == 1 else f"y^{b}"
+        # Replace placeholders at call time
+        return lambda x, y: f"{x_part}*{y_part}".replace("x", x).replace("y", y)
 
 
 @dataclass
@@ -155,3 +208,51 @@ class IdentityFactory(LibraryFactory):
     def generate(self, params: dict[str, float]) -> list[NamedFunc]:
         """Generate identity function."""
         return [(lambda x: x, lambda x: x)]
+
+
+@dataclass
+class CrossProductFactory(LibraryFactory):
+    """
+    Factory for cross-product / interaction terms: x*y
+    
+    Generates a two-variable function that multiplies its inputs.
+    PySINDy will apply this to all pairs of state variables.
+    
+    Example:
+        factory = CrossProductFactory()
+        funcs = factory.generate({})  # Returns x*y (applied to all variable pairs)
+    """
+    
+    def generate(self, params: dict[str, float]) -> list[NamedFunc]:
+        """Generate cross-product function."""
+        return [(lambda x, y: x * y, lambda x, y: f"{x}*{y}")]
+
+
+@dataclass
+class PowerCrossProductFactory(LibraryFactory):
+    """
+    Factory for powered cross-products: x^a * y^b
+    
+    Generates interaction terms with specified powers.
+    
+    Example:
+        factory = PowerCrossProductFactory(power_x=2, power_y=1)
+        funcs = factory.generate({})  # Returns x²*y
+    """
+    power_x: int = 1
+    power_y: int = 1
+    
+    def generate(self, params: dict[str, float]) -> list[NamedFunc]:
+        """Generate powered cross-product function."""
+        px, py = self.power_x, self.power_y
+        
+        def make_func(a, b):
+            return lambda x, y: (x ** a) * (y ** b)
+        
+        def make_name(a, b):
+            x_part = "x" if a == 1 else f"x^{a}"
+            y_part = "y" if b == 1 else f"y^{b}"
+            return lambda x, y: f"{x_part}*{y_part}".replace("x", x).replace("y", y)
+        
+        return [(make_func(px, py), make_name(px, py))]
+

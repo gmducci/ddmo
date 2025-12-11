@@ -37,7 +37,7 @@ from pymoo.optimize import minimize
 from pymoo.util.ref_dirs import get_reference_directions
 
 from ddmo.utils.data_constructor import DataConstructor
-from ddmo.utils.constructors import OptimizerSettings
+from ddmo.utils.constructors import OptimizerSettings, IdentificationResult
 from ddmo.solver.base import BaseSolver
 from ddmo.formulation import Formulation, WeakFormulation, StrongFormulation
 from ddmo.test_function_factory.hann_window import HannWindow
@@ -78,8 +78,8 @@ def identify(data_instance: DataConstructor,
         objective_functions: Optional custom objective functions.
 
     Returns:
-        Tuple of (problem, result, objective_space, solutions, 
-                  coeff_matrices, alphas, models, theta_matrices)
+        IdentificationResult: Structured result containing problem, result,
+            objective_space, solutions, coeff_matrices, alphas, models, theta_matrices.
     """
     from ddmo.optimizer.optimizer import Optimizer
     
@@ -171,8 +171,17 @@ def identify(data_instance: DataConstructor,
     solutions = res.opt.get("solution", to_numpy=False)
     coeff_matrices = res.opt.get("coeff_matrix", to_numpy=False)
     alphas = res.opt.get("alphas", to_numpy=False)
-    model = res.opt.get("models", to_numpy=False)
-    theta = res.opt.get("theta", to_numpy=False)
+    models = res.opt.get("models", to_numpy=False)
+    theta_matrices = res.opt.get("theta", to_numpy=False)
 
-    return problem, res, obj_space, solutions, coeff_matrices, alphas, model, theta
+    return IdentificationResult(
+        problem=problem,
+        result=res,
+        objective_space=obj_space,
+        solutions=solutions,
+        coeff_matrices=coeff_matrices,
+        alphas=alphas,
+        models=models,
+        theta_matrices=theta_matrices
+    )
 

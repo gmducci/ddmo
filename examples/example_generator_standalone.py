@@ -68,8 +68,12 @@ if __name__ == "__main__":
         n_obj=2,
         n_gen=10,
         algorithm="NSGA2",  # Options: "NSGA2", "NSGA3"
-        pop_size=50
+        pop_size=50,
+        crossover_eta=15, # default 15
+        crossover_prob=0.9, # default 0.9
+        mutation_eta=20 # default 20
     )
+
 
     solver_settings = SolverSettings(
         solver_name="pysindy",
@@ -91,25 +95,16 @@ if __name__ == "__main__":
     )
 
     # Run identification
-    identification = identify(
+    result = identify(
         data_instance=training_data,
         optimizer_settings=optimizer_settings,
         solver_instance=solver_settings,
         formulation_instance=formulation_settings,
     )
 
-    (problem,
-        res,
-        obj_space,
-        solutions,
-        coeff_matrices,
-        alphas,
-        sindy_model,
-        theta_matrices,
-    ) = identification
+    # Access results via named attributes
+    print(result.alphas)
 
-    print(alphas)
-
-    plt.plot(solutions[0])
+    plt.plot(result.solutions[0])
     plt.plot(x_raw[::skip], alpha=0.5)
     plt.show()

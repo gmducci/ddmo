@@ -149,3 +149,31 @@ class OptimizerSettings:
     def n_var(self) -> int:
         """Number of decision variables, inferred from bounds."""
         return len(self.xl)
+
+
+@dataclass
+class IdentificationResult:
+    """
+    Structured result from the identify() function.
+    
+    Provides named access to all outputs from the sparse identification process,
+    replacing the previous 8-element tuple return value.
+
+    Attributes:
+        problem: The optimization problem instance.
+        result: The pymoo Result object containing full optimization details.
+        objective_space: Array of objective function values for Pareto-optimal solutions.
+        solutions: List of reconstructed trajectory solutions.
+        coeff_matrices: List of coefficient matrices from sparse regression.
+        alphas: List of optimized parameter values.
+        models: List of fitted models (e.g., PySINDy models).
+        theta_matrices: List of feature matrices used in regression.
+    """
+    problem: Any
+    result: Any
+    objective_space: Any  # np.ndarray
+    solutions: list
+    coeff_matrices: list
+    alphas: list
+    models: list
+    theta_matrices: list

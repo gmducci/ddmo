@@ -23,6 +23,7 @@ dependencies = [
     "numpy",
     "scipy",
     "matplotlib",
+    "scikit-learn<1.8.0", # Pin to avoid breakage with pysindy 1.7.5
     "pysindy==1.7.5",
     "pymoo",
     "PyWavelets",

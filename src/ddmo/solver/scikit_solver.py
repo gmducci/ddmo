@@ -9,6 +9,7 @@ from sklearn.preprocessing import StandardScaler
 from scipy.integrate import solve_ivp
 from ddmo.solver.base import BaseSolver
 from ddmo.utils.data_constructor import DataConstructor
+from ddmo.utils.array_helpers import normalize_opt_vars, stack_state_matrix
 
 class ScikitSolver(BaseSolver):
     def __init__(self, 
@@ -34,13 +35,13 @@ class ScikitSolver(BaseSolver):
         lib_custom = None
         mask = None
         
-        lhs_matrix = self._stack_state_matrix(self.data_instance.x_dot)
+        lhs_matrix = stack_state_matrix(self.data_instance.x_dot)
 
         if len(args) == 1:
             optimization_vars = args[0]
         elif len(args) == 2:
             lhs_payload, rhs_payload = args
-            lhs_matrix = self._stack_state_matrix(lhs_payload)
+            lhs_matrix = stack_state_matrix(lhs_payload)
             if isinstance(rhs_payload, dict):
                 optimization_vars = rhs_payload.get("opt_vars")
                 theta = rhs_payload.get("theta")
@@ -54,7 +55,7 @@ class ScikitSolver(BaseSolver):
         if optimization_vars is None:
              raise ValueError("Optimization variables are required for ScikitSolver.")
 
-        opt_vars = self._normalize_opt_vars(optimization_vars)
+        opt_vars = normalize_opt_vars(optimization_vars)
         
         # 2. Prepare Data
         if theta is None:
@@ -177,43 +178,6 @@ class ScikitSolver(BaseSolver):
         except Exception as e:
             print(f"Error during ScikitSolver execution: {e}")
             return None, None, None, None, None
-
-
-    # --- Helpers ---
-
-    @staticmethod
-    def _normalize_opt_vars(opt_vars: Any) -> tuple[float, ...]:
-        if np.isscalar(opt_vars):
-            return (float(opt_vars),)
-
-        if isinstance(opt_vars, np.ndarray):
-            flattened = opt_vars.astype(float).ravel()
-            return tuple(float(value) for value in flattened)
-
-        if isinstance(opt_vars, Sequence) and not isinstance(opt_vars, (str, bytes)):
-            return tuple(float(value) for value in opt_vars)
-
-        try:
-            return (float(opt_vars),)
-        except (TypeError, ValueError) as exc:
-            msg = "Cannot normalize optimization variables into a tuple of floats."
-            raise TypeError(msg) from exc
-
-    @staticmethod
-    def _stack_state_matrix(values: Any) -> np.ndarray:
-        if isinstance(values, np.ndarray):
-            if values.ndim == 1:
-                return values.reshape(-1, 1)
-            if values.ndim == 3:
-                n_samples = values.shape[0] * values.shape[1]
-                return values.reshape(n_samples, values.shape[-1])
-            return values
-
-        if isinstance(values, Sequence) and not isinstance(values, (str, bytes)):
-            stacked = [np.atleast_2d(np.asarray(block)) for block in values]
-            return np.vstack(stacked)
-
-        return np.atleast_2d(np.asarray(values))
 
 
 class _ManualSimulationModel:

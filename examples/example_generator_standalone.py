@@ -30,9 +30,9 @@ if __name__ == "__main__":
     x_0 = [x_0_train]
 
     # Create a DataConstructor instance
-    skip = 10
+    skip = 2
     training_data = DataConstructor(
-        x_train=x_train[::skip, :],
+        x_train=x_raw[::skip, :],
         time_array=time_array[::skip],
         x_dot=x_dot_hat[::skip, :],
         library_object=library.build,  # Pass the build method
@@ -48,8 +48,7 @@ if __name__ == "__main__":
 
     # Formulation parameters (for weak formulation)
     formulation_bounds = {
-        "stride": (5, 50),
-        "degree": (3, 7),
+        "stride": (5, 120),
         "window_length": (51, 401),
     }
 
@@ -67,8 +66,8 @@ if __name__ == "__main__":
         solver_name="pysindy",
         regularization="STLSQ",
         regularization_parameters={
-            "alpha": 0.05, 
-            "threshold": 0.1,
+            "alpha": 0.2, 
+            "threshold": 0.25,
         }
     )
     

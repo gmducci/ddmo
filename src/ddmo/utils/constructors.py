@@ -39,9 +39,10 @@ class ProblemSettings:
 @dataclass
 class AlgorithmSettings:
     """
-    Configuration for the NSGA2 evolutionary algorithm.
+    Configuration for the evolutionary optimization algorithm.
 
     Attributes:
+        algorithm_name (str): Name of the algorithm to use. Options: "NSGA2", "NSGA3".
         pop_size (int): Size of the population.
         sampling (Any): Sampling strategy (e.g., FloatRandomSampling()).
         selection (Any): Selection operator (e.g., TournamentSelection()).
@@ -53,6 +54,7 @@ class AlgorithmSettings:
         advance_after_initial_infill (bool): Advance after the initial population is evaluated.
         tournament_type (Optional[str]): Type of tournament selection (used for diagnostics).
     """
+    algorithm_name: str = "NSGA2"
     pop_size: int = 100
     sampling: Any = None
     selection: Any = None
@@ -97,3 +99,53 @@ class GASettings:
     termination: TerminationSettings
     seed: Optional[int] = None
     verbose: bool = True
+
+
+@dataclass
+class OptimizerSettings:
+    """
+    Unified configuration for the optimization process.
+    
+    This is the recommended user-facing API that consolidates problem,
+    algorithm, and termination settings with sensible defaults.
+
+    Attributes:
+        xl (dict[str, float]): Lower bounds for optimization variables.
+        xu (dict[str, float]): Upper bounds for optimization variables.
+        n_obj (int): Number of objective functions.
+        n_gen (int): Number of generations to run.
+        algorithm (str): Algorithm name. Options: "NSGA2", "NSGA3". Default: "NSGA2".
+        pop_size (int): Population size. Default: 100.
+        crossover_eta (float): SBX crossover distribution index. Default: 15.0.
+        crossover_prob (float): Crossover probability. Default: 0.9.
+        mutation_eta (float): Polynomial mutation distribution index. Default: 20.0.
+        seed (int | None): Random seed for reproducibility. Default: None.
+        verbose (bool): Whether to print progress. Default: True.
+    """
+    # Required parameters
+    xl: dict[str, float]
+    xu: dict[str, float]
+    n_obj: int
+    n_gen: int
+    
+    # Optional with sensible defaults
+    algorithm: str = "NSGA2"
+    pop_size: int = 100
+    crossover_eta: float = 15.0
+    crossover_prob: float = 0.9
+    mutation_eta: float = 20.0
+    seed: int | None = None
+    verbose: bool = True
+    
+    def __post_init__(self):
+        """Validate that bounds have matching keys."""
+        if set(self.xl.keys()) != set(self.xu.keys()):
+            raise ValueError("xl and xu must have the same keys")
+        for key in self.xl:
+            if self.xl[key] > self.xu[key]:
+                raise ValueError(f"Lower bound for '{key}' exceeds upper bound")
+    
+    @property
+    def n_var(self) -> int:
+        """Number of decision variables, inferred from bounds."""
+        return len(self.xl)

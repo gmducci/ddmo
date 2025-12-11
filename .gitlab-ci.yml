@@ -45,7 +45,7 @@ unit-test-job: # This job runs in the test stage.
     - pip install uv --quiet
     - uv venv
     - source .venv/bin/activate
-    - uv pip install . # Install the project and its dependencies
+    - uv pip install setuptools . # Install the project and its dependencies (setuptools needed for pkg_resources)
   script:
     - uv pip install pytest coverage
     - coverage run -m pytest -v --junitxml=junit.xml

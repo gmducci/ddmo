@@ -29,9 +29,8 @@ if __name__ == "__main__":
     )
 
     x_0 = [x_0_train]
-
     # Create a DataConstructor instance
-    skip = 2
+    skip = 5
     training_data = DataConstructor(
         x_train=x_raw[::skip, :],
         time_array=time_array[::skip],
@@ -59,7 +58,7 @@ if __name__ == "__main__":
         formulation_bounds=formulation_bounds,
         n_obj=2,
         n_gen=10,
-        algorithm="NSGA2",
+        algorithm="NSGA3",
         pop_size=50,
     )
 

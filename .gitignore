@@ -28,3 +28,6 @@ pyrightconfig.json
 # Temporary files
 .ipynb_checkpoints/
 .eggs/
+
+# Config
+.editorconfig

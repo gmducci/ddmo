@@ -12,7 +12,6 @@ class OneDProblem:
         return dxdt
 
 
-
 class Bimolecular:
     def __init__(self, k=0.1, b0=1):
         self.k = k
@@ -23,7 +22,6 @@ class Bimolecular:
         return dxdt
 
     def dynamics_2(self, x_0, t):
-
         x, y = x_0
         dxdt = -self.k * x * y
         dydt = -self.k * x * y

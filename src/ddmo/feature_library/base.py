@@ -1,6 +1,7 @@
 """
 Base class for feature library classes.
 """
+
 import abc
 import warnings
 from collections.abc import Sequence
@@ -24,6 +25,7 @@ class BaseFeatureLibrary(TransformerMixin):
     Forces subclasses to implement ``fit``, ``transform``,
     and ``get_feature_names`` methods.
     """
+
     def __init__(self, library_ensemble: bool = False, ensemble_indices: list = [0]):
         self.library_ensemble = library_ensemble
         self.ensemble_indices = ensemble_indices

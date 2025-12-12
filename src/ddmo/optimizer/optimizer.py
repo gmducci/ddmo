@@ -1,14 +1,14 @@
 # optimizer.py
 import multiprocessing as mp
 import warnings
+from collections.abc import Callable
+from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 import pymoo.gradient.toolbox as anp
 from pymoo.config import Config
 from pymoo.core.problem import Problem
-
-from dataclasses import dataclass
-from typing import Any, Optional
 
 from ddmo.formulation import Formulation
 from ddmo.optimizer.objective_functions import (
@@ -17,45 +17,48 @@ from ddmo.optimizer.objective_functions import (
     compute_ppcc_matrix,
 )
 from ddmo.utils.data_constructor import DataConstructor
-from typing import Callable
 
 # Configure environment
 warnings.filterwarnings("ignore")
 Config.warnings['not_compiled'] = False
 mp.set_start_method("fork", force=True)
 
+
 @dataclass
 class EvaluationResult:
     obj_func_score: list[float]
-    solution: Optional[Any]
-    regression_coefficients: Optional[Any]
+    solution: Any | None
+    regression_coefficients: Any | None
     opt_vars: np.ndarray
-    symbolic_model: Optional[Any] = None
-    feature_matrix: Optional[Any] = None
+    symbolic_model: Any | None = None
+    feature_matrix: Any | None = None
+
 
 class Optimizer(Problem):
-    def __init__(self,
-                 data_instance: DataConstructor,
-                 # library_factory: Callable[[list[float]], list[NamedFunc]],
-                 # formution: Formulation,
-                 solver: Callable,
-                 objectives=None,
-                 objective_functions=None,
-                 formulation: Formulation | None = None):
+    def __init__(
+        self,
+        data_instance: DataConstructor,
+        # library_factory: Callable[[list[float]], list[NamedFunc]],
+        # formution: Formulation,
+        solver: Callable,
+        objectives=None,
+        objective_functions=None,
+        formulation: Formulation | None = None,
+    ):
+        super().__init__(
+            n_var=1, n_obj=None, n_ieq_constr=0, xl=0.0, xu=1.0, vtype=float
+        )
 
-        super().__init__(n_var=1,
-                         n_obj=None,
-                         n_ieq_constr=0,
-                         xl=0.,
-                         xu=1.,
-                         vtype=float)
-        
         self.data_instance = data_instance
         self.solver = solver
         self.formulation = formulation
-        #self.library_factory = library_factory
+        # self.library_factory = library_factory
         # self.formution = formution
-        self.objectives = objectives if objectives is not None else [compute_mse, compute_dw_coefficient]
+        self.objectives = (
+            objectives
+            if objectives is not None
+            else [compute_mse, compute_dw_coefficient]
+        )
         self.objective_functions = objective_functions
         self.n_obj = len(self.objectives)
 
@@ -65,11 +68,10 @@ class Optimizer(Problem):
         self.solution = []
 
     def _compute_metrics(self, optimization_variables, *args):
-
         _objective_functions_dict = {
             "mse": compute_mse,
             "dw_coefficient": compute_dw_coefficient,
-            "ppcc_matrix": compute_ppcc_matrix
+            "ppcc_matrix": compute_ppcc_matrix,
         }
 
         if self.formulation is not None:
@@ -92,7 +94,7 @@ class Optimizer(Problem):
             solver_args = (lhs, rhs)
         else:
             solver_args = (optimization_variables,)
-            
+
         solver_output = self.solver(*solver_args)
 
         if solver_output is None:
@@ -138,7 +140,7 @@ class Optimizer(Problem):
             symbolic_model=model,
             feature_matrix=feature_matrix,
         )
-    
+
     def _evaluate(self, x, out, *args, **kwargs):
         # Clear previous state
         self.coefficient_matrix.clear()
@@ -160,9 +162,9 @@ class Optimizer(Problem):
 
         for res in results:
             if (
-                res is not None and
-                res.obj_func_score is not None and
-                not np.all(np.isnan(res.obj_func_score))
+                res is not None
+                and res.obj_func_score is not None
+                and not np.all(np.isnan(res.obj_func_score))
             ):
                 obj = res.obj_func_score
                 sol = res.solution
@@ -200,7 +202,7 @@ class Optimizer(Problem):
         # Store output
         out["F"] = anp.column_stack([obj_arrays[:, 0], dw_stats])
         out["solution"] = np.asarray(solutions, dtype=object)
-        out["coeff_matrix"] =  np.asarray(coeff_matrices, dtype=object)
+        out["coeff_matrix"] = np.asarray(coeff_matrices, dtype=object)
         out["alphas"] = np.asarray(alphas, dtype=object)
         out["dw_coeff"] = dw_stats
         out['models'] = models

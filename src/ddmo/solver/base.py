@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class BaseSolver(ABC):
     @abstractmethod
     def configure(self, **kwargs):

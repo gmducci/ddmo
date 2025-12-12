@@ -3,7 +3,7 @@ Library Functions module for building SINDy-compatible function libraries.
 
 Main API:
     from ddmo.library_functions import LibraryBuilder
-    
+
     library = (
         LibraryBuilder()
         .add_polynomial(max_degree=3)
@@ -12,17 +12,18 @@ Main API:
         .add_exponential(rate_param="gamma_2")
     )
 """
-from ddmo.library_functions.factories import (
-    LibraryFactory,
-    PolynomialFactory,
-    HillFactory,
-    ExponentialFactory,
-    IdentityFactory,
-    CrossProductFactory,
-    PowerCrossProductFactory,
-    NamedFunc,
-)
+
 from ddmo.library_functions.composer import LibraryBuilder
+from ddmo.library_functions.factories import (
+    CrossProductFactory,
+    ExponentialFactory,
+    HillFactory,
+    IdentityFactory,
+    LibraryFactory,
+    NamedFunc,
+    PolynomialFactory,
+    PowerCrossProductFactory,
+)
 
 __all__ = [
     # Main API

@@ -76,7 +76,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #########################################################
 """
 
-
 import logging
 
 import numpy as np
@@ -88,20 +87,33 @@ try:
     import matplotlib.pyplot as plt
 except ImportError:
     _has_matplotlib = False
-    logging.warning("Matplotlib is not installed - plotting "
-                    "functionality disabled")
+    logging.warning("Matplotlib is not installed - plotting functionality disabled")
 
 
 def log_iteration(ii, s0, u, g):
     relative_change = np.linalg.norm(s0) / np.linalg.norm(u)
     g_norm = np.linalg.norm(g)
-    logging.info(f'iteration {ii:4d}: relative change = {relative_change:.3e}, '
-                 f'gradient norm = {g_norm:.3e}\n')
+    logging.info(
+        f'iteration {ii:4d}: relative change = {relative_change:.3e}, '
+        f'gradient norm = {g_norm:.3e}\n'
+    )
 
 
-def TVRegDiff(data, itern, alph, u0=None, scale='small', ep=1e-6, dx=None,
-              plotflag=_has_matplotlib, diagflag=True, precondflag=True,
-              diffkernel='abs', cgtol=1e-4, cgmaxit=100):
+def TVRegDiff(
+    data,
+    itern,
+    alph,
+    u0=None,
+    scale='small',
+    ep=1e-6,
+    dx=None,
+    plotflag=_has_matplotlib,
+    diagflag=True,
+    precondflag=True,
+    diffkernel='abs',
+    cgtol=1e-4,
+    cgmaxit=100,
+):
     """
     Estimate derivatives from noisy data based using the Total
     Variation Regularized Numerical Differentiation (TVDiff)
@@ -196,12 +208,11 @@ def TVRegDiff(data, itern, alph, u0=None, scale='small', ep=1e-6, dx=None,
         dx = 1.0 / n
 
     # Different methods for small- and large-scale problems.
-    if (scale.lower() == 'small'):
-
+    if scale.lower() == 'small':
         # Differentiation operator
-        d0 = -np.ones(n)/dx
-        du = np.ones(n-1)/dx
-        dl = np.zeros(n-1)
+        d0 = -np.ones(n) / dx
+        du = np.ones(n - 1) / dx
+        dl = np.zeros(n - 1)
         dl[-1] = d0[-1]
         d0[-1] *= -1
 
@@ -209,29 +220,35 @@ def TVRegDiff(data, itern, alph, u0=None, scale='small', ep=1e-6, dx=None,
         DT = D.transpose()
 
         # Antidifferentiation and its adjoint
-        def A(x): return (np.cumsum(x) - 0.5 * (x + x[0])) * dx
+        def A(x):
+            return (np.cumsum(x) - 0.5 * (x + x[0])) * dx
 
-        def AT(x): return np.concatenate([[sum(x[1:])/2.0],
-                                          (sum(x)-np.cumsum(x)+0.5*x)[1:]])*dx
+        def AT(x):
+            return (
+                np.concatenate(
+                    [[sum(x[1:]) / 2.0], (sum(x) - np.cumsum(x) + 0.5 * x)[1:]]
+                )
+                * dx
+            )
 
         # Default initialization is naive derivative
 
         if u0 is None:
-            u0 = D*data
+            u0 = D * data
 
         u = u0.copy()
         # Since Au( 0 ) = 0, we need to adjust.
         ofst = data[0]
         # Precompute.
-        ATb = AT(ofst - data)        # input: size n
+        ATb = AT(ofst - data)  # input: size n
 
         smoothed_signal = data.copy()  # Initialize smoothed signal
 
         # Main loop.
-        for ii in range(1, itern+1):
+        for ii in range(1, itern + 1):
             if diffkernel == 'abs':
                 # Diagonal matrix of weights, for linearizing E-L equation.
-                Q = sparse.spdiags(1. / (np.sqrt((D * u)**2 + ep)), 0, n, n)
+                Q = sparse.spdiags(1.0 / (np.sqrt((D * u) ** 2 + ep)), 0, n, n)
                 # Linearized diffusion matrix, also approximation of Hessian.
                 L = dx * DT * Q * D
             elif diffkernel == 'sq':
@@ -249,19 +266,27 @@ def TVRegDiff(data, itern, alph, u0=None, scale='small', ep=1e-6, dx=None,
             else:
                 P = None
 
-            def linop(v): return (alph * L * v + AT(A(v)))
+            def linop(v):
+                return alph * L * v + AT(A(v))
+
             linop = splin.LinearOperator((n, n), linop)
 
             s, info_i = sparse.linalg.cg(
-                linop, g, x0=None, rtol=cgtol, atol=0, maxiter=cgmaxit,
-                callback=None, M=P)
+                linop,
+                g,
+                x0=None,
+                rtol=cgtol,
+                atol=0,
+                maxiter=cgmaxit,
+                callback=None,
+                M=P,
+            )
 
             if diagflag:
                 log_iteration(ii, s[0], u, g)
-                if (info_i > 0):
-                    logging.warning(
-                        "WARNING - convergence to tolerance not achieved!")
-                elif (info_i < 0):
+                if info_i > 0:
+                    logging.warning("WARNING - convergence to tolerance not achieved!")
+                elif info_i < 0:
                     logging.warning("WARNING - illegal input or breakdown")
 
             # Update solution.
@@ -275,14 +300,16 @@ def TVRegDiff(data, itern, alph, u0=None, scale='small', ep=1e-6, dx=None,
                 plt.plot(u)
                 plt.show()
 
-    elif (scale.lower() == 'large'):
-
+    elif scale.lower() == 'large':
         # Construct anti-differentiation operator and its adjoint.
-        def A(v): return np.cumsum(v)
+        def A(v):
+            return np.cumsum(v)
 
-        def AT(w): return (sum(w) * np.ones(len(w)) -
-                           np.transpose(np.concatenate(([0.0],
-                                                        np.cumsum(w[:-1])))))
+        def AT(w):
+            return sum(w) * np.ones(len(w)) - np.transpose(
+                np.concatenate(([0.0], np.cumsum(w[:-1])))
+            )
+
         # Construct differentiation matrix.
         c = np.ones(n)
         D = sparse.spdiags([-c, c], [0, 1], n, n) / dx
@@ -301,10 +328,9 @@ def TVRegDiff(data, itern, alph, u0=None, scale='small', ep=1e-6, dx=None,
 
         # Main loop.
         for ii in range(1, itern + 1):
-
             if diffkernel == 'abs':
                 # Diagonal matrix of weights, for linearizing E-L equation.
-                Q = sparse.spdiags(1. / (np.sqrt((D * u)**2 + ep)), 0, n, n)
+                Q = sparse.spdiags(1.0 / (np.sqrt((D * u) ** 2 + ep)), 0, n, n)
                 # Linearized diffusion matrix, also approximation of Hessian.
                 L = DT * Q * D
             elif diffkernel == 'sq':
@@ -326,18 +352,26 @@ def TVRegDiff(data, itern, alph, u0=None, scale='small', ep=1e-6, dx=None,
                 P = None
             # Prepare to solve linear equation.
 
-            def linop(v): return (alph * L * v + AT(A(v)))
+            def linop(v):
+                return alph * L * v + AT(A(v))
+
             linop = splin.LinearOperator((n, n), linop)
 
             s, info_i = sparse.linalg.cg(
-                linop, -g, x0=None, tol=cgtol, maxiter=cgmaxit, callback=None,
-                M=P, atol='legacy')
+                linop,
+                -g,
+                x0=None,
+                tol=cgtol,
+                maxiter=cgmaxit,
+                callback=None,
+                M=P,
+                atol='legacy',
+            )
             if diagflag:
                 log_iteration(ii, s[0], u, g)
-                if (info_i > 0):
-                    logging.warning(
-                        "WARNING - convergence to tolerance not achieved!")
-                elif (info_i < 0):
+                if info_i > 0:
+                    logging.warning("WARNING - convergence to tolerance not achieved!")
+                elif info_i < 0:
                     logging.warning("WARNING - illegal input or breakdown")
 
             # Update current solution
@@ -356,9 +390,7 @@ def TVRegDiff(data, itern, alph, u0=None, scale='small', ep=1e-6, dx=None,
     return smoothed_signal, u
 
 
-
 if __name__ == "__main__":
-
     # Command line operation
     import matplotlib
     import matplotlib.pyplot as plt
@@ -368,11 +400,23 @@ if __name__ == "__main__":
     matplotlib.use('Qt5Agg')
     import pylops
 
-
     # Goodwin class
     class GoodwinModel:
-        def __init__(self, k1=1, k2=0.2, k3=1, k4=0.15, k5=1, k6=0.1,
-                     K1=1, K2=1, K4=1, K6=1, n=9.5, perturbation=False):
+        def __init__(
+            self,
+            k1=1,
+            k2=0.2,
+            k3=1,
+            k4=0.15,
+            k5=1,
+            k6=0.1,
+            K1=1,
+            K2=1,
+            K4=1,
+            K6=1,
+            n=9.5,
+            perturbation=False,
+        ):
             self.k1 = k1
             self.k2 = k2
             self.k3 = k3
@@ -401,8 +445,10 @@ if __name__ == "__main__":
 
             x, y, z = x0
 
-            dx_dt = self.k1 * (self.K1 ** self.n / (self.K1 ** self.n + z ** self.n)) - \
-                    self.k2 * x
+            dx_dt = (
+                self.k1 * (self.K1**self.n / (self.K1**self.n + z**self.n))
+                - self.k2 * x
+            )
 
             dy_dt = self.k3 * x - self.k4 * y
 
@@ -411,17 +457,18 @@ if __name__ == "__main__":
             vel_array = np.array([dx_dt, dy_dt, dz_dt], float)
             return vel_array
 
-
     # Routine to add noise on the clean data
     def add_noise(x_train, time_array, noise_level):
         x_train_noise = np.zeros_like(x_train)
 
         for i in range(len(x_train[0, :])):
-            x_train_noise[:, i] = x_train[:, i] + \
-                                  np.random.normal(0, x_train[:, i].std(), time_array.size) * noise_level
+            x_train_noise[:, i] = (
+                x_train[:, i]
+                + np.random.normal(0, x_train[:, i].std(), time_array.size)
+                * noise_level
+            )
 
         return x_train_noise
-
 
     # Initialization of the Goodwin object
     GoodwinObj = GoodwinModel(n=9.5)
@@ -429,7 +476,7 @@ if __name__ == "__main__":
     time_steps = 50000
     time = np.linspace(0, 500, time_steps)
     x_0 = [0, 1, 1]
-    x_1 = [.1, .5, .1]
+    x_1 = [0.1, 0.5, 0.1]
 
     # numerical integration of the Goodwin model
     solution = odeint(goodwin_eqs, x_0, time)
@@ -448,8 +495,6 @@ if __name__ == "__main__":
         true_derivatives[i, :] = goodwin_eqs(x_noise[i, :], time[i])
         td_1[i, :] = goodwin_eqs(x_noise_1[i, :], time[i])
 
-
-
     dX = time[1] - time[0]
     Sop = pylops.Smoothing1D(nsmooth=1, dims=(len(time)), dtype="float32")
 
@@ -458,24 +503,37 @@ if __name__ == "__main__":
     y2 = Sop * x_noise[:, 2]
     x_hat = np.array([y0, y1, y2]).T
 
-    y, dYdX = TVRegDiff(x_noise_1[:, 2], 100, 10, dx=dX, ep=1e-6,
-                     scale=('small'),
-                     plotflag=False, precondflag=True,
-                     diffkernel=('sq'))
+    y, dYdX = TVRegDiff(
+        x_noise_1[:, 2],
+        100,
+        10,
+        dx=dX,
+        ep=1e-6,
+        scale=('small'),
+        plotflag=False,
+        precondflag=True,
+        diffkernel=('sq'),
+    )
 
     fig, axs = plt.subplots(2, 1, figsize=(10, 8))
 
     off = np.mean(x_noise_1[:, 2]) - np.mean(y)
     # First panel
     axs[0].plot(time, x_noise_1[:, 2], label='Noisy Data')
-    axs[0].plot(time, solution_1[:, 2], label='GT', lw = 2, color = 'red')
-    axs[0].plot(time, y+off, label='Smoothed Signal')
+    axs[0].plot(time, solution_1[:, 2], label='GT', lw=2, color='red')
+    axs[0].plot(time, y + off, label='Smoothed Signal')
     axs[0].set_title('Noisy Data and Smoothed Signal')
     axs[0].legend()
 
     # Second panel
     # axs[1].plot(time, td_1[:, 0], label='Derivative of Noisy Data')
-    axs[1].plot(time, td_noiseless[:, 2], lw=2, color='red', label='Derivative of Smoothed Signal')
+    axs[1].plot(
+        time,
+        td_noiseless[:, 2],
+        lw=2,
+        color='red',
+        label='Derivative of Smoothed Signal',
+    )
     axs[1].plot(time, dYdX, label='dYdX')
     axs[1].set_title('Derivatives')
     axs[1].legend()

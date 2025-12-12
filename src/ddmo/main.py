@@ -7,7 +7,7 @@ Usage:
   # As a library:
   >>> from ddmo import identify
   >>> from ddmo.utils.constructors import OptimizerSettings
-  >>> 
+  >>>
   >>> optimizer_settings = OptimizerSettings(
   ...     xl={"gamma_1": 1.0, "gamma_2": 1.0},
   ...     xu={"gamma_1": 10.0, "gamma_2": 10.0},
@@ -25,33 +25,25 @@ Usage:
 """
 
 from collections.abc import Callable
-from typing import Any, Mapping, Optional
 
 import numpy as np
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.algorithms.moo.nsga3 import NSGA3
-from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
+from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.optimize import minimize
 from pymoo.util.ref_dirs import get_reference_directions
 
-from ddmo.utils.data_constructor import DataConstructor
-from ddmo.utils.constructors import OptimizerSettings, IdentificationResult
-from ddmo.solver.base import BaseSolver
-from ddmo.formulation import Formulation, WeakFormulation, StrongFormulation
-from ddmo.test_function_factory.hann_window import HannWindow
-from ddmo.test_function_factory.base import TestFunctionFamily
-from ddmo.solver.registry import SOLVER_REGISTRY
-from ddmo.solver.settings import SolverSettings
 from ddmo.formulation.formulation_settings import FormulationSettings
 from ddmo.formulation.registry import FORMULATION_REGISTRY
+from ddmo.solver.registry import SOLVER_REGISTRY
+from ddmo.solver.settings import SolverSettings
+from ddmo.utils.constructors import IdentificationResult, OptimizerSettings
+from ddmo.utils.data_constructor import DataConstructor
 
 # Algorithm registry for multi-objective optimization
-ALGORITHM_REGISTRY = {
-    "NSGA2": NSGA2,
-    "NSGA3": NSGA3
-}
+ALGORITHM_REGISTRY = {"NSGA2": NSGA2, "NSGA3": NSGA3}
 
 # Type aliases for clarity
 Func = Callable[..., float]
@@ -62,11 +54,14 @@ NamedFunc = tuple[Func, str]
 # Main identification function
 # -----------------------------------------------------------------------------
 
-def identify(data_instance: DataConstructor,
-             optimizer_settings: OptimizerSettings,
-             solver_settings: SolverSettings,
-             formulation_settings: FormulationSettings | None = None,
-             objective_functions: dict = None):    
+
+def identify(
+    data_instance: DataConstructor,
+    optimizer_settings: OptimizerSettings,
+    solver_settings: SolverSettings,
+    formulation_settings: FormulationSettings | None = None,
+    objective_functions: dict = None,
+):
     """
     Run sparse identification on provided data x(t).
 
@@ -82,34 +77,36 @@ def identify(data_instance: DataConstructor,
             objective_space, solutions, coeff_matrices, alphas, models, theta_matrices.
     """
     from ddmo.optimizer.optimizer import Optimizer
-    
+
     # Instantiate Solver
     solver_class = SOLVER_REGISTRY[solver_settings.solver_name]
     solver = solver_class(
         data_instance=data_instance,
         optimizer=solver_settings.regularization,
-        solver_parameters=solver_settings.regularization_parameters
+        solver_parameters=solver_settings.regularization_parameters,
     )
 
     # Instantiate Formulation
     if formulation_settings is None:
-        raise ValueError("identify requires a formulation instance (FormulationSettings).")
+        raise ValueError(
+            "identify requires a formulation instance (FormulationSettings)."
+        )
 
     formulation_class = FORMULATION_REGISTRY[formulation_settings.formulation]
     print(f"Using formulation: {formulation_settings.formulation}")
-    
+
     resolved_formulation = formulation_class(
         data_instance=data_instance,
-        class_attributes=formulation_settings.to_attributes_dict()
+        class_attributes=formulation_settings.to_attributes_dict(),
     )
-    
+
     # Build the optimization problem
     problem = Optimizer(
         data_instance=data_instance,
         solver=solver.solve,
         objectives=None,
         objective_functions=objective_functions,
-        formulation=resolved_formulation
+        formulation=resolved_formulation,
     )
 
     # Set up variable mappings from bounds
@@ -117,13 +114,17 @@ def identify(data_instance: DataConstructor,
     problem.map_label = map_label
     mapi_label = {n: i for i, n in enumerate(optimizer_settings.xl)}
     problem.mapi_label = mapi_label
-    
+
     # Store library param names for dict-based access in formulations
     problem.library_param_names = optimizer_settings.library_param_names
 
     # Convert bounds dictionaries to arrays
-    xl = np.array([optimizer_settings.xl[key] for key in optimizer_settings.xl], dtype=float)
-    xu = np.array([optimizer_settings.xu[key] for key in optimizer_settings.xu], dtype=float)
+    xl = np.array(
+        [optimizer_settings.xl[key] for key in optimizer_settings.xl], dtype=float
+    )
+    xu = np.array(
+        [optimizer_settings.xu[key] for key in optimizer_settings.xu], dtype=float
+    )
 
     problem.n_var = optimizer_settings.n_var
     problem.n_obj = optimizer_settings.n_obj
@@ -133,16 +134,20 @@ def identify(data_instance: DataConstructor,
 
     # Build pymoo operators from settings
     sampling = FloatRandomSampling()
-    crossover = SBX(eta=optimizer_settings.crossover_eta, prob=optimizer_settings.crossover_prob)
+    crossover = SBX(
+        eta=optimizer_settings.crossover_eta, prob=optimizer_settings.crossover_prob
+    )
     mutation = PM(eta=optimizer_settings.mutation_eta)
 
     # Select algorithm from registry
     algorithm_name = optimizer_settings.algorithm
     if algorithm_name not in ALGORITHM_REGISTRY:
-        raise ValueError(f"Unknown algorithm: {algorithm_name}. Available: {list(ALGORITHM_REGISTRY.keys())}")
-    
+        raise ValueError(
+            f"Unknown algorithm: {algorithm_name}. Available: {list(ALGORITHM_REGISTRY.keys())}"
+        )
+
     algorithm_class = ALGORITHM_REGISTRY[algorithm_name]
-    
+
     # Build algorithm kwargs
     algorithm_kwargs = {
         "pop_size": optimizer_settings.pop_size,
@@ -151,22 +156,24 @@ def identify(data_instance: DataConstructor,
         "mutation": mutation,
         "eliminate_duplicates": True,
     }
-    
+
     # NSGA3 requires reference directions
     if algorithm_name == "NSGA3":
-        ref_dirs = get_reference_directions("das-dennis", optimizer_settings.n_obj, n_partitions=12)
+        ref_dirs = get_reference_directions(
+            "das-dennis", optimizer_settings.n_obj, n_partitions=12
+        )
         algorithm_kwargs["ref_dirs"] = ref_dirs
-    
+
     algorithm = algorithm_class(**algorithm_kwargs)
     print(f"Using algorithm: {algorithm_name}")
-    
+
     # Run optimization
     res = minimize(
         problem,
         algorithm,
         ('n_gen', optimizer_settings.n_gen),
         seed=optimizer_settings.seed,
-        verbose=optimizer_settings.verbose
+        verbose=optimizer_settings.verbose,
     )
 
     # Extract results
@@ -185,6 +192,5 @@ def identify(data_instance: DataConstructor,
         coeff_matrices=coeff_matrices,
         alphas=alphas,
         models=models,
-        theta_matrices=theta_matrices
+        theta_matrices=theta_matrices,
     )
-

@@ -1,13 +1,14 @@
-from pprint import pprint as pp
+import warnings
+
 import matplotlib.pyplot as plt
 import numpy as np
-from ddmo.utils.data_constructor import DataConstructor
-from ddmo.utils.constructors import OptimizerSettings
-from ddmo.solver.settings import SolverSettings
+
+from ddmo import BENCHMARK_FOLDER, identify
 from ddmo.formulation.formulation_settings import FormulationSettings
 from ddmo.library_functions import LibraryBuilder
-from ddmo import BENCHMARK_FOLDER, identify
-import warnings
+from ddmo.solver.settings import SolverSettings
+from ddmo.utils.constructors import OptimizerSettings
+from ddmo.utils.data_constructor import DataConstructor
 
 warnings.filterwarnings("ignore")
 
@@ -22,24 +23,23 @@ if __name__ == "__main__":
     # Define the function library using the fluent API
     library = (
         LibraryBuilder()
-        .add_polynomial(max_degree=2)                # x, x², x*y
-        .add_hill(exponent_param="gamma_1")          # 1/(1+x^γ₁)
-        .add_exponential(rate_param="gamma_2")       # exp(-γ₂·x)
+        .add_polynomial(max_degree=2)  # x, x², x*y
+        .add_hill(exponent_param="gamma_1")  # 1/(1+x^γ₁)
+        .add_exponential(rate_param="gamma_2")  # exp(-γ₂·x)
     )
-    
-    x_0 = [x_0_train]
 
+    x_0 = [x_0_train]
     # Create a DataConstructor instance
-    skip = 2
+    skip = 3
     training_data = DataConstructor(
         x_train=x_raw[::skip, :],
         time_array=time_array[::skip],
         x_dot=x_dot_hat[::skip, :],
         library_object=library.build,  # Pass the build method
         x_0=x_0,
-        x_raw=x_raw[::skip, :]
+        x_raw=x_raw[::skip, :],
     )
-    
+
     # Library parameters (for SINDy function library) - tuple format: (min, max)
     library_bounds = {
         "gamma_1": (8.4, 9.6),
@@ -58,25 +58,24 @@ if __name__ == "__main__":
         formulation_bounds=formulation_bounds,
         n_obj=2,
         n_gen=10,
-        algorithm="NSGA2",
-        pop_size=50
+        algorithm="NSGA3",
+        pop_size=50,
     )
 
     solver_settings = SolverSettings(
-        solver_name="pysindy",
-        regularization="STLSQ",
+        solver_name="scikit",
+        regularization="LassoCV",
         regularization_parameters={
-            "alpha": 0.2, 
-            "threshold": 0.25,
-        }
+            "alphas": np.linspace(0.001, 1, 100),
+        },
     )
-    
+
     formulation_settings = FormulationSettings(
         formulation="weak",
         test_function="PolynomialWindow",
         degree=3,
         window_length=51,
-        stride=5
+        stride=5,
     )
 
     # Run identification

@@ -1,6 +1,5 @@
-
 class Brussellator:
-    def __init__(self, a=10, b=8/3, c=28):
+    def __init__(self, a=10, b=8 / 3, c=28):
         self.a = a
         self.b = b
         self.c = c

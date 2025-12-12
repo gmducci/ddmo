@@ -180,7 +180,7 @@ class WeakPDELibrary(BaseFeatureLibrary):
         diff_kwargs={},
         is_uniform=None,
         periodic=None,
-        library_feature_input=None
+        library_feature_input=None,
     ):
         super(WeakPDELibrary, self).__init__(
             library_ensemble=library_ensemble, ensemble_indices=ensemble_indices
@@ -488,7 +488,6 @@ class WeakPDELibrary(BaseFeatureLibrary):
         deriv = np.zeros(self.grid_ndim)
         deriv[-1] = 1
         for k in range(self.K):
-
             ret = np.ones(shapes_k[k])
             for i in range(self.grid_ndim):
                 s = [0] * (self.grid_ndim + 1)
@@ -507,7 +506,6 @@ class WeakPDELibrary(BaseFeatureLibrary):
         # Product weights over the axes for pure derivative terms, shaped as inds_k
         self.fullweights0 = []
         for k in range(self.K):
-
             ret = np.ones(shapes_k[k])
             for i in range(self.grid_ndim):
                 s = [0] * (self.grid_ndim + 1)
@@ -546,7 +544,6 @@ class WeakPDELibrary(BaseFeatureLibrary):
                 weights2 = weights2 + [ret * np.product(H_xt_k[k] ** (1.0 - deriv))]
             self.fullweights1 = self.fullweights1 + [weights2]
 
-
     @x_sequence_or_item
     def transform_simple(self, x_full):
         """Transform data to custom features
@@ -576,7 +573,9 @@ class WeakPDELibrary(BaseFeatureLibrary):
             if n_features != n_input_features:
                 raise ValueError("x shape does not match training shape")
 
-            n_library_terms = sum(sum(sublist[1]) for sublist in self.library_feature_input)
+            n_library_terms = sum(
+                sum(sublist[1]) for sublist in self.library_feature_input
+            )
             xp = np.zeros((*x.shape[:-1], n_library_terms))
 
             func_idx = 0
@@ -850,7 +849,6 @@ class WeakPDELibrary(BaseFeatureLibrary):
 
         # Count the number of non-derivative terms
         for i in range(len(self.functions)):
-
             n_args = self.functions[i].__code__.co_argcount
             n_output_features += len(
                 list(self._combinations(n_features, n_args, self.interaction_only))
@@ -898,7 +896,9 @@ class WeakPDELibrary(BaseFeatureLibrary):
         for x in x_full:
             n_features = x.shape[x.ax_coord]
 
-            n_library_terms = sum(sum(sublist[1]) for sublist in self.library_feature_input)
+            n_library_terms = sum(
+                sum(sublist[1]) for sublist in self.library_feature_input
+            )
 
             xp = np.empty((self.K, n_library_terms), dtype=x.dtype)
 
@@ -912,10 +912,14 @@ class WeakPDELibrary(BaseFeatureLibrary):
             #         n_features, f.__code__.co_argcount, self.interaction_only
             #     ):
             #         n_library_terms += 1
-            n_library_terms = sum(sum(sublist[1]) for sublist in self.library_feature_input)
+            n_library_terms = sum(
+                sum(sublist[1]) for sublist in self.library_feature_input
+            )
 
             if self.include_bias == True:
-                library_functions = np.empty((self.K, n_library_terms + 1), dtype=x.dtype)
+                library_functions = np.empty(
+                    (self.K, n_library_terms + 1), dtype=x.dtype
+                )
             else:
                 library_functions = np.empty((self.K, n_library_terms), dtype=x.dtype)
             # Evaluate the functions on the indices of domain cells
@@ -1098,9 +1102,7 @@ class WeakPDELibrary(BaseFeatureLibrary):
                                         tuple(np.arange(self.grid_ndim)),
                                         tuple(np.arange(self.grid_ndim)),
                                     ),
-                                ) * np.product(
-                                    binom(derivs_mixed, deriv)
-                                )
+                                ) * np.product(binom(derivs_mixed, deriv))
                         # collect the results
                         for n in range(n_features):
                             for m in range(n_library_terms):
@@ -1124,9 +1126,9 @@ class WeakPDELibrary(BaseFeatureLibrary):
 
             if self.derivative_order != 0:
                 # pure integral terms
-                xp[
-                    :, library_idx : library_idx + self.num_derivatives * n_features
-                ] = library_integrals
+                xp[:, library_idx : library_idx + self.num_derivatives * n_features] = (
+                    library_integrals
+                )
                 library_idx += self.num_derivatives * n_features
 
                 # mixed function integral terms

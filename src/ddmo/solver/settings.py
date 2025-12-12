@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 
 @dataclass
@@ -19,11 +19,11 @@ class SolverSettings:
             regularization_parameters={"alpha": 0.15, "threshold": 0.2}
         )
     """
+
     solver_name: str
-    regularization: Optional[str] = None
+    regularization: str | None = None
     regularization_parameters: dict[str, Any] = field(default_factory=dict)
 
     def update(self, **kwargs) -> None:
         """Update regularization_parameters with new values."""
         self.regularization_parameters.update(kwargs)
-

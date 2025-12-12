@@ -11,7 +11,7 @@ coverage*
 results/
 *results*
 *tmp*
-*build*
+build/
 ddmo/debug.log
 debug.log
 src/*.egg-info/**
@@ -28,3 +28,6 @@ pyrightconfig.json
 # Temporary files
 .ipynb_checkpoints/
 .eggs/
+
+# Config
+.editorconfig

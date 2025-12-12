@@ -1,4 +1,3 @@
-
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import odeint
@@ -25,6 +24,7 @@ class DataGenerator:
     random_state : int or None
         Seed for reproducibility.
     """
+
     def __init__(
         self,
         model_cls,
@@ -39,7 +39,9 @@ class DataGenerator:
         self.param_ranges = param_ranges
         self.state_dim = state_dim
         self.batch_size = batch_size
-        self.time_array = time_array if time_array is not None else np.linspace(0, 1, 50)
+        self.time_array = (
+            time_array if time_array is not None else np.linspace(0, 1, 50)
+        )
         self.noise_std = noise_std
         self.rng = np.random.default_rng(random_state)
 
@@ -106,7 +108,7 @@ class DataGenerator:
 
         return x_noisy_list, x_dot, self.time_array, initial_conditions, params
 
-    def plot_trajectories(self, x_noisy_list=None, figsize=(8,6)):
+    def plot_trajectories(self, x_noisy_list=None, figsize=(8, 6)):
         """
         Plot noisy trajectories for each state variable.
 
@@ -137,6 +139,7 @@ class DataGenerator:
         fig.tight_layout()
         plt.show()
 
+
 # Example usage:
 if __name__ == "__main__":
     from ddmo.equations.plugflow_equation import PlugFlow
@@ -153,7 +156,7 @@ if __name__ == "__main__":
         batch_size=3,
         time_array=np.linspace(0, 2, 150),
         noise_std=0.0,
-        random_state=60
+        random_state=60,
     )
 
     # Generate data
@@ -163,19 +166,19 @@ if __name__ == "__main__":
     X = np.vstack(x_noisy)
     dX = x_dot
     # Plot trajectories
-    #generator.plot_trajectories(x_noisy)
+    # generator.plot_trajectories(x_noisy)
 
     from collections.abc import Callable
 
     from ddmo import identify
 
-
     NamedFunc = tuple[Callable[[float, float], float], str]
+
     def get_base_functions(params: list[float]) -> list[NamedFunc]:
         alpha, beta = params
         return [
             (lambda x: x, "x"),
-            (lambda x, y: x**alpha * y**beta, f"x^{alpha} * y^{beta}")
+            (lambda x, y: x**alpha * y**beta, f"x^{alpha} * y^{beta}"),
         ]
 
     # named_funcs = get_base_functions([2.05, 3.05])
@@ -192,21 +195,30 @@ if __name__ == "__main__":
     # model.fit(X, t=t[1] - t[0], x_dot=dX)
     # print("\nRecovered model:")
     # model.print()
-    problem, res, obj_space, solutions, coeff_matrices, alphas, models, theta_matrices = identify(
-        x_train = x_noisy,
+    (
+        problem,
+        res,
+        obj_space,
+        solutions,
+        coeff_matrices,
+        alphas,
+        models,
+        theta_matrices,
+    ) = identify(
+        x_train=x_noisy,
         x_raw=x_noisy,
         x_dot=x_dot,
-        t = t,
+        t=t,
         x0=x0_list,
         library_object=get_base_functions,
-        bounds= [np.array([1, 1]), np.array([4, 4])],
+        bounds=[np.array([1, 1]), np.array([4, 4])],
         weak_form=False,
         scale_theta=True,
         optimizer='STLSQ',
-        solver_parameters={
-            "threshold": 0.1},
+        solver_parameters={"threshold": 0.1},
         solver='lasso',
         number_generations=5,
-        population_size=25)
+        population_size=25,
+    )
 
     print(alphas)

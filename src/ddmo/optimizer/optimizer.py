@@ -16,6 +16,7 @@ from ddmo.optimizer.objective_functions import (
     compute_mse,
     compute_ppcc_matrix,
 )
+from ddmo.solver.result import SolverResult
 from ddmo.utils.data_constructor import DataConstructor
 
 # Configure environment
@@ -52,28 +53,16 @@ class Optimizer(Problem):
         self.data_instance = data_instance
         self.solver = solver
         self.formulation = formulation
-        # self.library_factory = library_factory
-        # self.formution = formution
-        self.objectives = (
+        # Named objectives dict for generic handling
+        self.objectives: dict[str, Callable] = (
             objectives
             if objectives is not None
-            else [compute_mse, compute_dw_coefficient]
+            else {"mse": compute_mse, "dw_coefficient": compute_dw_coefficient}
         )
         self.objective_functions = objective_functions
         self.n_obj = len(self.objectives)
 
-        self.coefficient_matrix = []
-        self.alphas = []
-        self.results = []
-        self.solution = []
-
     def _compute_metrics(self, optimization_variables, *args):
-        _objective_functions_dict = {
-            "mse": compute_mse,
-            "dw_coefficient": compute_dw_coefficient,
-            "ppcc_matrix": compute_ppcc_matrix,
-        }
-
         if self.formulation is not None:
             # vector -> dict with names (using your existing mapi_label)
             param_dict = {
@@ -95,65 +84,46 @@ class Optimizer(Problem):
         else:
             solver_args = (optimization_variables,)
 
-        solver_output = self.solver(*solver_args)
+        solver_result: SolverResult = self.solver(*solver_args)
 
-        if solver_output is None:
+        if solver_result is None or not solver_result.success:
             return EvaluationResult(
-                obj_func_score=[np.nan] * self.n_obj,
+                obj_func_score={name: np.nan for name in self.objectives},
                 solution=None,
                 regression_coefficients=None,
                 opt_vars=np.array([np.nan]),
                 symbolic_model=None,
-                feature_matrix=None,
+                feature_matrix=solver_result.feature_matrix if solver_result else None,
             )
 
-        feature_matrix = None
-        try:
-            sol, regression_coeff, opt_vars, model, feature_matrix = solver_output
-        except ValueError:
-            sol, regression_coeff, opt_vars, model = solver_output
-            feature_matrix = None
-
-        if sol is None:
-            return EvaluationResult(
-                obj_func_score=[np.nan] * self.n_obj,
-                solution=None,
-                regression_coefficients=None,
-                opt_vars=np.array([np.nan]),
-                symbolic_model=None,
-                feature_matrix=feature_matrix,
-            )
-
-        objective_funcs = []
-        for obj_func in self.objectives:
+        # Compute objectives using named dict
+        objective_scores = {}
+        for name, obj_func in self.objectives.items():
             try:
-                objective_funcs.append(obj_func(self.data_instance, sol))
+                objective_scores[name] = obj_func(self.data_instance, solver_result.solution)
             except Exception:
-                objective_funcs.append(1e5)
+                objective_scores[name] = 1e5
 
-        print(f"Objective function values: {objective_funcs}")
+        print(f"Objective function values: {objective_scores}")
         return EvaluationResult(
-            obj_func_score=objective_funcs,
-            solution=sol,
-            regression_coefficients=regression_coeff,
-            opt_vars=opt_vars,
-            symbolic_model=model,
-            feature_matrix=feature_matrix,
+            obj_func_score=objective_scores,
+            solution=solver_result.solution,
+            regression_coefficients=solver_result.coefficients,
+            opt_vars=solver_result.opt_vars,
+            symbolic_model=solver_result.model,
+            feature_matrix=solver_result.feature_matrix,
         )
 
     def _evaluate(self, x, out, *args, **kwargs):
-        # Clear previous state
-        self.coefficient_matrix.clear()
-        self.alphas.clear()
-        self.results.clear()
-        self.solution.clear()
-
         flat_x = [tuple(row) for row in x]
         # Run model on each candidate
         results = [self._compute_metrics(xi) for xi in flat_x]
 
+        # Get objective names for consistent ordering
+        objective_names = list(self.objectives.keys())
+
         # Initialize containers with fallback values
-        objectives = []
+        objective_values = []
         solutions = []
         coeff_matrices = []
         alphas = []
@@ -161,17 +131,28 @@ class Optimizer(Problem):
         feature_matrices = []
 
         for res in results:
-            if (
-                res is not None
-                and res.obj_func_score is not None
-                and not np.all(np.isnan(res.obj_func_score))
-            ):
-                obj = res.obj_func_score
-                sol = res.solution
-                coeff = res.regression_coefficients
-                alpha = res.opt_vars
-                sindy_model = res.symbolic_model
-                theta = res.feature_matrix
+            if res is not None and res.obj_func_score is not None:
+                scores = res.obj_func_score
+                # Check if any objective is valid (not all NaN)
+                if isinstance(scores, dict):
+                    is_valid = not all(np.isnan(v) for v in scores.values())
+                else:
+                    is_valid = not np.all(np.isnan(scores))
+
+                if is_valid:
+                    obj = [scores.get(name, np.inf) for name in objective_names]
+                    sol = res.solution
+                    coeff = res.regression_coefficients
+                    alpha = res.opt_vars
+                    sindy_model = res.symbolic_model
+                    theta = res.feature_matrix
+                else:
+                    obj = [np.inf] * self.n_obj
+                    sol = None
+                    coeff = None
+                    alpha = np.array([np.nan])
+                    sindy_model = None
+                    theta = None
             else:
                 obj = [np.inf] * self.n_obj
                 sol = None
@@ -180,30 +161,32 @@ class Optimizer(Problem):
                 sindy_model = None
                 theta = None
 
-            objectives.append(obj)
+            objective_values.append(obj)
             solutions.append(sol)
             coeff_matrices.append(coeff)
             alphas.append(alpha)
             models.append(sindy_model)
             feature_matrices.append(theta)
 
-        # Convert to numpy arrays
-        obj_arrays = np.array(objectives, dtype=float)
-        dw_stats = obj_arrays[:, 1]
-        max_dw_stats = 2 - np.nanmin(dw_stats)
+        # Convert to numpy array and stack objectives dynamically
+        obj_arrays = np.array(objective_values, dtype=float)
 
-        # Monitoring output
-        print(
-            f"+{'-' * 60}+\n"
-            f"| DW statistic monitoring: Maximum value = {max_dw_stats:.4f} |\n"
-            f"+{'-' * 60}+"
-        )
+        # Monitoring output (use first DW-like objective if present)
+        if "dw_coefficient" in objective_names:
+            dw_idx = objective_names.index("dw_coefficient")
+            dw_stats = obj_arrays[:, dw_idx]
+            max_dw_stats = 2 - np.nanmin(dw_stats)
+            print(
+                f"+{'-' * 60}+\n"
+                f"| DW statistic monitoring: Maximum value = {max_dw_stats:.4f} |\n"
+                f"+{'-' * 60}+"
+            )
+            out["dw_coeff"] = dw_stats
 
-        # Store output
-        out["F"] = anp.column_stack([obj_arrays[:, 0], dw_stats])
+        # Store output - dynamically stack all objective columns
+        out["F"] = obj_arrays
         out["solution"] = np.asarray(solutions, dtype=object)
         out["coeff_matrix"] = np.asarray(coeff_matrices, dtype=object)
         out["alphas"] = np.asarray(alphas, dtype=object)
-        out["dw_coeff"] = dw_stats
         out['models'] = models
         out['theta'] = np.asarray(feature_matrices, dtype=object)

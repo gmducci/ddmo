@@ -127,7 +127,7 @@ class TestDDMO:
 
     def test_solver_timeout_integration(self, synthetic_data):
         """
-        Integration test: verify Pysindy_Solver.solve returns None on timeout.
+        Integration test: verify Pysindy_Solver.solve returns failed SolverResult on timeout.
         """
         from unittest.mock import patch
 
@@ -156,5 +156,7 @@ class TestDDMO:
 
             res = solver.solve(lhs, rhs)
 
-            # Should return None tuple
-            assert res == (None, None, None, None, None)
+            # Should return failed SolverResult
+            assert not res.success
+            assert res.solution is None
+            assert res.coefficients is None

@@ -7,6 +7,7 @@ from scipy.integrate import solve_ivp
 
 from ddmo.solver.base import BaseSolver
 from ddmo.solver.build_feature_matrix import FeatureMatrixBuilder
+from ddmo.solver.result import SolverResult
 from ddmo.utils.array_helpers import (
     normalize_opt_vars,
     stack_state_matrix,
@@ -139,10 +140,22 @@ class Pysindy_Solver(BaseSolver):
 
             x = sol
 
-            return x, regression_coeff, opt_vars, model, theta
+            return SolverResult(
+                solution=sol,
+                coefficients=regression_coeff,
+                opt_vars=opt_vars,
+                model=model,
+                feature_matrix=theta,
+            )
         except Exception as e:
             print(f"Error during solver execution: {e}")
-            return None, None, None, None, None
+            return SolverResult(
+                solution=None,
+                coefficients=None,
+                opt_vars=opt_vars,
+                model=None,
+                feature_matrix=theta if theta is not None else None,
+            )
 
 
 class _ManualSINDyModel:

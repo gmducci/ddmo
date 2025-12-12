@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
     x_0 = [x_0_train]
     # Create a DataConstructor instance
-    skip = 5
+    skip = 3
     training_data = DataConstructor(
         x_train=x_raw[::skip, :],
         time_array=time_array[::skip],

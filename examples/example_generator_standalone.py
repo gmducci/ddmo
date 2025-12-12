@@ -30,11 +30,11 @@ if __name__ == "__main__":
 
     x_0 = [x_0_train]
     # Create a DataConstructor instance
-    skip = 3
+    skip = 5
     training_data = DataConstructor(
-        x_train=x_raw[::skip, :],
+        x_train=x_train[::skip, :],
         time_array=time_array[::skip],
-        x_dot=x_dot_hat[::skip, :],
+        # x_dot=x_dot_hat[::skip, :],
         library_object=library.build,  # Pass the build method
         x_0=x_0,
         x_raw=x_raw[::skip, :],
@@ -48,8 +48,8 @@ if __name__ == "__main__":
 
     # Formulation parameters (for weak formulation)
     formulation_bounds = {
-        "stride": (5, 120),
-        "window_length": (51, 401),
+        "stride": (50, 120),
+        "window_length": (65, 401),
     }
 
     # Unified optimizer settings with separated bounds
@@ -57,16 +57,18 @@ if __name__ == "__main__":
         library_bounds=library_bounds,
         formulation_bounds=formulation_bounds,
         n_obj=2,
-        n_gen=10,
+        n_gen=15,
         algorithm="NSGA3",
         pop_size=50,
+        # seed = 42
     )
 
     solver_settings = SolverSettings(
-        solver_name="scikit",
-        regularization="LassoCV",
+        solver_name="pysindy",
+        regularization="STLSQ",
         regularization_parameters={
-            "alphas": np.linspace(0.001, 1, 100),
+            "alpha": 0.05,
+            "threshold": 0.1,
         },
     )
 

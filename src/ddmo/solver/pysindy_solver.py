@@ -6,6 +6,7 @@ from pysindy.optimizers import SINDyOptimizer
 from scipy.integrate import solve_ivp
 
 from ddmo.solver.base import BaseSolver
+from ddmo.solver.build_feature_matrix import FeatureMatrixBuilder
 from ddmo.utils.array_helpers import (
     normalize_opt_vars,
     stack_state_matrix,
@@ -17,15 +18,6 @@ from ddmo.utils.data_constructor import DataConstructor
 def get_optimizer(optimizer_name: str):
     """
     Get optimizer class by name.
-
-    Args:
-        optimizer_name: Name of the optimizer to retrieve
-
-    Returns:
-        Optimizer class
-
-    Raises:
-        ValueError: If optimizer name is not recognized
     """
 
     if optimizer_name == "STLSQ":
@@ -59,6 +51,7 @@ class Pysindy_Solver(BaseSolver):
         self.data_instance = data_instance
         self.solver_parameters = solver_parameters
         self.optimizer = optimizer
+        self.builder = FeatureMatrixBuilder(data_instance)
 
     def configure(self, **kwargs):
         self.solver_parameters.update(kwargs)
@@ -66,34 +59,33 @@ class Pysindy_Solver(BaseSolver):
     def solve(self, *args):
         theta = None
         lib_custom = None
-        named_funcs = None
-
-        lhs_matrix = stack_state_matrix(self.data_instance.x_dot)
 
         if len(args) == 1:
-            optimization_vars = args[0]
+            # Build problem from optimization variables
+            problem = self.builder.build_problem(args[0])
+            lhs_matrix = problem.rhs
+            theta = problem.feature_matrix
+            lib_custom = problem.feature_library
+            opt_vars = problem.opt_vars
+            mask = None  # Mask is derived from optimizer result, not input here
         elif len(args) == 2:
+            # Manual payload injection
             lhs_payload, rhs_payload = args
             lhs_matrix = stack_state_matrix(lhs_payload)
             if isinstance(rhs_payload, dict):
-                optimization_vars = rhs_payload.get("opt_vars")
+                opt_vars = normalize_opt_vars(rhs_payload.get("opt_vars"))
                 theta = rhs_payload.get("theta")
                 lib_custom = rhs_payload.get("library")
-                named_funcs = rhs_payload.get("named_funcs")
                 mask = rhs_payload.get("colmask")
             else:
-                optimization_vars = rhs_payload
+                opt_vars = normalize_opt_vars(rhs_payload)
         else:
             raise ValueError(
                 "Pysindy_Solver.solve expects optimization variables or (lhs, rhs)."
             )
 
-        if optimization_vars is None:
+        if opt_vars is None:
             raise ValueError("Optimization variables are required for Pysindy solver.")
-
-        opt_vars = normalize_opt_vars(optimization_vars)
-
-        x_matrix = stack_state_matrix(self.data_instance.x_train)
 
         theta = np.asarray(theta)
 

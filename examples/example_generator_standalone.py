@@ -13,6 +13,10 @@ from ddmo.utils.data_constructor import DataConstructor
 warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
+    # Set random seed for reproducibility
+    seed = 42
+    np.random.seed(seed)
+
     # Load benchmark data
     x_0_train = np.load(BENCHMARK_FOLDER / 'x_0.npy')
     x_raw = np.load(BENCHMARK_FOLDER / 'x_train_noise.npy')
@@ -60,13 +64,15 @@ if __name__ == "__main__":
         n_gen=10,
         algorithm="NSGA3",
         pop_size=50,
+        seed=seed,
     )
 
     solver_settings = SolverSettings(
-        solver_name="scikit",
-        regularization="LassoCV",
+        solver_name="pysindy",
+        regularization="STLSQ",
         regularization_parameters={
-            "alphas": np.linspace(0.001, 1, 100),
+            "alpha": 0.2,
+            "threshold": 0.25,
         },
     )
 

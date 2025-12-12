@@ -14,6 +14,7 @@ from sklearn.multioutput import MultiOutputRegressor
 from sklearn.preprocessing import StandardScaler
 
 from ddmo.solver.base import BaseSolver
+from ddmo.solver.build_feature_matrix import FeatureMatrixBuilder
 from ddmo.utils.array_helpers import normalize_opt_vars, stack_state_matrix
 from ddmo.utils.data_constructor import DataConstructor
 
@@ -25,6 +26,7 @@ class ScikitSolver(BaseSolver):
         self.data_instance = data_instance
         self.solver_parameters = solver_parameters or {}
         self.optimizer_name = optimizer
+        self.builder = FeatureMatrixBuilder(data_instance)
 
         # Validate optimizer
         valid_optimizers = [
@@ -47,29 +49,31 @@ class ScikitSolver(BaseSolver):
         lib_custom = None
         mask = None
 
-        lhs_matrix = stack_state_matrix(self.data_instance.x_dot)
-
         if len(args) == 1:
-            optimization_vars = args[0]
+            # Automatic build
+            problem = self.builder.build_problem(args[0])
+            lhs_matrix = problem.rhs
+            theta = problem.feature_matrix
+            lib_custom = problem.feature_library
+            opt_vars = problem.opt_vars
         elif len(args) == 2:
+            # Manual payload
             lhs_payload, rhs_payload = args
             lhs_matrix = stack_state_matrix(lhs_payload)
             if isinstance(rhs_payload, dict):
-                optimization_vars = rhs_payload.get("opt_vars")
+                opt_vars = normalize_opt_vars(rhs_payload.get("opt_vars"))
                 theta = rhs_payload.get("theta")
                 lib_custom = rhs_payload.get("library")
                 mask = rhs_payload.get("colmask")
             else:
-                optimization_vars = rhs_payload
+                opt_vars = normalize_opt_vars(rhs_payload)
         else:
             raise ValueError(
                 "ScikitSolver.solve expects optimization variables or (lhs, rhs)."
             )
 
-        if optimization_vars is None:
+        if opt_vars is None:
             raise ValueError("Optimization variables are required for ScikitSolver.")
-
-        opt_vars = normalize_opt_vars(optimization_vars)
 
         # 2. Prepare Data
         if theta is None:

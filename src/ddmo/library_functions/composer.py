@@ -70,7 +70,7 @@ class LibraryBuilder:
     _custom_funcs: list[tuple[CustomFunc, CustomNameFunc]] = field(default_factory=list)
 
     def add_polynomial(
-        self, max_degree: int = 2, include_constant: bool = False
+        self, max_degree: int = 2, include_constant: bool = False, include_interactions: bool = True
     ) -> "LibraryBuilder":
         """
         Add polynomial functions: x, x², x³, ...
@@ -78,12 +78,13 @@ class LibraryBuilder:
         Args:
             max_degree: Maximum polynomial degree (e.g., 3 for x, x², x³).
             include_constant: Whether to include constant term (1).
+            include_interactions: Whether to include cross-product terms (x*y).
 
         Returns:
             Self for method chaining.
         """
         self._factories.append(
-            PolynomialFactory(max_degree=max_degree, include_constant=include_constant)
+            PolynomialFactory(max_degree=max_degree, include_constant=include_constant, include_interactions=include_interactions)
         )
         return self
 

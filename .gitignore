@@ -11,7 +11,7 @@ coverage*
 results/
 *results*
 *tmp*
-*build*
+build/
 ddmo/debug.log
 debug.log
 src/*.egg-info/**

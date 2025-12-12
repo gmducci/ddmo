@@ -63,11 +63,10 @@ if __name__ == "__main__":
     )
 
     solver_settings = SolverSettings(
-        solver_name="pysindy",
-        regularization="STLSQ",
+        solver_name="scikit",
+        regularization="LassoCV",
         regularization_parameters={
-            "alpha": 0.2,
-            "threshold": 0.25,
+            "alphas": np.linspace(0.001, 1, 100),
         },
     )
 

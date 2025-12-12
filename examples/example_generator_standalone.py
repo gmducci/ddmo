@@ -13,10 +13,6 @@ from ddmo.utils.data_constructor import DataConstructor
 warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
-    # Set random seed for reproducibility
-    seed = 42
-    np.random.seed(seed)
-
     # Load benchmark data
     x_0_train = np.load(BENCHMARK_FOLDER / 'x_0.npy')
     x_raw = np.load(BENCHMARK_FOLDER / 'x_train_noise.npy')
@@ -38,7 +34,7 @@ if __name__ == "__main__":
     training_data = DataConstructor(
         x_train=x_raw[::skip, :],
         time_array=time_array[::skip],
-        x_dot=x_dot_hat[::skip, :],
+        # x_dot=x_dot_hat[::skip, :],
         library_object=library.build,  # Pass the build method
         x_0=x_0,
         x_raw=x_raw[::skip, :],
@@ -64,7 +60,7 @@ if __name__ == "__main__":
         n_gen=10,
         algorithm="NSGA3",
         pop_size=50,
-        seed=seed,
+        seed = 42
     )
 
     solver_settings = SolverSettings(

@@ -84,6 +84,7 @@ def identify(
         data_instance=data_instance,
         optimizer=solver_settings.regularization,
         solver_parameters=solver_settings.regularization_parameters,
+        scale_features=solver_settings.scale_features,
     )
 
     # Instantiate Formulation

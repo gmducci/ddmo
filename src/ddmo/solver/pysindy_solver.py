@@ -47,11 +47,13 @@ def get_optimizer(optimizer_name: str):
 
 class Pysindy_Solver(BaseSolver):
     def __init__(
-        self, data_instance: DataConstructor, optimizer: str, solver_parameters: dict
+        self, data_instance: DataConstructor, optimizer: str, solver_parameters: dict,
+        scale_features: bool = True
     ):
         self.data_instance = data_instance
         self.solver_parameters = solver_parameters
         self.optimizer = optimizer
+        self.scale_features = scale_features
         self.builder = FeatureMatrixBuilder(data_instance)
 
     def configure(self, **kwargs):
@@ -100,13 +102,20 @@ class Pysindy_Solver(BaseSolver):
 
         theta_axes = AxesArray(theta, {"ax_sample": 0, "ax_coord": 1})
         lhs_axes = AxesArray(np.asarray(lhs_matrix), {"ax_sample": 0, "ax_coord": 1})
-        scaler_X = StandardScaler()
-        scaler_y = StandardScaler()
 
-        theta_axes = scaler_X.fit_transform(theta_axes)
-        lhs_axes = scaler_y.fit_transform(lhs_axes)
-        sx = np.asarray(scaler_X.scale_)  # length P
-        sy = np.asarray(scaler_y.scale_)  # length d
+        # Conditionally apply scaling
+        if self.scale_features:
+            scaler_X = StandardScaler(with_mean=False)
+            scaler_y = StandardScaler(with_mean=False)
+
+            theta_axes = scaler_X.fit_transform(theta_axes)
+            lhs_axes   = scaler_y.fit_transform(lhs_axes)
+
+            sx = scaler_X.scale_
+            sy = scaler_y.scale_        
+        else:
+            sx = np.ones(theta.shape[1])
+            sy = np.ones(lhs_matrix.shape[1] if lhs_matrix.ndim > 1 else 1)
 
         # Increase threshold to enforce more sparsity
         try:

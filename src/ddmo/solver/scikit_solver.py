@@ -22,11 +22,13 @@ from ddmo.utils.data_constructor import DataConstructor
 
 class ScikitSolver(BaseSolver):
     def __init__(
-        self, data_instance: DataConstructor, optimizer: str, solver_parameters: dict
+        self, data_instance: DataConstructor, optimizer: str, solver_parameters: dict,
+        scale_features: bool = True
     ):
         self.data_instance = data_instance
         self.solver_parameters = solver_parameters or {}
         self.optimizer_name = optimizer
+        self.scale_features = scale_features
         self.builder = FeatureMatrixBuilder(data_instance)
 
         # Validate optimizer
@@ -82,19 +84,23 @@ class ScikitSolver(BaseSolver):
 
         theta = np.asarray(theta)
 
-        # Standardize
-        scaler_X = StandardScaler()
-        scaler_y = StandardScaler()
-
         # Check dimensions
         if theta.ndim != 2:
             pass
 
-        X_scaled = scaler_X.fit_transform(theta)
-        y_scaled = scaler_y.fit_transform(lhs_matrix)
-
-        sx = np.asarray(scaler_X.scale_)  # length n_features
-        sy = np.asarray(scaler_y.scale_)  # length n_targets
+        # Conditionally apply scaling
+        if self.scale_features:
+            scaler_X = StandardScaler()
+            scaler_y = StandardScaler()
+            X_scaled = scaler_X.fit_transform(theta)
+            y_scaled = scaler_y.fit_transform(lhs_matrix)
+            sx = np.asarray(scaler_X.scale_)  # length n_features
+            sy = np.asarray(scaler_y.scale_)  # length n_targets
+        else:
+            X_scaled = theta
+            y_scaled = lhs_matrix
+            sx = np.ones(theta.shape[1])
+            sy = np.ones(lhs_matrix.shape[1] if lhs_matrix.ndim > 1 else 1)
 
         # 3. Instantiate Optimizer
         params = self.solver_parameters.copy()

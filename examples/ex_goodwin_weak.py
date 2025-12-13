@@ -32,12 +32,12 @@ if __name__ == "__main__":
     # Create a DataConstructor instance
     skip = 5
     training_data = DataConstructor(
-        x_train=x_train[20:-20, :],
-        time_array=time_array[20:-20],
-        x_dot=x_dot_hat[20:-20, :],
+        x_train=x_train[::skip, :],
+        time_array=time_array[::skip],
+        x_dot=x_dot_hat[::skip, :],
         library_object=library.build,  # Pass the build method
         x_0=x_0,
-        x_raw=x_raw[20:-20, :],
+        x_raw=x_raw[::skip, :],
     )
 
     # Library parameters (for SINDy function library) - tuple format: (min, max)
@@ -57,7 +57,7 @@ if __name__ == "__main__":
         library_bounds=library_bounds,
         formulation_bounds=formulation_bounds,
         n_obj=2,
-        n_gen=5,
+        n_gen=3,
         algorithm="NSGA3",
         pop_size=50,
         # seed = 42
@@ -67,13 +67,19 @@ if __name__ == "__main__":
         solver_name="pysindy",
         regularization="STLSQ",
         regularization_parameters={
-            "alpha": 0.15,
-            "threshold": 0.2,
+            "normalize_columns": False,
+            "alpha": .15,
+            "threshold": .25,
         },
+        scale_features=True
     )
 
     formulation_settings = FormulationSettings(
-        formulation="strong",
+        formulation="weak",
+        test_function = "PolynomialWindow",
+        degree = 3,
+        window_length = 65,
+        stride = 50,
     )
 
     # Run identification
@@ -88,5 +94,5 @@ if __name__ == "__main__":
     print(result.alphas)
 
     plt.plot(result.solutions[0])
-    plt.plot(x_raw[::skip], alpha=0.5)
+    plt.plot(x_raw[::skip, :], alpha=0.5)
     plt.show()

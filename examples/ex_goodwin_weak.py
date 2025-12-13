@@ -32,7 +32,7 @@ if __name__ == "__main__":
     # Create a DataConstructor instance
     skip = 5
     training_data = DataConstructor(
-        x_train=x_train[::skip, :],
+        x_train=x_raw[::skip, :],
         time_array=time_array[::skip],
         x_dot=x_dot_hat[::skip, :],
         library_object=library.build,  # Pass the build method
@@ -48,8 +48,9 @@ if __name__ == "__main__":
 
     # Formulation parameters (for weak formulation)
     formulation_bounds = {
-        "stride": (50, 120),
-        "window_length": (65, 401),
+        "degree": (2, 7),
+        "stride": (50, 250),
+        "window_length": (127, 801),
     }
 
     # Unified optimizer settings with separated bounds
@@ -57,9 +58,9 @@ if __name__ == "__main__":
         library_bounds=library_bounds,
         formulation_bounds=formulation_bounds,
         n_obj=2,
-        n_gen=3,
+        n_gen=2,
         algorithm="NSGA3",
-        pop_size=50,
+        pop_size=150,
         # seed = 42
     )
 
@@ -69,7 +70,7 @@ if __name__ == "__main__":
         regularization_parameters={
             "normalize_columns": False,
             "alpha": .15,
-            "threshold": .25,
+            "threshold": .2,
         },
         scale_features=True
     )
@@ -77,7 +78,7 @@ if __name__ == "__main__":
     formulation_settings = FormulationSettings(
         formulation="weak",
         test_function = "PolynomialWindow",
-        degree = 3,
+        degree = 2,
         window_length = 65,
         stride = 50,
     )

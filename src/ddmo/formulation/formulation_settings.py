@@ -31,6 +31,7 @@ class FormulationSettings:
     formulation: str
     test_function: str | None = None
     degree: int | None = None
+    sigma: int | None = None
     window_length: int | None = None
     stride: int | None = None
 
@@ -58,4 +59,6 @@ class FormulationSettings:
             attrs["window_length"] = self.window_length
         if self.stride is not None:
             attrs["stride"] = self.stride
+        if self.sigma is not None:
+            attrs["sigma"] = self.sigma
         return attrs

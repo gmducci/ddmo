@@ -35,7 +35,6 @@ python examples/ex_goodwin_weak.py    # Weak formulation example
 |------|-------|----------------|
 | **Objective Functions** | Hardcoded in optimizer | Allow user-defined objectives via main API without modifying `src/ddmo/optimizer` |
 | **SolverResult Dataclass** | Solver returns fragile tuples | Implement `SolverResult` dataclass for consistent return types |
-| **Scaling Robustness** | Regression fails with high-dimensional Θ | Add condition number logging, consider per-feature normalization strategies |
 | **Error Handling** | Silent failures in solver | Surface errors with informative messages instead of returning `None` |
 
 ### Architecture Improvements

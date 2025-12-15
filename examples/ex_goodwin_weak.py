@@ -30,11 +30,11 @@ if __name__ == "__main__":
 
     x_0 = [x_0_train]
     # Create a DataConstructor instance
-    skip = 5
+    skip = 10
     training_data = DataConstructor(
         x_train=x_raw[::skip, :],
         time_array=time_array[::skip],
-        x_dot=x_dot_hat[::skip, :],
+        # x_dot=x_dot_hat[::skip, :],
         library_object=library.build,  # Pass the build method
         x_0=x_0,
         x_raw=x_raw[::skip, :],
@@ -58,9 +58,9 @@ if __name__ == "__main__":
         library_bounds=library_bounds,
         formulation_bounds=formulation_bounds,
         n_obj=2,
-        n_gen=2,
+        n_gen=15,
         algorithm="NSGA3",
-        pop_size=150,
+        pop_size=50,
         # seed = 42
     )
 
@@ -69,8 +69,8 @@ if __name__ == "__main__":
         regularization="STLSQ",
         regularization_parameters={
             "normalize_columns": False,
-            "alpha": .15,
-            "threshold": .2,
+            "alpha": .05,
+            "threshold": .1,
         },
         scale_features=True
     )

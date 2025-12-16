@@ -105,26 +105,33 @@ class Pysindy_Solver(BaseSolver):
 
         # Conditionally apply scaling
         if self.scale_features:
-            scaler_X = StandardScaler(with_mean=False)
-            scaler_y = StandardScaler(with_mean=False)
+            # --- CHANGE START ---
+            # Calculate L2 norm for Theta columns (library features)
+            # Add epsilon to avoid division by zero for empty columns
+            sx = np.linalg.norm(theta_axes, axis=0)
+            sx[sx == 0] = 1.0 
+            
+            # Calculate std or norm for LHS (derivatives)
+            # Std is usually fine for LHS as derivatives often center around 0
+            sy = np.std(lhs_axes, axis=0) 
+            sy[sy == 0] = 1.0
 
-            theta_axes = scaler_X.fit_transform(theta_axes)
-            lhs_axes   = scaler_y.fit_transform(lhs_axes)
-
-            sx = scaler_X.scale_
-            sy = scaler_y.scale_        
+            # Apply scaling
+            theta_axes = theta_axes / sx
+            lhs_axes   = lhs_axes / sy
+            # --- CHANGE END ---
         else:
             sx = np.ones(theta.shape[1])
             sy = np.ones(lhs_matrix.shape[1] if lhs_matrix.ndim > 1 else 1)
 
-        # Increase threshold to enforce more sparsity
+        # Fit optimizer
         try:
             fitted_optimizer = sindy_optimizer.fit(theta_axes, lhs_axes)
             raw_coefficients = fitted_optimizer.coef_
-            # regression_coeff = raw_coefficients.T
+            
+            # Unscale (Your logic here remains exactly valid)
             regression_coeff = (raw_coefficients * sy[:, None]) / sx[None, :]
             regression_coeff = regression_coeff.T
-
             solver_kwargs = {
                 "method": "BDF",
                 "rtol": 1e-7,

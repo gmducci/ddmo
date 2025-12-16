@@ -22,6 +22,7 @@ from dataclasses import dataclass, field
 
 from ddmo.library_functions.factories import (
     CrossProductFactory,
+    CustomFunctionFactory,
     ExponentialFactory,
     HillFactory,
     IdentityFactory,
@@ -31,9 +32,9 @@ from ddmo.library_functions.factories import (
     PowerCrossProductFactory,
 )
 
-# Type for custom functions: takes (x, params_dict) -> float
-CustomFunc = Callable[[float, dict[str, float]], float]
-CustomNameFunc = Callable[[str, dict[str, float]], str] | str
+# Type for custom functions: takes (*args, params_dict) -> float
+CustomFunc = Callable[..., float]
+CustomNameFunc = Callable[..., str] | str
 
 
 @dataclass
@@ -67,7 +68,6 @@ class LibraryBuilder:
 
     _factories: list[LibraryFactory] = field(default_factory=list)
     _static_funcs: list[tuple[Callable, Callable]] = field(default_factory=list)
-    _custom_funcs: list[tuple[CustomFunc, CustomNameFunc]] = field(default_factory=list)
 
     def add_polynomial(
         self, max_degree: int = 2, include_constant: bool = False, include_interactions: bool = True
@@ -164,6 +164,30 @@ class LibraryBuilder:
         )
         return self
 
+    def add_parametric_power_cross_product(
+        self, exponent_x_param: str, exponent_y_param: str
+    ) -> "LibraryBuilder":
+        """
+        Add parametric powered cross-product: x^γ₁ * y^γ₂
+
+        Args:
+            exponent_x_param: Name of the optimizer parameter for γ₁.
+            exponent_y_param: Name of the optimizer parameter for γ₂.
+
+        Returns:
+            Self for method chaining.
+        """
+
+        def func(x, y, p):
+            return (x ** p[exponent_x_param]) * (y ** p[exponent_y_param])
+
+        def name(x, y, p):
+            gx = p[exponent_x_param]
+            gy = p[exponent_y_param]
+            return f"{x}^{gx:.2f}*{y}^{gy:.2f}"
+
+        return self.add_custom(func, name)
+
     def add_factory(self, factory: LibraryFactory) -> "LibraryBuilder":
         """
         Add a custom factory instance.
@@ -207,8 +231,8 @@ class LibraryBuilder:
         Add a custom parameterized function (depends on optimizer params).
 
         Args:
-            func: Function taking (x, params_dict) -> float.
-            name: Either a string or callable taking (varname, params_dict) -> str.
+            func: Function taking (*args, params_dict) -> float.
+            name: Either a string or callable taking (*args, params_dict) -> str.
 
         Returns:
             Self for method chaining.
@@ -219,7 +243,7 @@ class LibraryBuilder:
                 lambda x, p: f"{x}^{p['gamma_3']:.2f}"
             )
         """
-        self._custom_funcs.append((func, name))
+        self._factories.append(CustomFunctionFactory(func=func, name=name))
         return self
 
     def build(self, params: dict[str, float]) -> list[NamedFunc]:
@@ -244,26 +268,4 @@ class LibraryBuilder:
         for func, name_func in self._static_funcs:
             result.append((func, name_func))
 
-        # Add custom parameterized functions
-        for func, name in self._custom_funcs:
-            wrapped_func = self._wrap_custom_func(func, params)
-            wrapped_name = self._wrap_custom_name(name, params)
-            result.append((wrapped_func, wrapped_name))
-
         return result
-
-    @staticmethod
-    def _wrap_custom_func(
-        func: CustomFunc, params: dict[str, float]
-    ) -> Callable[[float], float]:
-        """Wrap a custom function to capture params."""
-        return lambda x, f=func, p=params: f(x, p)
-
-    @staticmethod
-    def _wrap_custom_name(
-        name: CustomNameFunc, params: dict[str, float]
-    ) -> Callable[[str], str]:
-        """Wrap a custom name to capture params."""
-        if isinstance(name, str):
-            return lambda x, n=name: n
-        return lambda x, n=name, p=params: n(x, p)

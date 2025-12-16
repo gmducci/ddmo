@@ -244,3 +244,62 @@ class PowerCrossProductFactory(LibraryFactory):
             return lambda x, y: f"{x_part}*{y_part}".replace("x", x).replace("y", y)
 
         return [(make_func(px, py), make_name(px, py))]
+
+
+@dataclass
+class CustomFunctionFactory(LibraryFactory):
+    """
+    Factory for generic custom functions defined by lambdas.
+
+    Allows passing arbitrary functions that depend on optimizer parameters.
+
+    Args:
+        func: Callable taking (*args, params_dict) -> float
+        name: Callable taking (*args, params_dict) -> str, or static string
+    """
+
+    func: Callable[..., float]
+    name: Callable[..., str] | str
+
+    def generate(self, params: dict[str, float]) -> list[NamedFunc]:
+        """Generate custom function with bound parameters."""
+        import inspect
+
+        # Inspect the user provided function
+        # Expectation: func(arg1, arg2, ..., params)
+        # We need to determine how many 'inputs' it takes (N)
+        # N = Total Args - 1 (params)
+        sig = inspect.signature(self.func)
+        n_args_total = len(sig.parameters)
+        n_inputs = n_args_total - 1
+
+        if n_inputs < 0:
+            raise ValueError("Custom function must take at least 'params' argument.")
+
+        # 1. Create wrapper with correct arity for PySINDy introspection
+        def make_func(f, p, n_vars):
+            if n_vars == 1:
+                return lambda x: f(x, p)
+            elif n_vars == 2:
+                return lambda x, y: f(x, y, p)
+            elif n_vars == 3:
+                return lambda x, y, z: f(x, y, z, p)
+            elif n_vars == 4:
+                return lambda x, y, z, w: f(x, y, z, w, p)
+            else:
+                # Fallback for higher dimensions (PySINDy might not inspect correctly but will run if passed args)
+                # Or we can generate code dynamically if needed.
+                # For now, generic *args wrapper, keeping in mind PySINDy inspection limitation
+                return lambda *args: f(*args, p)
+
+        # 2. Wrap name generator
+        def make_name(n, p):
+            if isinstance(n, str):
+                return lambda *args: n
+            # Naive wrapper for name, PySINDy passes args locally so it usually works
+            return lambda *args: n(*args, p)
+
+        wrapped_func = make_func(self.func, params, n_inputs)
+        wrapped_name = make_name(self.name, params)
+
+        return [(wrapped_func, wrapped_name)]

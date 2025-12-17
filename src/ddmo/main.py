@@ -108,6 +108,7 @@ def identify(
         objectives=None,
         objective_functions=objective_functions,
         formulation=resolved_formulation,
+        solver_param_names=optimizer_settings.solver_param_names,
     )
 
     # Set up variable mappings from bounds

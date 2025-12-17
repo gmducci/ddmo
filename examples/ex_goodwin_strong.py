@@ -49,10 +49,16 @@ if __name__ == "__main__":
     # Formulation parameters (for weak formulation)
     formulation_bounds = {}
 
+    # Solver bounds: Optimize the SINDy threshold!
+    solver_bounds = {
+        "threshold": (0.01, 1.0)
+    }
+
     # Unified optimizer settings with separated bounds
     optimizer_settings = OptimizerSettings(
         library_bounds=library_bounds,
         formulation_bounds=formulation_bounds,
+        solver_bounds=solver_bounds,
         n_obj=2,
         n_gen=3,
         algorithm="NSGA3",

@@ -20,14 +20,20 @@ if __name__ == "__main__":
     print("Generating synthetic data using Goodwin Model...")
     # Using default parameters which are set to produce oscillations
     # k1=1, k2=0.2, k3=1, k4=0.15, k5=1, k6=0.1, n=9.5
-    goodwin = GoodwinModel(n = 10.5)
+    goodwin = GoodwinModel(k1 = 0.1, 
+                           k2 = 0.2, 
+                           k3 = 0.1, 
+                           k4 = 0.15, 
+                           k5 = 1, 
+                           k6 = 0.1, 
+                           n = 9)
     
     # Time vector
-    t_start, t_end, dt = 0, 250, 0.1
+    t_start, t_end, dt = 0, 250, 0.05
     t = np.arange(t_start, t_end, dt)
     
     # Initial conditions [x, y, z]
-    x0 = [0.1, .5, 0.5]
+    x0 = [0.1, 0.5, 0.5]
     
     # Integrate dynamics
     x_clean = odeint(goodwin.dynamics, x0, t)
@@ -45,39 +51,47 @@ if __name__ == "__main__":
     # add_hill adds 1/(1+x^p) type terms.
     library = (
         LibraryBuilder()
-        .add_polynomial(max_degree=2, include_interactions=True)
+        .add_polynomial(max_degree=2, include_interactions=False)
         .add_hill(exponent_param="n_hill")  # 1/(1+x^n)
     )
 
     # 3. Construct Data Container
     data = DataConstructor(
-        x_train=x_noisy[50:, :],
-        time_array=t[50:],
+        x_train=x_noisy[:, :],
+        time_array=t,
         x_dot=None, # Weak formulation will handle derivatives
         library_object=library.build,
         x_0=[x0],
-        x_raw=x_noisy[50:, :]
+        x_raw=x_noisy[:, :]
     )
 
     # 4. Settings
     # Optimizer settings 
     # The 'n' parameter in Goodwin is around 9.5
     library_bounds = {
-        "n_hill": (8.0, 11.0) # Search range around expected n=9.5
+        "n_hill": (4.0, 10.0),
     }
 
     # Weak formulation optimization parameters
     formulation_bounds = {
-        "window_length": (21, 151),
-        "stride": (2, 10),
-        "degree": (2, 6)
+        "window_length": (5, 51),
+        "stride": (1, 5),
+    }
+
+    # Solver bounds: Optimize the SINDy hyperparameters
+    solver_bounds = {
+        # "alpha": (.001, 1),
+        # "kappa": (0.0000001, 0.0000005),
+        "threshold": (.01, .5),
+        "alpha": (0.001, 0.1)
     }
 
     optimizer_settings = OptimizerSettings(
         library_bounds=library_bounds,
         formulation_bounds=formulation_bounds,
+        solver_bounds=solver_bounds,
         n_obj=2,
-        n_gen=3, 
+        n_gen=2, 
         pop_size=50,
         algorithm="NSGA3"
     )
@@ -87,12 +101,14 @@ if __name__ == "__main__":
         solver_name="pysindy",
         regularization="STLSQ",
         regularization_parameters={
-            "normalize_columns": True,
+            "normalize_columns": False,
+            # "threshold": 0.5, 
+            # "nu": 10,
             # "fit_intercept": False,
-            "alpha": 0.001,
-            "threshold": 5,
+            # "alpha": 0.001,
+            # "thresholder": 'L0',
         },
-        # scale_features=True
+        scale_features=True
     )
 
     # Formulation settings -> WEAK
@@ -104,7 +120,7 @@ if __name__ == "__main__":
         # Default values if optimization doesn't override them immediately or for initial population
         window_length=21, 
         stride=1,
-        degree=2    
+        degree=2
     )
 
     # 5. Run Identification

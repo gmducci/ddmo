@@ -85,6 +85,7 @@ def identify(
         optimizer=solver_settings.regularization,
         solver_parameters=solver_settings.regularization_parameters,
         scale_features=solver_settings.scale_features,
+        ensemble_settings=solver_settings.ensemble,
     )
 
     # Instantiate Formulation

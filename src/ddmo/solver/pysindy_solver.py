@@ -48,12 +48,13 @@ def get_optimizer(optimizer_name: str):
 class Pysindy_Solver(BaseSolver):
     def __init__(
         self, data_instance: DataConstructor, optimizer: str, solver_parameters: dict,
-        scale_features: bool = True
+        scale_features: bool = True, ensemble_settings: dict | None = None
     ):
         self.data_instance = data_instance
         self.solver_parameters = solver_parameters
         self.optimizer = optimizer
         self.scale_features = scale_features
+        self.ensemble_settings = ensemble_settings
         self.builder = FeatureMatrixBuilder(data_instance)
 
     def configure(self, **kwargs):
@@ -105,17 +106,32 @@ class Pysindy_Solver(BaseSolver):
              unbias_flag = True
         sindy_optimizer = SINDyOptimizer(base_optimizer, unbias=unbias_flag)
         
-        # Patch SINDyOptimizer to have attributes required by EnsembleOptimizer
-        # EnsembleOptimizer expects these to be present on the wrapped optimizer
-        for attr in ['max_iter', 'fit_intercept', 'copy_X', 'initial_guess']:
-            if hasattr(base_optimizer, attr):
-                setattr(sindy_optimizer, attr, getattr(base_optimizer, attr))
+        if self.ensemble_settings and self.ensemble_settings.get("enabled", True):
+            # Patch SINDyOptimizer to have attributes required by EnsembleOptimizer
+            # EnsembleOptimizer expects these to be present on the wrapped optimizer
+            for attr in ['max_iter', 'fit_intercept', 'copy_X', 'initial_guess']:
+                if hasattr(base_optimizer, attr):
+                    setattr(sindy_optimizer, attr, getattr(base_optimizer, attr))
 
-        ensemble_optimizer = EnsembleOptimizer(sindy_optimizer,
-                                                bagging = True,
-                                                n_models = 20,
-                                                n_subset= 130,
-                                                n_candidates_to_drop = 10)
+            # Handle bagging/library_ensemble defaults if not present
+            ensemble_kwargs = self.ensemble_settings.copy()
+            
+            # Remove 'enabled' key if present so it's not passed to EnsembleOptimizer
+            if "enabled" in ensemble_kwargs:
+                del ensemble_kwargs["enabled"]
+            
+            if "bagging" not in ensemble_kwargs and "library_ensemble" not in ensemble_kwargs:
+                ensemble_kwargs["bagging"] = True # Default to bagging if nothing specified
+
+            ensemble_optimizer = EnsembleOptimizer(sindy_optimizer, **ensemble_kwargs)
+            # Check for n_subset relative to sample size
+            if "n_subset" in ensemble_kwargs and ensemble_kwargs["n_subset"] > len(theta):
+                 print(f"Warning: n_subset ({ensemble_kwargs['n_subset']}) > n_samples ({len(theta)}). Adjusting to n_samples.")
+                 ensemble_optimizer.n_subset = len(theta)
+            
+            target_optimizer = ensemble_optimizer
+        else:
+            target_optimizer = sindy_optimizer
 
         theta_axes = AxesArray(theta, {"ax_sample": 0, "ax_coord": 1})
         lhs_axes = AxesArray(np.asarray(lhs_matrix), {"ax_sample": 0, "ax_coord": 1})
@@ -137,7 +153,7 @@ class Pysindy_Solver(BaseSolver):
 
         # Fit optimizer
         try:
-            fitted_optimizer = ensemble_optimizer.fit(theta_axes, lhs_axes)
+            fitted_optimizer = target_optimizer.fit(theta_axes, lhs_axes)
             raw_coefficients = fitted_optimizer.coef_
             
             # Unscale (Your logic here remains exactly valid)

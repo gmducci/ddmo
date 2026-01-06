@@ -23,10 +23,10 @@ if __name__ == "__main__":
     # Using default parameters which are set to produce oscillations
     # k1=1, k2=0.2, k3=1, k4=0.15, k5=1, k6=0.1, n=9.5
     goodwin = GoodwinModel(k1 = 0.1, 
-                           k2 = 0.2, 
+                           k2 = 0.76, 
                            k3 = 0.5, 
                            k4 = 0.15, 
-                           k5 = 1, 
+                           k5 = 0.2, 
                            k6 = 0.1, 
                            n = 8)
     
@@ -37,14 +37,14 @@ if __name__ == "__main__":
     t = np.arange(t_start, t_end, dt)
     
     # Initial conditions [x, y, z]
-    x0 = [0., 0.1, 0.1]
+    x0 = [0.7, 0.7, 1.1]
     
     # Integrate dynamics
     x_clean = odeint(goodwin.dynamics, x0, t)
     sigma_per_var = np.std(x_clean, axis=0) 
 
     # Define noise level as a percentage of that variation (e.g., 5%)
-    noise_ratio = 0.15
+    noise_ratio = 0.2
 
     # Generate noise scaled to each variable's std dev
     noise = np.random.normal(0, 1, x_clean.shape) * sigma_per_var * noise_ratio
@@ -70,13 +70,13 @@ if __name__ == "__main__":
 
     # 3. Construct Data Container
     data = DataConstructor(
-        x_train=x_hat[30:-30, :], # Or use x_hat_estimated if preferred, but usually we train on noisy data (or smoothed?)
+        x_train=x_noisy[:, :], # Or use x_hat_estimated if preferred, but usually we train on noisy data (or smoothed?)
         # User asked for x_dot estimates, usually implies we might want to use strong formulation or at least provide them.
-        x_dot =x_dot_hat[30:-30, :],
-        time_array=t[30:-30],
+        x_dot =x_dot_hat[:, :],
+        time_array=t,
         library_object=library.build,
         x_0=[x0],
-        x_raw=x_noisy[30:-30, :]
+        x_raw=x_noisy[:, :]
     )
 
     # 4. Settings
@@ -88,7 +88,7 @@ if __name__ == "__main__":
 
     # Weak formulation optimization parameters
     formulation_bounds = {
-        "window_length": (5, 21),
+        "window_length": (21, 101),
         "stride": (1, 5),
     }
 
@@ -96,8 +96,8 @@ if __name__ == "__main__":
     solver_bounds = {
         # "alpha": (.001, 1),
         # "kappa": (0.0000001, 0.0000005),
-        # "threshold": (.01, 10),
-        # "alpha": (0.00001, .1)
+        "threshold": (.01, 2),
+        "alpha": (0.0001, .1)
     }
 
     optimizer_settings = OptimizerSettings(
@@ -105,8 +105,8 @@ if __name__ == "__main__":
         formulation_bounds=formulation_bounds,
         solver_bounds=solver_bounds,
         n_obj=2,
-        n_gen=12, 
-        pop_size=50,
+        n_gen=100, 
+        pop_size=100,
         algorithm="NSGA3"
     )
 
@@ -124,11 +124,10 @@ if __name__ == "__main__":
         },
         scale_features=True,
         ensemble={
-            "enabled": False,
+            "enabled": True,
             "bagging": True,
-            "n_models": 50,
-            "n_subset": 120,
-            "n_candidates_to_drop": 20
+            "n_models": 200,
+            "n_candidates_to_drop": 5
         }
     )
 
@@ -136,12 +135,12 @@ if __name__ == "__main__":
     # We can also start with an initial guess for parameters if not optimized,
     # but since we provided bounds in optimizer_settings, they will be optimized.
     formulation_settings = FormulationSettings(
-        formulation="strong",
-        # test_function="PolynomialWindow",
+        formulation="weak",
+        test_function="PolynomialWindow",
         # # Default values if optimization doesn't override them immediately or for initial population
-        # window_length=21, 
-        # stride=1,
-        # degree=2
+        window_length=21, 
+        stride=1,
+        degree=2
     )
 
     # 5. Run Identification

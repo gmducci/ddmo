@@ -13,7 +13,7 @@ from ddmo.utils.array_helpers import (
     stack_state_matrix,
 )
 from ddmo.utils.data_constructor import DataConstructor
-
+from pysindy.optimizers import EnsembleOptimizer
 
 # Optimizer dispatch logic
 def get_optimizer(optimizer_name: str):
@@ -48,18 +48,19 @@ def get_optimizer(optimizer_name: str):
 class Pysindy_Solver(BaseSolver):
     def __init__(
         self, data_instance: DataConstructor, optimizer: str, solver_parameters: dict,
-        scale_features: bool = True
+        scale_features: bool = True, ensemble_settings: dict | None = None
     ):
         self.data_instance = data_instance
         self.solver_parameters = solver_parameters
         self.optimizer = optimizer
         self.scale_features = scale_features
+        self.ensemble_settings = ensemble_settings
         self.builder = FeatureMatrixBuilder(data_instance)
 
     def configure(self, **kwargs):
         self.solver_parameters.update(kwargs)
 
-    def solve(self, *args):
+    def solve(self, *args, **kwargs):
         theta = None
         lib_custom = None
 
@@ -95,43 +96,71 @@ class Pysindy_Solver(BaseSolver):
         from pysindy.utils import AxesArray
         from sklearn.preprocessing import StandardScaler
 
-        params_dict = self.solver_parameters
+        # Merge static parameters with dynamic optimization parameters
+        params_dict = {**self.solver_parameters, **kwargs}
         base_optimizer = get_optimizer(self.optimizer)(**params_dict)
-        unbias_flag = getattr(base_optimizer, "unbias", True)
+        
+        if hasattr(base_optimizer, "unbias"):
+             unbias_flag = base_optimizer.unbias
+        else:
+             unbias_flag = True
         sindy_optimizer = SINDyOptimizer(base_optimizer, unbias=unbias_flag)
+        
+        if self.ensemble_settings and self.ensemble_settings.get("enabled", True):
+            # Patch SINDyOptimizer to have attributes required by EnsembleOptimizer
+            # EnsembleOptimizer expects these to be present on the wrapped optimizer
+            for attr in ['max_iter', 'fit_intercept', 'copy_X', 'initial_guess']:
+                if hasattr(base_optimizer, attr):
+                    setattr(sindy_optimizer, attr, getattr(base_optimizer, attr))
+
+            # Handle bagging/library_ensemble defaults if not present
+            ensemble_kwargs = self.ensemble_settings.copy()
+            
+            # Remove 'enabled' key if present so it's not passed to EnsembleOptimizer
+            if "enabled" in ensemble_kwargs:
+                del ensemble_kwargs["enabled"]
+            
+            if "bagging" not in ensemble_kwargs and "library_ensemble" not in ensemble_kwargs:
+                ensemble_kwargs["bagging"] = True # Default to bagging if nothing specified
+
+            ensemble_optimizer = EnsembleOptimizer(sindy_optimizer, **ensemble_kwargs)
+            # Check for n_subset relative to sample size
+            if "n_subset" in ensemble_kwargs and ensemble_kwargs["n_subset"] > len(theta):
+                 print(f"Warning: n_subset ({ensemble_kwargs['n_subset']}) > n_samples ({len(theta)}). Adjusting to n_samples.")
+                 ensemble_optimizer.n_subset = len(theta)
+            
+            target_optimizer = ensemble_optimizer
+        else:
+            target_optimizer = sindy_optimizer
 
         theta_axes = AxesArray(theta, {"ax_sample": 0, "ax_coord": 1})
         lhs_axes = AxesArray(np.asarray(lhs_matrix), {"ax_sample": 0, "ax_coord": 1})
 
         # Conditionally apply scaling
+        # Conditionally apply scaling
         if self.scale_features:
-            # --- CHANGE START ---
-            # Calculate L2 norm for Theta columns (library features)
-            # Add epsilon to avoid division by zero for empty columns
-            sx = np.linalg.norm(theta_axes, axis=0)
-            sx[sx == 0] = 1.0 
-            
-            # Calculate std or norm for LHS (derivatives)
-            # Std is usually fine for LHS as derivatives often center around 0
-            sy = np.std(lhs_axes, axis=0) 
-            sy[sy == 0] = 1.0
+            scaler_X = StandardScaler(with_mean=False)
+            scaler_y = StandardScaler(with_mean=False)
 
-            # Apply scaling
-            theta_axes = theta_axes / sx
-            lhs_axes   = lhs_axes / sy
-            # --- CHANGE END ---
+            theta_axes = scaler_X.fit_transform(theta_axes)
+            lhs_axes   = scaler_y.fit_transform(lhs_axes)
+
+            sx = scaler_X.scale_
+            sy = scaler_y.scale_        
         else:
             sx = np.ones(theta.shape[1])
             sy = np.ones(lhs_matrix.shape[1] if lhs_matrix.ndim > 1 else 1)
 
         # Fit optimizer
         try:
-            fitted_optimizer = sindy_optimizer.fit(theta_axes, lhs_axes)
+            fitted_optimizer = target_optimizer.fit(theta_axes, lhs_axes)
             raw_coefficients = fitted_optimizer.coef_
             
             # Unscale (Your logic here remains exactly valid)
             regression_coeff = (raw_coefficients * sy[:, None]) / sx[None, :]
             regression_coeff = regression_coeff.T
+            # print("MAX Raw Coeff:", np.max(np.abs(raw_coefficients)))
+            # print("Raw Coeffs (Sample):\n", raw_coefficients)   
             solver_kwargs = {
                 "method": "BDF",
                 "rtol": 1e-7,
@@ -140,7 +169,7 @@ class Pysindy_Solver(BaseSolver):
             model = _ManualSINDyModel(
                 feature_library=lib_custom,
                 coefficients=regression_coeff,
-                optimizer=fitted_optimizer.optimizer,
+                optimizer=None, # fitted_optimizer.optimizer is not available on EnsembleOptimizer and seems unused
                 solver_kwargs=solver_kwargs,
                 active_mask=mask,
             )

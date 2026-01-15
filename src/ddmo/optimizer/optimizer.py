@@ -45,6 +45,7 @@ class Optimizer(Problem):
         objectives=None,
         objective_functions=None,
         formulation: Formulation | None = None,
+        solver_param_names: list[str] = None,
     ):
         super().__init__(
             n_var=1, n_obj=None, n_ieq_constr=0, xl=0.0, xu=1.0, vtype=float
@@ -61,15 +62,18 @@ class Optimizer(Problem):
         )
         self.objective_functions = objective_functions
         self.n_obj = len(self.objectives)
+        self.solver_param_names = solver_param_names if solver_param_names else []
 
     def _compute_metrics(self, optimization_variables, *args):
-        if self.formulation is not None:
-            # vector -> dict with names (using your existing mapi_label)
+        # Create param_dict if mapi_label is available
+        param_dict = {}
+        if hasattr(self, "mapi_label"):
             param_dict = {
                 name: optimization_variables[idx]
                 for name, idx in self.mapi_label.items()
             }
 
+        if self.formulation is not None:
             lhs = self.formulation.get_lhs(
                 self.data_instance,
                 optimization_variables,
@@ -81,10 +85,18 @@ class Optimizer(Problem):
                 opt_param_dict=param_dict,
             )
             solver_args = (lhs, rhs)
+            solver_args = (lhs, rhs)
         else:
             solver_args = (optimization_variables,)
 
-        solver_result: SolverResult = self.solver(*solver_args)
+        # Extract solver-specific parameters if any
+        solver_kwargs = {}
+        if self.solver_param_names:
+            for name in self.solver_param_names:
+                if name in param_dict:
+                    solver_kwargs[name] = param_dict[name]
+
+        solver_result: SolverResult = self.solver(*solver_args, **solver_kwargs)
 
         if solver_result is None or not solver_result.success:
             return EvaluationResult(

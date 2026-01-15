@@ -85,6 +85,7 @@ def identify(
         optimizer=solver_settings.regularization,
         solver_parameters=solver_settings.regularization_parameters,
         scale_features=solver_settings.scale_features,
+        ensemble_settings=solver_settings.ensemble,
     )
 
     # Instantiate Formulation
@@ -108,6 +109,7 @@ def identify(
         objectives=None,
         objective_functions=objective_functions,
         formulation=resolved_formulation,
+        solver_param_names=optimizer_settings.solver_param_names,
     )
 
     # Set up variable mappings from bounds

@@ -26,6 +26,7 @@ class SolverSettings:
     regularization: str | None = None
     regularization_parameters: dict[str, Any] = field(default_factory=dict)
     scale_features: bool = True
+    ensemble: dict[str, Any] | None = None
 
     def update(self, **kwargs) -> None:
         """Update regularization_parameters with new values."""

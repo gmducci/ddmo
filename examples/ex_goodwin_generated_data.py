@@ -2,6 +2,8 @@
 import warnings
 import matplotlib.pyplot as plt
 import numpy as np
+
+import ddmo.differentiation.differentiation as diff
 from scipy.integrate import odeint
 
 from ddmo import identify
@@ -20,25 +22,42 @@ if __name__ == "__main__":
     print("Generating synthetic data using Goodwin Model...")
     # Using default parameters which are set to produce oscillations
     # k1=1, k2=0.2, k3=1, k4=0.15, k5=1, k6=0.1, n=9.5
-    goodwin = GoodwinModel(n = 10.5)
+    goodwin = GoodwinModel(k1 = 1, 
+                           k2 = 0.2, 
+                           k3 = 1, 
+                           k4 = 0.15, 
+                           k5 = 1, 
+                           k6 = 0.1, 
+                           n = 9.5)
+    
+    
     
     # Time vector
-    t_start, t_end, dt = 0, 250, 0.1
+    t_start, t_end, dt = 0, 250, 0.08
     t = np.arange(t_start, t_end, dt)
     
     # Initial conditions [x, y, z]
-    x0 = [0.1, .5, 0.5]
+    x0 = [0., 1, 1.]
     
     # Integrate dynamics
     x_clean = odeint(goodwin.dynamics, x0, t)
     sigma_per_var = np.std(x_clean, axis=0) 
 
     # Define noise level as a percentage of that variation (e.g., 5%)
-    noise_ratio = 0.1
+    noise_ratio = 0.2
 
     # Generate noise scaled to each variable's std dev
     noise = np.random.normal(0, 1, x_clean.shape) * sigma_per_var * noise_ratio
     x_noisy = x_clean + noise
+    
+    # Estimate derivatives using pynumdiff Kalman method
+    print("Estimating derivatives with pynumdiff (Kalman)...")
+    x_dot_estimated = np.zeros_like(x_noisy)
+    x_hat_estimated = np.zeros_like(x_noisy)
+    
+    MyDerivatives = diff.Derivatives("kalman", t, optimization = False)
+    x_hat0, x_dot_hat0 = MyDerivatives.get_derivatives(x_noisy)
+    x_hat, x_dot_hat = MyDerivatives.get_derivatives(x_hat0)
     
     # 2. Define the Library
     # The Goodwin model contains linear terms and a Hill function term: 1/(1+z^n)
@@ -51,34 +70,43 @@ if __name__ == "__main__":
 
     # 3. Construct Data Container
     data = DataConstructor(
-        x_train=x_noisy[50:, :],
-        time_array=t[50:],
-        x_dot=None, # Weak formulation will handle derivatives
+        x_train=x_noisy[:, :], # Or use x_hat_estimated if preferred, but usually we train on noisy data (or smoothed?)
+        # User asked for x_dot estimates, usually implies we might want to use strong formulation or at least provide them.
+        x_dot =x_dot_hat[:, :],
+        time_array=t,
         library_object=library.build,
         x_0=[x0],
-        x_raw=x_noisy[50:, :]
+        x_raw=x_noisy[:, :]
     )
 
     # 4. Settings
     # Optimizer settings 
     # The 'n' parameter in Goodwin is around 9.5
     library_bounds = {
-        "n_hill": (8.0, 11.0) # Search range around expected n=9.5
+        "n_hill": (4.0, 10.0),
     }
 
     # Weak formulation optimization parameters
     formulation_bounds = {
-        "window_length": (21, 151),
-        "stride": (2, 10),
-        "degree": (2, 6)
+        "window_length": (21, 101),
+        "stride": (1, 5),
+    }
+
+    # Solver bounds: Optimize the SINDy hyperparameters
+    solver_bounds = {
+        # "alpha": (.001, 1),
+        # "kappa": (0.0000001, 0.0000005),
+        "threshold": (.01, 2),
+        "alpha": (0.0001, .1)
     }
 
     optimizer_settings = OptimizerSettings(
         library_bounds=library_bounds,
         formulation_bounds=formulation_bounds,
+        solver_bounds=solver_bounds,
         n_obj=2,
-        n_gen=3, 
-        pop_size=50,
+        n_gen=10, 
+        pop_size=100,
         algorithm="NSGA3"
     )
 
@@ -87,12 +115,20 @@ if __name__ == "__main__":
         solver_name="pysindy",
         regularization="STLSQ",
         regularization_parameters={
-            "normalize_columns": True,
+            "normalize_columns": False,
+            # "threshold": 0.5, 
+            # "nu": 10,
             # "fit_intercept": False,
-            "alpha": 0.001,
-            "threshold": 5,
+            # "alpha": 0.001,
+            # "thresholder": 'L0',
         },
-        # scale_features=True
+        scale_features=True,
+        ensemble={
+            "enabled": True,
+            "bagging": True,
+            "n_models": 50,
+            "n_candidates_to_drop": 15
+        }
     )
 
     # Formulation settings -> WEAK
@@ -101,14 +137,14 @@ if __name__ == "__main__":
     formulation_settings = FormulationSettings(
         formulation="weak",
         test_function="PolynomialWindow",
-        # Default values if optimization doesn't override them immediately or for initial population
+        # # Default values if optimization doesn't override them immediately or for initial population
         window_length=21, 
         stride=1,
-        degree=2    
+        degree=2
     )
 
     # 5. Run Identification
-    print("Running identification with Weak Formulation...")
+    print("Running identification...")
     result = identify(
         data_instance=data,
         optimizer_settings=optimizer_settings,

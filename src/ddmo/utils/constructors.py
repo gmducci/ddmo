@@ -140,6 +140,7 @@ class OptimizerSettings:
     formulation_bounds: dict[str, tuple[float, float]]
     n_obj: int
     n_gen: int
+    solver_bounds: dict[str, tuple[float, float]] | None = None
 
     # Optional with sensible defaults
     algorithm: str = "NSGA2"
@@ -152,7 +153,16 @@ class OptimizerSettings:
 
     def __post_init__(self):
         """Validate bounds format."""
-        for name, bounds in {**self.library_bounds, **self.formulation_bounds}.items():
+    def __post_init__(self):
+        """Validate bounds format."""
+        if self.solver_bounds is None:
+            self.solver_bounds = {}
+
+        for name, bounds in {
+            **self.library_bounds,
+            **self.formulation_bounds,
+            **self.solver_bounds,
+        }.items():
             if not isinstance(bounds, tuple) or len(bounds) != 2:
                 raise ValueError(f"Bounds for '{name}' must be a (min, max) tuple")
             if bounds[0] > bounds[1]:
@@ -161,12 +171,20 @@ class OptimizerSettings:
     @property
     def n_var(self) -> int:
         """Total number of decision variables."""
-        return len(self.library_bounds) + len(self.formulation_bounds)
+        return (
+            len(self.library_bounds)
+            + len(self.formulation_bounds)
+            + len(self.solver_bounds)
+        )
 
     @property
     def all_bounds(self) -> dict[str, tuple[float, float]]:
-        """Combined bounds dict (library first, then formulation)."""
-        return {**self.library_bounds, **self.formulation_bounds}
+        """Combined bounds dict (library, formulation, then solver)."""
+        return {
+            **self.library_bounds,
+            **self.formulation_bounds,
+            **self.solver_bounds,
+        }
 
     @property
     def xl(self) -> dict[str, float]:
@@ -187,6 +205,11 @@ class OptimizerSettings:
     def formulation_param_names(self) -> list[str]:
         """Names of formulation parameters."""
         return list(self.formulation_bounds.keys())
+
+    @property
+    def solver_param_names(self) -> list[str]:
+        """Names of solver parameters."""
+        return list(self.solver_bounds.keys())
 
 
 @dataclass

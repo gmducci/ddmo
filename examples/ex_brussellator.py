@@ -31,7 +31,7 @@ if __name__ == "__main__":
     
     # Add Gaussian noise
     # Weak formulation is robust to noise, so we can add some visible noise
-    noise_level = 0.05
+    noise_level = 0.01
     x_noisy = x_clean + np.random.normal(0, noise_level, x_clean.shape)
     
     # For data constructor, we pass the noisy data. 
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     # Brussellator involves terms like x, x^2*y. This requires polynomial degree 3.
     library = (
         LibraryBuilder()
-        .add_polynomial(max_degree=3, include_interactions=True)
+        .add_polynomial(max_degree=2, include_interactions=False)
         .add_custom(lambda x, y, p: (x ** p["g1"]) * (y ** p["g2"]),
             lambda x, y, p: f"x^{p['g1']:.2f}*y^{p['g2']:.2f}")
     )
@@ -62,17 +62,22 @@ if __name__ == "__main__":
     # We MUST provide at least one variable to optimize to avoid pymoo crashing.
     # For Weak Formulation, 'window_length' is a key parameter to optimize.
     formulation_bounds = {
-        "window_length": (81, 201), # Must be odd; formulation handles conversion usually or we step carefully
-        "stride": (5, 70),
-        "degree": (1, 5)
+        "window_length": (21, 201), # Must be odd; formulation handles conversion usually or we step carefully
+        "stride": (5, 21),
     }
+    solver_bounds = {
+        "alpha": (.0000001, .001),
+        "threshold": (.000001, 0.1),
+        # "alpha": (0.0001, 1)
+    }
+
 
     optimizer_settings = OptimizerSettings(
         library_bounds={"g1": (0, 5), "g2": (0, 5)},
         formulation_bounds=formulation_bounds,
         n_obj=2,  # Multi-objective: Complexity vs Error
-        n_gen=15, 
-        pop_size=150,
+        n_gen=5, 
+        pop_size=50,
         algorithm="NSGA3"
     )
 
@@ -81,11 +86,19 @@ if __name__ == "__main__":
         solver_name="pysindy",
         regularization="STLSQ",
         regularization_parameters={
-            "fit_intercept": True,
-            "alpha": 0.1,
-            "threshold": 0.25
+            "fit_intercept": False,
+            "alpha": 1,
+            "threshold": 1
         },
-        scale_features=True
+        scale_features=True,
+                ensemble={
+            "enabled": False,
+            "bagging": True,
+            "n_models": 20,
+            "n_subset": 60,
+            "n_candidates_to_drop": 2
+        }
+
     )
 
     # Formulation settings -> WEAK

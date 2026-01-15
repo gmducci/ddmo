@@ -22,22 +22,22 @@ if __name__ == "__main__":
     print("Generating synthetic data using Goodwin Model...")
     # Using default parameters which are set to produce oscillations
     # k1=1, k2=0.2, k3=1, k4=0.15, k5=1, k6=0.1, n=9.5
-    goodwin = GoodwinModel(k1 = 0.1, 
-                           k2 = 0.76, 
-                           k3 = 0.5, 
+    goodwin = GoodwinModel(k1 = 1, 
+                           k2 = 0.2, 
+                           k3 = 1, 
                            k4 = 0.15, 
-                           k5 = 0.2, 
+                           k5 = 1, 
                            k6 = 0.1, 
-                           n = 8)
+                           n = 9.5)
     
     
     
     # Time vector
-    t_start, t_end, dt = 0, 250, 0.15
+    t_start, t_end, dt = 0, 250, 0.08
     t = np.arange(t_start, t_end, dt)
     
     # Initial conditions [x, y, z]
-    x0 = [0.7, 0.7, 1.1]
+    x0 = [0., 1, 1.]
     
     # Integrate dynamics
     x_clean = odeint(goodwin.dynamics, x0, t)
@@ -105,7 +105,7 @@ if __name__ == "__main__":
         formulation_bounds=formulation_bounds,
         solver_bounds=solver_bounds,
         n_obj=2,
-        n_gen=100, 
+        n_gen=10, 
         pop_size=100,
         algorithm="NSGA3"
     )
@@ -126,8 +126,8 @@ if __name__ == "__main__":
         ensemble={
             "enabled": True,
             "bagging": True,
-            "n_models": 200,
-            "n_candidates_to_drop": 5
+            "n_models": 50,
+            "n_candidates_to_drop": 15
         }
     )
 

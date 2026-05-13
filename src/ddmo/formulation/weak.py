@@ -361,8 +361,8 @@ def _build_lhs_weights_with_interpolation(
         # Numerical quadrature on the fine grid (trapezoidal)
         dx_fine = dt / (refinement - 1)
 
-        A_n = -np.trapz(integrand_left, dx=dx_fine)  # coefficient for x_n
-        B_n = -np.trapz(integrand_right, dx=dx_fine)  # coefficient for x_{n+1}
+        A_n = -np.trapezoid(integrand_left, dx=dx_fine)  # coefficient for x_n
+        B_n = -np.trapezoid(integrand_right, dx=dx_fine)  # coefficient for x_{n+1}
 
         # Accumulate these interval contributions into nodal weights
         w[n] += A_n
@@ -435,8 +435,8 @@ def _build_rhs_weights_with_interpolation(
 
         dx_fine = dt / (refinement - 1)
 
-        A_n = np.trapz(integrand_left, dx=dx_fine)
-        B_n = np.trapz(integrand_right, dx=dx_fine)
+        A_n = np.trapezoid(integrand_left, dx=dx_fine)
+        B_n = np.trapezoid(integrand_right, dx=dx_fine)
 
         w[n] += A_n
         w[n + 1] += B_n

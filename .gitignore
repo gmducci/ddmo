@@ -24,6 +24,7 @@ pyrightconfig.json
 
 # OS specific
 .DS_Store
+*.log
 
 # Temporary files
 .ipynb_checkpoints/
@@ -50,3 +51,8 @@ examples/plot_phase_space_comparison.py
 examples/show_grid_mapping.py
 examples/show_job_distribution.py
 examples/submit_parametric_study.sh
+
+lightning_logs/
+**/lightning_logs/
+*.ckpt
+events.out.tfevents.*

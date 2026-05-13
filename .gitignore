@@ -31,3 +31,10 @@ pyrightconfig.json
 
 # Config
 .editorconfig
+
+# Local/postprocessing outputs
+examples/analysis/
+examples/results_cluster/
+examples/results_parametric/
+results_cluster/
+results_parametric/

@@ -58,7 +58,7 @@ if __name__ == "__main__":
         library_bounds=library_bounds,
         formulation_bounds=formulation_bounds,
         n_obj=2,
-        n_gen=15,
+        n_gen=10,
         algorithm="NSGA3",
         pop_size=50,
         # seed = 42

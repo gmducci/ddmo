@@ -1,14 +1,17 @@
 # ddmo
 
-`ddmo` is a data-driven model optimization package tailored for identifying mathematical models of ordinary differential equations from data.
+`ddmo` is a Python package for data-driven model optimization and sparse identification of ordinary differential equation systems from data.
+
+The package is designed around a modular workflow: construct candidate function libraries, choose a strong or weak formulation, configure a sparse regression solver, and optimize model-identification settings with multi-objective optimization.
 
 ## Features
 
-- **Differentiation Module:** Smoothing, noise addition, and derivative estimation through Kalman smoothing, wavelet methods, and Total Variation Regularization.
-- **Library Functions Module:** Fluent API (`LibraryBuilder`) for composing function libraries with polynomials, Hill functions, exponentials, and custom parameterized functions.
-- **Formulation Module:** Strong and weak formulations for sparse regression.
-- **Optimizer Module:** Multi-objective optimization (pymoo) with sparse regression (PySINDy, scikit-learn).
-- **Modular Architecture:** Clean separation of data, formulation, solver, and optimization concerns.
+- **Function-library construction** through a fluent `LibraryBuilder` API.
+- **Strong and weak formulations** for sparse model identification.
+- **Sparse-regression solvers** built around PySINDy and related optimization tools.
+- **Multi-objective optimization** of formulation, solver, and library parameters.
+- **Benchmark examples** for Goodwin-type and Brusselator dynamical systems.
+- **Modular package structure** separating data, formulation, solver, optimization, and utilities.
 
 ## Installation
 
@@ -18,70 +21,68 @@ cd ddmo
 pip install -e .
 ```
 
-## Running Examples
+For development, install optional development dependencies if configured in `pyproject.toml`:
 
 ```bash
-python examples/ex_goodwin_strong.py  # Strong formulation example
-python examples/ex_goodwin_weak.py    # Weak formulation example
+pip install -e ".[dev]"
 ```
 
----
+## Quickstart
 
-## Roadmap: Future Improvements
+Run one of the example workflows from the repository root:
 
-### High Priority
+```bash
+python examples/ex_goodwin_weak.py
+```
 
-| Area | Issue | Recommendation |
-|------|-------|----------------|
-| **Objective Functions** | Hardcoded in optimizer | Allow user-defined objectives via main API without modifying `src/ddmo/optimizer` |
-| **SolverResult Dataclass** | Solver returns fragile tuples | Implement `SolverResult` dataclass for consistent return types |
-| **Error Handling** | Silent failures in solver | Surface errors with informative messages instead of returning `None` |
+or:
 
-### Architecture Improvements
+```bash
+python examples/ex_goodwin_strong.py
+```
 
-| Area | Current State | Target State |
-|------|---------------|--------------|
-| **Named Objectives** | List-based `[mse, dw]` | Dict-based `{"mse": fn, "dw": fn}` for generic handling |
-| **Formulation Parameters** | Mixed in bounds dicts | Separate `library_bounds` and `formulation_bounds` (✅ done) |
-| **Feature Matrix Builder** | Duplicated across solvers | Centralized `FeatureMatrixBuilder` class (✅ done) |
-| **Registry Pattern** | Manual if/else chains | Use registries for solvers, formulations, test functions |
+The main public API can be imported directly from `ddmo`:
 
-### Robustness Enhancements
+```python
+from ddmo import (
+    DataConstructor,
+    FormulationSettings,
+    OptimizerSettings,
+    SolverSettings,
+    identify,
+)
+```
 
-- [ ] **Condition number diagnostics**: Log `np.linalg.cond(Θ)` before regression
-- [ ] **Alternative optimizers**: SR3 is more robust than STLSQ for ill-conditioned problems
-- [ ] **Adaptive thresholding**: Auto-tune threshold based on coefficient distribution
-- [ ] **Cross-validation**: Add CV-based regularization parameter selection
+## Documentation
 
-### Testing & Quality
+Project documentation is available in [`docs/`](docs/):
 
-- [ ] **Unit test coverage**: Expand tests for `FeatureMatrixBuilder`, formulations, solvers
-- [ ] **Integration tests**: End-to-end tests with known benchmark systems
-- [ ] **Deterministic seeding**: Ensure reproducibility via `seed` parameter
-- [ ] **Type hints**: Add comprehensive type annotations throughout
+- [Installation](docs/installation.md)
+- [Quickstart](docs/quickstart.md)
+- [Development guide](docs/development.md)
 
-### Code Quality
+## Development
 
-- [ ] Remove unused imports and dead code paths
-- [ ] Add docstrings to all public APIs
-- [ ] Standardize naming conventions (snake_case everywhere)
-- [ ] Add `py.typed` marker for static analysis
+Run the test suite with:
 
-### Documentation
+```bash
+python -m pytest
+```
 
-- [ ] API reference documentation
-- [ ] Tutorial notebooks for common use cases
-- [ ] Architecture diagram showing module relationships
-
----
+Generated outputs, logs, local analysis folders, checkpoints, and large numerical result files should not be committed to the repository.
 
 ## Contributing
 
-Contributions are **greatly appreciated**.
+Contributions are welcome. Prefer small, focused changes with tests where appropriate.
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/YourFeature`)
-3. Commit your Changes (`git commit -m 'Add some feature'`)
-4. Push to the Branch (`git push origin feature/YourFeature`)
-5. Open a Pull Request
+A typical workflow is:
+
+```bash
+git checkout -b feature/my-change
+python -m pytest
+git commit -m "Describe the change"
+git push origin feature/my-change
+```
+
+Then open a merge request or pull request.
 

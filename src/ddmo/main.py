@@ -25,6 +25,7 @@ Usage:
 """
 
 from collections.abc import Callable
+import logging
 
 import numpy as np
 from pymoo.algorithms.moo.nsga2 import NSGA2
@@ -42,6 +43,7 @@ from ddmo.solver.settings import SolverSettings
 from ddmo.utils.constructors import IdentificationResult, OptimizerSettings
 from ddmo.utils.data_constructor import DataConstructor
 
+logger = logging.getLogger(__name__)
 # Algorithm registry for multi-objective optimization
 ALGORITHM_REGISTRY = {"NSGA2": NSGA2, "NSGA3": NSGA3}
 
@@ -95,7 +97,7 @@ def identify(
         )
 
     formulation_class = FORMULATION_REGISTRY[formulation_settings.formulation]
-    print(f"Using formulation: {formulation_settings.formulation}")
+    logger.info("Using formulation: %s", formulation_settings.formulation)
 
     resolved_formulation = formulation_class(
         data_instance=data_instance,
@@ -131,7 +133,7 @@ def identify(
 
     problem.n_var = optimizer_settings.n_var
     problem.n_obj = optimizer_settings.n_obj
-    print(f"Bounds: xl={xl}, xu={xu}")
+    logger.info("Bounds: xl=%s, xu=%s", xl, xu)
     problem.xl = xl
     problem.xu = xu
 
@@ -168,7 +170,7 @@ def identify(
         algorithm_kwargs["ref_dirs"] = ref_dirs
 
     algorithm = algorithm_class(**algorithm_kwargs)
-    print(f"Using algorithm: {algorithm_name}")
+    logger.info("Using algorithm: %s", algorithm_name)
 
     # Run optimization
     res = minimize(

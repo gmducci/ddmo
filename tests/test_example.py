@@ -75,56 +75,6 @@ class TestDDMO:
         assert res is not None
         assert res.objective_space is not None
 
-    def test_solver_timeout(self, synthetic_data):
-        """
-        Test that the solver correctly handles timeouts during simulation.
-        We force a timeout by using a very short timeout value.
-        """
-        import pysindy as ps
-
-        from ddmo.solver.pysindy_solver import _ManualSINDyModel
-
-        # Dummy library and coefficients
-        lib = ps.CustomLibrary(library_functions=[lambda x: x])
-        lib.fit(np.array([[1.0]]))  # Fit to establish n_features_in_
-
-        coefs = np.array([[-0.5]])  # dx/dt = -0.5x
-        mask = np.array([True])
-
-        model = _ManualSINDyModel(
-            feature_library=lib,
-            coefficients=coefs,
-            optimizer=None,
-            solver_kwargs={"method": "RK45"},
-            active_mask=mask,
-        )
-
-        # Test immediate timeout
-        # Using a timeout of 1 second but requesting a massive simulation
-        with pytest.raises(TimeoutError):
-            # We simulate a large time range with small steps relative to the range
-            # to ensure it takes enough time.
-            # timeout=0 disables alarm in signal.alarm(0), so we use 1 with huge task
-            # if 1s is too long, we can try mocking signal.alarm if needed,
-            # but let's try a real timeout first or mock the handler.
-
-            # Actually, waiting 1s in unit test is slow.
-            # Better to mock signal.alarm or simply rely on "simulate" implementation detail check.
-            # But here we want to verifying the "simulate" method raises TimeoutError.
-
-            # Let's mock time.sleep inside the rhs or make rhs extremely slow?
-            # Or just allow 1s wait.
-
-            # For speed, let's mock signal.signal/alarm behavior?
-            # No, let's just make the function sleep inside the integration step?
-            # solve_ivp calls RHS.
-
-            model.simulate(
-                x0=np.array([1.0]),
-                time_array=np.linspace(0, 1e6, int(1e6)),  # Huge task
-                timeout=1,
-            )
-
     def test_solver_timeout_integration(self, synthetic_data):
         """
         Integration test: verify Pysindy_Solver.solve returns failed SolverResult on timeout.

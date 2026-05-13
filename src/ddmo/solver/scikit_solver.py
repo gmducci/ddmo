@@ -1,4 +1,5 @@
 from typing import Any
+import logging
 
 import numpy as np
 from scipy.integrate import solve_ivp
@@ -209,7 +210,7 @@ class ScikitSolver(BaseSolver):
             )
 
         except Exception as e:
-            print(f"Error during ScikitSolver execution: {e}")
+            logger.exception("Error during ScikitSolver execution.")
             return SolverResult(
                 solution=None,
                 coefficients=None,

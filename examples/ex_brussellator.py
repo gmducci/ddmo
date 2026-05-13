@@ -7,10 +7,7 @@ from scipy.integrate import odeint
 from ddmo import identify
 from ddmo.equations.brussellator import Brussellator
 from ddmo.library_functions import LibraryBuilder
-from ddmo.solver.settings import SolverSettings
-from ddmo.utils.constructors import OptimizerSettings
-from ddmo.utils.data_constructor import DataConstructor
-from ddmo.formulation.formulation_settings import FormulationSettings
+from ddmo import DataConstructor, FormulationSettings, OptimizerSettings, SolverSettings
 
 warnings.filterwarnings("ignore")
 

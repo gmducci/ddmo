@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from ddmo import BENCHMARK_FOLDER, identify
-from ddmo.formulation.formulation_settings import FormulationSettings
+from ddmo import FormulationSettings
 from ddmo.library_functions import LibraryBuilder
-from ddmo.solver.settings import SolverSettings
-from ddmo.utils.constructors import OptimizerSettings
-from ddmo.utils.data_constructor import DataConstructor
+from ddmo import SolverSettings
+from ddmo import OptimizerSettings
+from ddmo import DataConstructor
 
 warnings.filterwarnings("ignore")
 

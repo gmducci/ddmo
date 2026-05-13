@@ -1,4 +1,5 @@
 # optimizer.py
+import logging
 import multiprocessing as mp
 import warnings
 from collections.abc import Callable
@@ -19,6 +20,7 @@ from ddmo.optimizer.objective_functions import (
 from ddmo.solver.result import SolverResult
 from ddmo.utils.data_constructor import DataConstructor
 
+logger = logging.getLogger(__name__)
 # Configure environment
 warnings.filterwarnings("ignore")
 Config.warnings['not_compiled'] = False
@@ -116,7 +118,7 @@ class Optimizer(Problem):
             except Exception:
                 objective_scores[name] = 1e5
 
-        print(f"Objective function values: {objective_scores}")
+        logger.debug("Objective function values: %s", objective_scores)
         return EvaluationResult(
             obj_func_score=objective_scores,
             solution=solver_result.solution,
@@ -188,11 +190,7 @@ class Optimizer(Problem):
             dw_idx = objective_names.index("dw_coefficient")
             dw_stats = obj_arrays[:, dw_idx]
             max_dw_stats = 2 - np.nanmin(dw_stats)
-            print(
-                f"+{'-' * 60}+\n"
-                f"| DW statistic monitoring: Maximum value = {max_dw_stats:.4f} |\n"
-                f"+{'-' * 60}+"
-            )
+            logger.debug("DW statistic monitoring: maximum value = %.4f", max_dw_stats)
             out["dw_coeff"] = dw_stats
 
         # Store output - dynamically stack all objective columns

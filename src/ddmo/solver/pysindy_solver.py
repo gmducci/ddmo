@@ -1,4 +1,5 @@
 from typing import Any
+import logging
 
 import numpy as np
 import pysindy as ps
@@ -15,6 +16,7 @@ from ddmo.utils.array_helpers import (
 from ddmo.utils.data_constructor import DataConstructor
 from pysindy.optimizers import EnsembleOptimizer
 
+logger = logging.getLogger(__name__)
 # Optimizer dispatch logic
 def get_optimizer(optimizer_name: str):
     """
@@ -126,7 +128,11 @@ class Pysindy_Solver(BaseSolver):
             ensemble_optimizer = EnsembleOptimizer(sindy_optimizer, **ensemble_kwargs)
             # Check for n_subset relative to sample size
             if "n_subset" in ensemble_kwargs and ensemble_kwargs["n_subset"] > len(theta):
-                 print(f"Warning: n_subset ({ensemble_kwargs['n_subset']}) > n_samples ({len(theta)}). Adjusting to n_samples.")
+                 logger.warning(
+                    "n_subset (%s) > n_samples (%s). Adjusting to n_samples.",
+                    ensemble_kwargs["n_subset"], 
+                    len(theta)
+                 )
                  ensemble_optimizer.n_subset = len(theta)
             
             target_optimizer = ensemble_optimizer
@@ -193,7 +199,7 @@ class Pysindy_Solver(BaseSolver):
                 feature_matrix=theta,
             )
         except Exception as e:
-            print(f"Error during solver execution: {e}")
+            logger.exception("Error during solver execution.")
             return SolverResult(
                 solution=None,
                 coefficients=None,

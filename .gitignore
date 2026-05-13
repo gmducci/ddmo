@@ -38,3 +38,15 @@ examples/results_cluster/
 examples/results_parametric/
 results_cluster/
 results_parametric/
+
+# Local parametric-study / paper workflow scripts
+examples/CLUSTER_DEPLOYMENT.md
+examples/PARAMETRIC_STUDY_README.md
+examples/analyze_parametric_study.py
+examples/ex_goodwin_parametric_study.py
+examples/plot_3d_trajectories.py
+examples/plot_coefficient_matrices.py
+examples/plot_phase_space_comparison.py
+examples/show_grid_mapping.py
+examples/show_job_distribution.py
+examples/submit_parametric_study.sh

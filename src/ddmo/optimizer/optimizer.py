@@ -1,6 +1,5 @@
 # optimizer.py
 import logging
-import multiprocessing as mp
 import warnings
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -24,7 +23,7 @@ logger = logging.getLogger(__name__)
 # Configure environment
 warnings.filterwarnings("ignore")
 Config.warnings['not_compiled'] = False
-mp.set_start_method("fork", force=True)
+
 
 
 @dataclass

@@ -26,6 +26,15 @@ Usage:
 
 from collections.abc import Callable
 import logging
+import multiprocessing as mp
+import platform
+
+if mp.current_process().name == "MainProcess":
+    _method = "fork" if platform.system() == "Linux" else "spawn"
+    try:
+        mp.set_start_method(_method, force=False)
+    except RuntimeError:
+        pass  # Already set by the caller
 
 import numpy as np
 from pymoo.algorithms.moo.nsga2 import NSGA2

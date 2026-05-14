@@ -153,8 +153,6 @@ class OptimizerSettings:
 
     def __post_init__(self):
         """Validate bounds format."""
-    def __post_init__(self):
-        """Validate bounds format."""
         if self.solver_bounds is None:
             self.solver_bounds = {}
 

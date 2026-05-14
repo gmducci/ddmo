@@ -199,7 +199,7 @@ class Pysindy_Solver(BaseSolver):
                 feature_matrix=theta,
             )
         except Exception as e:
-            logger.exception("Error during solver execution.")
+            logger.debug("Error during solver execution.")
             return SolverResult(
                 solution=None,
                 coefficients=None,

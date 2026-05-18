@@ -71,14 +71,6 @@ x_noisy = np.load(BENCHMARK_FOLDER / "x_train_noise.npy")
 time_array = np.load(BENCHMARK_FOLDER / "time.npy")
 ```
 
-The trajectory is downsampled with:
-
-```python
-SKIP = 10
-```
-
-Downsampling makes the example lighter to run and reduces the number of time points used during the weak-form construction. This also affects the interpretation of weak-form parameters such as `window_length` and `stride`, because those parameters are applied after downsampling.
-
 The helper function returns a dictionary containing:
 
 ```python

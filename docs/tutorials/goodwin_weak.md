@@ -365,13 +365,3 @@ benchmark trajectory data
 to produce an identified dynamical model.
 
 The most important design point is that each part of the workflow is configured explicitly. This makes the example easier to modify, document, and eventually test.
-
-## Next steps
-
-Natural extensions of this tutorial are:
-
-- add symbolic-equation printing for the identified model;
-- add quantitative error metrics;
-- compare the weak formulation with the strong formulation on the same data;
-- add a smoke test that verifies the script runs successfully;
-- add a shorter debugging configuration for continuous integration.

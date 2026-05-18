@@ -3,7 +3,7 @@
 This tutorial explains the example script:
 
 ```text
-examples/ex_goodwin_weak.py
+examples/tutorial_goodwin_weak.py
 ```
 
 The example demonstrates a complete DDMO workflow for identifying a dynamical model from noisy Goodwin oscillator data using the weak formulation.
@@ -26,13 +26,13 @@ This example shows how to:
 From the repository root, run:
 
 ```bash
-PYTHONPATH=src python examples/ex_goodwin_weak.py
+PYTHONPATH=src python examples/tutorial_goodwin_weak.py
 ```
 
 If the package has been installed in editable mode, run:
 
 ```bash
-python examples/ex_goodwin_weak.py
+python examples/tutorial_goodwin_weak.py
 ```
 
 The example prints the selected parameter vectors and displays a plot comparing the identified trajectory with the noisy observed data.
@@ -84,9 +84,9 @@ The helper function returns a dictionary containing:
 ```python
 {
     "x_0": [x_0_train],
-    "x_train": x_noisy[::skip, :],
-    "x_raw": x_noisy[::skip, :],
-    "time_array": time_array[::skip],
+    "x_train": x_noisy[:, :],
+    "x_raw": x_noisy[:, :],
+    "time_array": time_array[:, :],
 }
 ```
 

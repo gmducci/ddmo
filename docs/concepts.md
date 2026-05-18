@@ -1,14 +1,14 @@
 # Concepts
 
-DDMO is a Python package for data-driven model discovery of differential equations.
+`ddmo` is a Python package for data-driven model discovery of differential equations.
 
-The package is designed around a modular identification workflow. Starting from trajectory data, DDMO builds a regression problem, evaluates candidate model terms, fits sparse coefficients, and optionally optimizes over configuration parameters of the identification pipeline.
+The package is designed around a modular identification workflow. Starting from trajectory data, `ddmo` builds a regression problem, evaluates candidate model terms, fits sparse coefficients, and optionally optimizes over configuration parameters of the identification pipeline.
 
 The main goal is to make model discovery workflows configurable, reproducible, and extensible.
 
 ## High-level workflow
 
-A typical DDMO workflow follows this structure:
+A typical `ddmo` workflow follows this structure:
 
 ```text
 raw trajectory data
@@ -38,11 +38,9 @@ This separation is intentional. It allows users to modify one part of the identi
 
 ## Model discovery problem
 
-DDMO addresses problems of the following form:
+``ddmo`` addresses problems of the following form:
 
-```text
 Given observed data from a dynamical system, identify a compact differential-equation model that explains the observed dynamics.
-```
 
 For example, given measurements of a state vector over time,
 
@@ -64,7 +62,7 @@ The discovered model is represented as a sparse combination of candidate functio
 
 The data object represents the observed trajectories used for model identification.
 
-In DDMO, data are constructed before running the identification pipeline. The data layer is responsible for storing quantities such as:
+In `ddmo`, data are constructed before running the identification pipeline. The data layer is responsible for storing quantities such as:
 
 - observed state variables;
 - time information;
@@ -76,9 +74,7 @@ The data object is shared by the rest of the pipeline. Candidate libraries, form
 
 Conceptually, the data layer answers the question:
 
-```text
-What observations are available for model discovery?
-```
+** What observations are available for model discovery? **
 
 ## Candidate libraries
 
@@ -96,19 +92,17 @@ The library defines the search space of possible equations. If a term is not inc
 
 Conceptually, the library layer answers the question:
 
-```text
-Which mathematical terms may appear in the model?
-```
+** Which mathematical terms may appear in the model? **
 
 A good candidate library should be expressive enough to contain the true dynamics, but not so large that the regression problem becomes unnecessarily unstable or difficult to interpret.
 
 ## Formulations
 
-A formulation defines how DDMO transforms trajectory data and candidate library terms into a regression problem.
+A formulation defines how `ddmo` transforms trajectory data and candidate library terms into a regression problem.
 
 The formulation is one of the most important parts of the model discovery pipeline because it determines what the solver actually sees.
 
-DDMO supports different formulation strategies, including strong and weak formulations.
+`ddmo` supports different formulation strategies, including strong and weak formulations.
 
 ### Strong formulation
 
@@ -116,9 +110,7 @@ The strong formulation uses pointwise information about the dynamics.
 
 In a typical strong-form approach, one estimates time derivatives from data and solves a regression problem of the form:
 
-```text
-time derivatives ≈ candidate library × coefficients
-```
+** time derivatives ≈ candidate library × coefficients **
 
 The strong formulation is usually simple and computationally efficient. It is often a natural first choice when the data are clean and derivative estimates are reliable.
 
@@ -159,7 +151,7 @@ Once the formulation has constructed a regression problem, the solver estimates 
 
 In sparse model discovery, the solver should usually favor compact models. This means that many candidate terms should receive zero or near-zero coefficients, leaving only the most relevant terms active.
 
-In DDMO, solver behavior is configured through `SolverSettings`.
+In `ddmo`, solver behavior is configured through `SolverSettings`.
 
 A typical solver configuration may look like this:
 
@@ -181,15 +173,13 @@ In this configuration:
 - `solver_name` selects the solver backend;
 - `regularization` selects the sparse-regression optimizer used by that backend;
 - `regularization_parameters` are forwarded to the selected optimizer;
-- `scale_features` controls whether DDMO applies feature scaling before fitting.
+- `scale_features` controls whether `ddmo` applies feature scaling before fitting.
 
 For the PySINDy backend, `regularization="STLSQ"` selects the STLSQ optimizer. Parameters such as `threshold`, `alpha`, and `normalize_columns` are passed to the corresponding PySINDy optimizer.
 
 Conceptually, the solver layer answers the question:
 
-```text
-Given a regression problem, which candidate terms should be active in the model?
-```
+** Given a regression problem, which candidate terms should be active in the model? **
 
 ## Feature scaling
 
@@ -197,11 +187,11 @@ Feature scaling can have a significant effect on sparse regression.
 
 Candidate library terms may have very different numerical scales. For example, a constant term, a linear term, and a high-degree polynomial term may differ by several orders of magnitude. Without scaling, the solver may favor or penalize terms partly because of their numerical magnitude rather than their explanatory value.
 
-In DDMO, `scale_features=True` enables DDMO-level scaling of the regression problem before fitting. The fitted coefficients are then transformed back to the original scale.
+In `ddmo`, `scale_features=True` enables `ddmo`-level scaling of the regression problem before fitting. The fitted coefficients are then transformed back to the original scale.
 
 This is separate from optimizer-specific normalization options such as `normalize_columns` in STLSQ.
 
-For example, the following configuration means that DDMO applies its own feature scaling, while the STLSQ optimizer does not apply additional column normalization internally:
+For example, the following configuration means that `ddmo` applies its own feature scaling, while the STLSQ optimizer does not apply additional column normalization internally:
 
 ```python
 solver_settings = SolverSettings(
@@ -220,7 +210,7 @@ This distinction is important:
 
 ```text
 scale_features
-    DDMO-level preprocessing before sparse regression.
+    `ddmo`-level preprocessing before sparse regression.
 
 normalize_columns
     optimizer-level behavior inside the selected sparse-regression method.
@@ -228,7 +218,7 @@ normalize_columns
 
 ## Optimization
 
-DDMO can optimize over parameters of the identification pipeline.
+`ddmo` can optimize over parameters of the identification pipeline.
 
 Instead of fitting a single fixed model, the optimizer evaluates multiple candidate configurations. These configurations may differ in formulation parameters, library parameters, or solver parameters.
 
@@ -242,17 +232,15 @@ For example, the optimizer may search over:
 
 Conceptually, the optimization layer answers the question:
 
-```text
-Which configuration of the model discovery pipeline gives the best trade-off between accuracy, sparsity, and complexity?
-```
+** Which configuration of the model discovery pipeline gives the best trade-off between accuracy, sparsity, and complexity? **
 
 This is especially useful because model discovery often involves competing objectives. A very accurate model may be too complex, while a very sparse model may underfit the data.
 
-DDMO is designed to support this trade-off explicitly.
+`ddmo` is designed to support this trade-off explicitly.
 
 ## Configuration layers
 
-DDMO separates configuration into different settings objects.
+`ddmo` separates configuration into different settings objects.
 
 The exact structure may evolve, but the core idea is:
 
@@ -277,7 +265,7 @@ This separation improves readability and reproducibility. A complete experiment 
 
 ## Outputs
 
-The output of a DDMO workflow depends on the specific identification and optimization setup, but it generally includes information such as:
+The output of a `ddmo` workflow depends on the specific identification and optimization setup, but it generally includes information such as:
 
 - the discovered model coefficients;
 - the selected active terms;
@@ -292,7 +280,7 @@ For scientific machine learning workflows, this is important because the identif
 
 ## How the pieces fit together
 
-A minimal DDMO workflow can be understood as follows:
+A minimal `ddmo` workflow can be understood as follows:
 
 ```python
 # 1. Construct or load data
@@ -339,7 +327,7 @@ data + configurable pipeline + parameter bounds → optimized identified model
 
 ## Design principles
 
-DDMO is organized around a few design principles.
+`ddmo` is organized around a few design principles.
 
 ### Modularity
 
@@ -359,18 +347,4 @@ The final model should be understandable as an equation or sparse combination of
 
 ### Research-to-software transition
 
-DDMO is intended to support scientific model discovery while following software-engineering practices that make the code usable by others: clear configuration, documented abstractions, examples, and tests.
-
-## Summary
-
-The central idea of DDMO is to treat data-driven model discovery as a configurable pipeline.
-
-```text
-Data define the observations.
-Libraries define the possible terms.
-Formulations define the regression problem.
-Solvers select the active terms.
-Optimization searches over pipeline configurations.
-```
-
-This structure makes the package suitable for experimenting with different model discovery strategies while keeping the workflow explicit and reproducible.
+`ddmo` is intended to support scientific model discovery while following software-engineering practices that make the code usable by others: clear configuration, documented abstractions, examples, and tests.

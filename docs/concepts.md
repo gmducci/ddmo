@@ -136,6 +136,8 @@ Weak formulations usually introduce additional configuration choices, such as:
 - the stride between windows;
 - the polynomial degree or shape parameters of the test functions.
 
+Such additional configurations, are often parameters dependent. Such parameters fine tuning can still be handled by the `ddmo` optimization layer. 
+
 The weak formulation is often appropriate when:
 
 - the data are noisy;

@@ -74,7 +74,7 @@ The data object is shared by the rest of the pipeline. Candidate libraries, form
 
 Conceptually, the data layer answers the question:
 
-** What observations are available for model discovery? **
+**What observations are available for model discovery?**
 
 ## Candidate libraries
 
@@ -92,7 +92,7 @@ The library defines the search space of possible equations. If a term is not inc
 
 Conceptually, the library layer answers the question:
 
-** Which mathematical terms may appear in the model? **
+**Which mathematical terms may appear in the model?**
 
 A good candidate library should be expressive enough to contain the true dynamics, but not so large that the regression problem becomes unnecessarily unstable or difficult to interpret.
 
@@ -110,7 +110,7 @@ The strong formulation uses pointwise information about the dynamics.
 
 In a typical strong-form approach, one estimates time derivatives from data and solves a regression problem of the form:
 
-** time derivatives ≈ candidate library × coefficients **
+**time derivatives ≈ candidate library × coefficients**
 
 The strong formulation is usually simple and computationally efficient. It is often a natural first choice when the data are clean and derivative estimates are reliable.
 
@@ -179,7 +179,7 @@ For the PySINDy backend, `regularization="STLSQ"` selects the STLSQ optimizer. P
 
 Conceptually, the solver layer answers the question:
 
-** Given a regression problem, which candidate terms should be active in the model? **
+**Given a regression problem, which candidate terms should be active in the model?**
 
 ## Feature scaling
 
@@ -232,7 +232,7 @@ For example, the optimizer may search over:
 
 Conceptually, the optimization layer answers the question:
 
-** Which configuration of the model discovery pipeline gives the best trade-off between accuracy, sparsity, and complexity? **
+**Which configuration of the model discovery pipeline gives the best trade-off between accuracy, sparsity, and complexity?**
 
 This is especially useful because model discovery often involves competing objectives. A very accurate model may be too complex, while a very sparse model may underfit the data.
 
@@ -306,7 +306,7 @@ solver_settings = SolverSettings(
 
 # 5. Run model identification
 result = identify(
-    data_instance=data_instance,
+    data_instance=data_instance,ƒ
     formulation_settings=formulation_settings,
     library_settings=library_settings,
     solver_settings=solver_settings,

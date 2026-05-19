@@ -18,11 +18,16 @@ DDMO. For the default synthetic system, the expected values are close to:
 
 Run from the repository root with:
 
-    PYTHONPATH=src python examples/ex_custom_library_brusselator.py
+    PYTHONPATH=src python examples/tutorial_custom_library_brusselator.py
 
-NOTE: It is important for a proper reconstruction to have at least 2 different 
-trajectories with two different initial conditions. This prevents overfitting
-of a single trajectory.
+or after installing the package in editable mode:
+
+    python examples/tutorial_custom_library_brusselator.py
+
+This compact tutorial trains on one synthetic trajectory. For a real
+identification study, use several trajectories or validation initial
+conditions to check that the discovered model generalizes beyond the training
+path.
 """
 
 from __future__ import annotations
@@ -83,7 +88,12 @@ def generate_data(
     noise_level: float = 0.1,
     seed: int = 42,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, list[float]]:
-    """Generate synthetic Brusselator data and exact derivatives."""
+    """Generate noisy observations and clean-system derivatives.
+
+    The weak formulation does not require users to estimate derivatives from
+    noisy data. The exact derivative array is included here because synthetic
+    examples can provide it and some solver/objective paths may consume it.
+    """
     rng = np.random.default_rng(seed)
 
     system = Brussellator(a=a, b=b, alpha=alpha, beta=beta)
@@ -134,12 +144,19 @@ def make_plot(
     plt.show()
 
 
-def main() -> None:
-    """Run DDMO with a custom parameterized library function."""
-    time, x_train, x_dot, x0 = generate_data(noise_level=0.1, seed=42)
-    library = build_custom_library()
+def build_training_data(
+    time: np.ndarray,
+    x_train: np.ndarray,
+    x_dot: np.ndarray,
+    x0: list[float],
+    library: LibraryBuilder,
+) -> DataConstructor:
+    """Create the DDMO data container.
 
-    data = DataConstructor(
+    `library.build` is passed as a callable because DDMO rebuilds the candidate
+    library for each optimizer proposal of the library parameters.
+    """
+    return DataConstructor(
         x_train=x_train,
         time_array=time,
         x_dot=x_dot,
@@ -148,7 +165,12 @@ def main() -> None:
         x_raw=x_train,
     )
 
-    optimizer_settings = OptimizerSettings(
+
+def build_optimizer_settings() -> OptimizerSettings:
+    """Configure the search over library, weak-form, and solver parameters."""
+    # These names must match the keys read inside the custom function:
+    # params["g1"] and params["g2"].
+    return OptimizerSettings(
         library_bounds={
             "g1": (1.0, 3.0),
             "g2": (0.5, 2.0),
@@ -156,7 +178,7 @@ def main() -> None:
         formulation_bounds={
             "degree": (2, 7),
             "stride": (10, 100),
-            "window_length": (30, 240) ,
+            "window_length": (30, 240),
         },
         solver_bounds={
             "threshold": (0.001, 0.2),
@@ -170,7 +192,10 @@ def main() -> None:
         verbose=True,
     )
 
-    solver_settings = SolverSettings(
+
+def build_solver_settings() -> SolverSettings:
+    """Configure the sparse-regression backend."""
+    return SolverSettings(
         solver_name="pysindy",
         regularization="STLSQ",
         regularization_parameters={
@@ -180,13 +205,27 @@ def main() -> None:
         scale_features=True,
     )
 
-    formulation_settings = FormulationSettings(
+
+def build_formulation_settings() -> FormulationSettings:
+    """Configure the initial weak formulation used before optimization."""
+    return FormulationSettings(
         formulation="weak",
         test_function="PolynomialWindow",
         degree=2,
         window_length=65,
         stride=50,
     )
+
+
+def main() -> None:
+    """Run DDMO with a custom parameterized library function."""
+    time, x_train, x_dot, x0 = generate_data(noise_level=0.1, seed=42)
+    library = build_custom_library()
+    data = build_training_data(time, x_train, x_dot, x0, library)
+
+    optimizer_settings = build_optimizer_settings()
+    solver_settings = build_solver_settings()
+    formulation_settings = build_formulation_settings()
 
     result = identify(
         data_instance=data,
@@ -196,6 +235,7 @@ def main() -> None:
     )
 
     print("\nOptimized library/solver parameters:")
+    print("Each row is one selected parameter vector from the Pareto front.")
     print(result.alphas)
 
     if len(result.solutions) > 0:

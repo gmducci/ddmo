@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
@@ -16,5 +17,12 @@ class DataConstructor:
     number_initial_conditions: int = field(init=False)
 
     def __post_init__(self):
-        self.dimension = self.x_train.shape[1]
+        if isinstance(self.x_train, np.ndarray):
+            self.dimension = self.x_train.shape[-1]
+        elif isinstance(self.x_train, Sequence) and not isinstance(
+            self.x_train, (str, bytes)
+        ):
+            self.dimension = np.asarray(self.x_train[0]).shape[-1]
+        else:
+            self.dimension = np.asarray(self.x_train).shape[-1]
         self.number_initial_conditions = len(self.x_0)

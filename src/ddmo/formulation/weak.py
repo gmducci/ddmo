@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Any
 
@@ -48,14 +48,23 @@ class WeakFormulation(Formulation):
         self.time_array = self.data_instance.time_array
         self.x_train = self.data_instance.x_train
 
+        self.x_train_blocks = _as_trajectory_blocks(self.x_train)
+
         # Basic shape checks
         if self.time_array.ndim != 1:
             raise ValueError("time_array must be 1-D.")
-        if self.x_train.ndim != 2:
-            raise ValueError("x_train must be 2-D (M_time, n_var).")
+        if any(block.shape[0] != self.time_array.shape[0] for block in self.x_train_blocks):
+            raise ValueError(
+                "Each trajectory in x_train must have the same length as time_array."
+            )
+
+        var_counts = {block.shape[1] for block in self.x_train_blocks}
+        if len(var_counts) != 1:
+            raise ValueError("All trajectories in x_train must have the same number of variables.")
 
         self.dt = float(self.time_array[1] - self.time_array[0])
-        self.N = self.x_train.shape[0]
+        self.N = self.x_train_blocks[0].shape[0]
+        self.var_numbers = self.x_train_blocks[0].shape[1]
 
         # ------------------------------------------------------------------
         # Build initial test-family from the registry
@@ -160,15 +169,23 @@ class WeakFormulation(Formulation):
         )
 
         try:
-            centers = family.grid_centers(self.N)
+            centers_by_trajectory = [
+                np.asarray(family.grid_centers(block.shape[0]), dtype=int)
+                for block in self.x_train_blocks
+            ]
         except AttributeError as exc:
             raise AttributeError(
                 "test_family must implement `grid_centers(M: int) -> np.ndarray` "
                 "to provide window centres."
             ) from exc
 
-        self.centers = np.asarray(centers, dtype=int)
-        self.M = self.centers.shape[0]
+        self.centers_by_trajectory = centers_by_trajectory
+        self.centers = (
+            np.concatenate(centers_by_trajectory)
+            if centers_by_trajectory
+            else np.array([], dtype=int)
+        )
+        self.M = sum(centers.shape[0] for centers in centers_by_trajectory)
 
     # ------------------------------------------------------------------
     # Left-hand side (unchanged integral logic)
@@ -181,14 +198,16 @@ class WeakFormulation(Formulation):
             new_family = self.family_builder(param_dict)
             self._configure_from_family(new_family)
 
-        var_numbers = data_instance.x_train.shape[-1]
-        B = np.zeros((self.M, var_numbers))
+        blocks = _as_trajectory_blocks(data_instance.x_train)
+        lhs_blocks = []
 
-        for i in range(var_numbers):
-            xi = data_instance.x_train[:, i]
-            B[:, i] = _sliding_integral(xi, self.centers, self.w_lhs)
+        for block, centers in zip(blocks, self.centers_by_trajectory):
+            B = np.zeros((centers.shape[0], self.var_numbers))
+            for i in range(self.var_numbers):
+                B[:, i] = _sliding_integral(block[:, i], centers, self.w_lhs)
+            lhs_blocks.append(B)
 
-        return B
+        return np.vstack(lhs_blocks)
 
     # ------------------------------------------------------------------
     # Right-hand side (unchanged integral logic)
@@ -211,7 +230,8 @@ class WeakFormulation(Formulation):
         raw_names = [name for _, name in named_funcs]
         function_names = [ensure_callable_name(name) for name in raw_names]
 
-        x_matrix = stack_state_matrix(data_instance.x_train)
+        trajectory_blocks = _as_trajectory_blocks(data_instance.x_train)
+        x_matrix = stack_state_matrix(trajectory_blocks)
 
         lib_custom = ps.CustomLibrary(
             library_functions=functions,
@@ -222,13 +242,17 @@ class WeakFormulation(Formulation):
         colmask = ~np.isnan(theta).any(axis=0)
 
         theta = theta[:, colmask]
-        rhs = np.zeros((self.M, theta.shape[1]))
+        theta_blocks = _split_stacked_matrix(theta, trajectory_blocks)
+        rhs_blocks = []
 
-        for j, G in enumerate(theta.T):
-            rhs[:, j] = _sliding_integral(G, self.centers, self.w_rhs)
+        for theta_block, centers in zip(theta_blocks, self.centers_by_trajectory):
+            rhs = np.zeros((centers.shape[0], theta.shape[1]))
+            for j, G in enumerate(theta_block.T):
+                rhs[:, j] = _sliding_integral(G, centers, self.w_rhs)
+            rhs_blocks.append(rhs)
 
         return {
-            "theta": rhs,
+            "theta": np.vstack(rhs_blocks),
             "library": lib_custom,
             "opt_vars": opt_vars,
             "named_funcs": named_funcs,
@@ -239,6 +263,38 @@ class WeakFormulation(Formulation):
 # ----------------------------------------------------------------------
 # Helpers (unchanged)
 # ----------------------------------------------------------------------
+def _as_trajectory_blocks(values: Any) -> list[np.ndarray]:
+    """Normalize trajectory data to a list of 2-D arrays."""
+    if isinstance(values, np.ndarray):
+        if values.ndim == 2:
+            return [np.asarray(values)]
+        if values.ndim == 3:
+            return [np.asarray(values[i]) for i in range(values.shape[0])]
+        raise ValueError("x_train must be 2-D or 3-D for weak formulation.")
+
+    if isinstance(values, Sequence) and not isinstance(values, (str, bytes)):
+        blocks = [np.asarray(block) for block in values]
+        if not blocks:
+            raise ValueError("x_train must contain at least one trajectory.")
+        if any(block.ndim != 2 for block in blocks):
+            raise ValueError("Each trajectory in x_train must be 2-D.")
+        return blocks
+
+    array = np.asarray(values)
+    if array.ndim == 2:
+        return [array]
+    raise ValueError("x_train must be 2-D or a sequence of 2-D trajectories.")
+
+
+def _split_stacked_matrix(
+    stacked: np.ndarray,
+    trajectory_blocks: list[np.ndarray],
+) -> list[np.ndarray]:
+    lengths = [block.shape[0] for block in trajectory_blocks]
+    split_points = np.cumsum(lengths)[:-1]
+    return list(np.split(stacked, split_points, axis=0))
+
+
 def _extract_rhs_inputs(*args: Any, **kwargs: Any) -> tuple[Any, tuple[float, ...]]:
     data_instance = None
     opt_vars = None

@@ -140,7 +140,13 @@ def plot_solution(result, observed: np.ndarray) -> None:
     plt.show()
 
 
-def main() -> None:
+def run() -> None:
+    """Run the Goodwin weak-form tutorial.
+
+    This function contains the same code previously guarded by
+    ``if __name__ == '__main__'`` so the example is easier to read and
+    can be imported and executed programmatically (e.g. from a notebook).
+    """
     data = load_goodwin_benchmark()
     library = build_candidate_library()
     training_data = build_training_data(data, library)
@@ -160,7 +166,3 @@ def main() -> None:
     print(result.alphas)
 
     plot_solution(result, observed=data["x_raw"])
-
-
-if __name__ == "__main__":
-    main()

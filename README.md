@@ -32,13 +32,13 @@ pip install -e ".[dev]"
 Run one of the example workflows from the repository root:
 
 ```bash
-python examples/ex_goodwin_weak.py
+python examples/tutorial_goodwin_weak.py
 ```
 
 or:
 
 ```bash
-python examples/ex_goodwin_strong.py
+python examples/tutorial_custom_library_brusselator.py
 ```
 
 The main public API can be imported directly from `ddmo`:
@@ -85,4 +85,3 @@ git push origin feature/my-change
 ```
 
 Then open a merge request or pull request.
-

@@ -10,11 +10,8 @@ Example:
         .add_custom(lambda x, p: x**p["gamma_3"], "x^γ₃")
     )
 
-    # Use in DataConstructor
-    training_data = DataConstructor(
-        library_object=library.build,
-        ...
-    )
+    # Pass to identify alongside data/settings:
+    identify(..., library_object=library.build)
 """
 
 from collections.abc import Callable
@@ -56,11 +53,8 @@ class LibraryBuilder:
             .add_hill(exponent_param="gamma_1")
         )
 
-        # Use in DataConstructor
-        training_data = DataConstructor(
-            library_object=library.build,
-            ...
-        )
+        # Pass to identify alongside data/settings:
+        identify(..., library_object=library.build)
 
         # Called by optimizer with current params:
         # library.build({"gamma_1": 9.0}) -> [(func, name), ...]

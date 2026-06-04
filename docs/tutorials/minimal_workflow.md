@@ -1,10 +1,15 @@
-# Minimal Identification Workflow
+# Minimal workflow
 
-This tutorial outlines the main objects used in a typical `ddmo` identification workflow.
+This tutorial shows the smallest useful `ddmo` workflow. The main idea is:
 
-The goal is to show how the package components fit together, rather than to reproduce a full scientific experiment.
+```text
+library + data -> formulation -> solver -> optimizer -> identify
+```
 
-## 1. Import the public API
+Each object has one job. Build them in that order, then pass them to
+`identify`.
+
+## 1. Imports
 
 ```python
 from ddmo import (
@@ -17,85 +22,117 @@ from ddmo import (
 from ddmo.library_functions import LibraryBuilder
 ```
 
-## 2. Prepare trajectory data
+## 2. Candidate library
 
-A `DataConstructor` instance collects the data needed by the identification workflow:
+The library defines which terms the discovered model may use.
+
+```python
+library = LibraryBuilder().add_polynomial(max_degree=2)
+```
+
+For a parameterized library, give parameter names that can later be optimized:
+
+```python
+library = (
+    LibraryBuilder()
+    .add_polynomial(max_degree=2)
+    .add_hill(exponent_param="gamma_1")
+)
+```
+
+## 3. Data
+
+`DataConstructor` stores only trajectory data, time points, and initial
+conditions. The candidate library is passed later to `identify`.
+
+```python
+data = DataConstructor(
+    x_train=x_train,
+    time_array=time_array,
+    x_0=[x_train[0]],
+    x_raw=x_train,
+)
+```
+
+For the strong formulation, also pass derivative data:
 
 ```python
 data = DataConstructor(
     x_train=x_train,
     time_array=time_array,
     x_dot=x_dot,
-    library_object=library.build,
     x_0=[x_train[0]],
     x_raw=x_train,
 )
 ```
 
-The expected inputs are:
+## 4. Formulation
 
-- `x_train`: training trajectory data;
-- `time_array`: time points associated with the trajectory;
-- `x_dot`: derivative estimates or ground-truth derivatives;
-- `library_object`: candidate function library;
-- `x_0`: initial condition used for simulation;
-- `x_raw`: raw trajectory data, usually before preprocessing.
+The formulation decides how the regression problem is built from the data.
 
-## 3. Define a candidate library
-
-Candidate functions are constructed with `LibraryBuilder`:
-
-```python
-library = (
-    LibraryBuilder()
-    .add_polynomial(max_degree=2)
-)
-```
-
-The library determines which terms can appear in the identified dynamical system.
-
-## 4. Configure the formulation
-
-For a weak-formulation workflow:
+Use the weak formulation when you do not want to rely on pointwise derivative
+estimates:
 
 ```python
 formulation_settings = FormulationSettings(
     formulation="weak",
     test_function="PolynomialWindow",
     degree=2,
-    window_length=11,
-    stride=1,
+    window_length=65,
+    stride=50,
 )
 ```
 
-The formulation controls how the regression problem is constructed from the data.
+Use the strong formulation when reliable derivatives are available:
 
-## 5. Configure the solver
+```python
+formulation_settings = FormulationSettings(formulation="strong")
+```
+
+## 5. Solver
+
+The solver estimates sparse coefficients for the candidate terms.
 
 ```python
 solver_settings = SolverSettings(
     solver_name="pysindy",
     regularization="STLSQ",
-    regularization_parameters={"threshold": 0.01, "alpha": 0.05},
+    regularization_parameters={
+        "threshold": 0.01,
+        "alpha": 0.05,
+    },
+    scale_features=True,
 )
 ```
 
-The solver controls the sparse-regression backend and regularization parameters.
+## 6. Optimizer
 
-## 6. Configure the optimizer
+The optimizer searches over selected library, formulation, and solver
+parameters.
 
 ```python
 optimizer_settings = OptimizerSettings(
-    formulation_bounds={"window_length": (5, 20), "stride": (1.0, 2.0)},
-    library_bounds={},
+    library_bounds={"gamma_1": (5.0, 10.0)},
+    formulation_bounds={
+        "window_length": (40, 140),
+        "stride": (10, 50),
+    },
+    solver_bounds={"threshold": (0.001, 0.2)},
     n_obj=2,
-    n_gen=2,
-    pop_size=5,
-    algorithm="NSGA2",
+    n_gen=10,
+    pop_size=40,
+    algorithm="NSGA3",
 )
 ```
 
-The optimizer searches over selected formulation and library parameters.
+Bounds use this format:
+
+```python
+{"parameter_name": (lower_bound, upper_bound)}
+```
+
+If a parameter should stay fixed, leave it out of the bounds and set it in the
+corresponding settings object instead.
 
 ## 7. Run identification
 
@@ -105,17 +142,28 @@ result = identify(
     optimizer_settings=optimizer_settings,
     solver_settings=solver_settings,
     formulation_settings=formulation_settings,
+    library_object=library.build,
 )
 ```
 
-The returned result contains optimization outputs, objective-space values, and model-identification results.
+The result contains the selected optimizer vectors, coefficient matrices, and
+simulated solutions:
 
-## Next steps
-
-For executable examples, see:
-
-```bash
-python examples/ex_goodwin_weak.py
-python examples/ex_goodwin_strong.py
+```python
+print(result.alphas)
+print(result.coeff_matrices)
 ```
 
+## Complete examples
+
+Run a tutorial script from the repository root:
+
+```bash
+PYTHONPATH=src python examples/tutorial_goodwin_weak.py
+```
+
+After installing the package in editable mode, `PYTHONPATH=src` is not needed:
+
+```bash
+python examples/tutorial_goodwin_weak.py
+```

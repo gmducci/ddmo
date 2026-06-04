@@ -41,6 +41,7 @@ class WeakFormulation(Formulation):
 
     data_instance: DataConstructor
     class_attributes: dict[str, Any]
+    library_object: Callable | None = None
     integral_solver: IntegralSolver | None = None
     family_builder: FamilyBuilder | None = None
 
@@ -222,10 +223,14 @@ class WeakFormulation(Formulation):
 
         # Pass dict to library function (safer than positional list)
         # If param_dict not available, fall back to list for backward compat
+        library_object = kwargs.get("library_object", self.library_object)
+        if library_object is None:
+            msg = "WeakFormulation.get_rhs requires a candidate library callable."
+            raise ValueError(msg)
         if param_dict is not None:
-            named_funcs = data_instance.library_object(param_dict)
+            named_funcs = library_object(param_dict)
         else:
-            named_funcs = data_instance.library_object([*opt_vars])
+            named_funcs = library_object([*opt_vars])
         functions = [func for func, _ in named_funcs]
         raw_names = [name for _, name in named_funcs]
         function_names = [ensure_callable_name(name) for name in raw_names]

@@ -50,14 +50,15 @@ def get_optimizer(optimizer_name: str):
 class Pysindy_Solver(BaseSolver):
     def __init__(
         self, data_instance: DataConstructor, optimizer: str, solver_parameters: dict,
-        scale_features: bool = True, ensemble_settings: dict | None = None
+        scale_features: bool = True, ensemble_settings: dict | None = None,
+        library_object=None,
     ):
         self.data_instance = data_instance
         self.solver_parameters = solver_parameters
         self.optimizer = optimizer
         self.scale_features = scale_features
         self.ensemble_settings = ensemble_settings
-        self.builder = FeatureMatrixBuilder(data_instance)
+        self.builder = FeatureMatrixBuilder(data_instance, library_object=library_object)
 
     def configure(self, **kwargs):
         self.solver_parameters.update(kwargs)

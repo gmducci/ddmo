@@ -99,11 +99,13 @@ class FeatureMatrixBuilder:
         self,
         data_instance: DataConstructor,
         *,
+        library_object: Callable | None = None,
         formulation: str = "strong",
         weak_options: Optional[Mapping[str, Any]] = None,
         weak_library_factory: Optional[WeakLibraryFactory] = None,
     ):
         self.data_instance = data_instance
+        self.library_object = library_object
         self.formulation = formulation.lower()
         self.weak_options: dict[str, Any] = dict(weak_options or {})
         self.weak_library_factory = weak_library_factory
@@ -213,7 +215,9 @@ class FeatureMatrixBuilder:
         return library
 
     def _extract_library_components(self, opt_vars: Tuple[float, ...]) -> Tuple[list, list]:
-        named_funcs = self.data_instance.library_object(list(opt_vars))
+        if self.library_object is None:
+            raise ValueError("FeatureMatrixBuilder requires a candidate library callable.")
+        named_funcs = self.library_object(list(opt_vars))
         functions = [func for func, _ in named_funcs]
         function_names = [name for _, name in named_funcs]
         return functions, function_names

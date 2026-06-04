@@ -20,7 +20,6 @@ def test_compute_mse_slices_stacked_solution_by_trajectory_length():
     data = DataConstructor(
         x_train=x_raw,
         time_array=np.arange(3, dtype=float),
-        library_object=lambda _: [],
         x_0=[x_raw[0, 0], x_raw[1, 0]],
         x_raw=x_raw,
     )

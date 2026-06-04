@@ -13,20 +13,24 @@ def simple_data_instance():
     x_train = np.array([[1.0, 2.0], [2.0, 3.0], [3.0, 4.0]])
     x_dot = np.array([[0.1, 0.2], [0.1, 0.2], [0.1, 0.2]])
 
-    def library_object(params):
+    return DataConstructor(
+        x_train=x_train,
+        time_array=np.array([0.0, 1.0, 2.0]),
+        x_0=[x_train[0]],
+        x_raw=x_train,
+        x_dot=x_dot,
+    )
+
+
+@pytest.fixture
+def library_object():
+    def build(params):
         return [
             (lambda x: x, "x"),
             (lambda x: x**2, "x_sq"),
         ]
 
-    return DataConstructor(
-        x_train=x_train,
-        time_array=np.array([0.0, 1.0, 2.0]),
-        library_object=library_object,
-        x_0=[x_train[0]],
-        x_raw=x_train,
-        x_dot=x_dot,
-    )
+    return build
 
 
 def test_get_lhs_falls_back_to_x_dot(simple_data_instance):
@@ -50,8 +54,8 @@ def test_get_lhs_requires_data_instance():
         formulation.get_lhs()
 
 
-def test_get_rhs_returns_theta_and_library(simple_data_instance):
-    formulation = StrongFormulation()
+def test_get_rhs_returns_theta_and_library(simple_data_instance, library_object):
+    formulation = StrongFormulation(library_object=library_object)
     result = formulation.get_rhs(simple_data_instance, (1.0,))
 
     assert isinstance(result, dict)

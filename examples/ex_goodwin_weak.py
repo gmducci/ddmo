@@ -35,7 +35,6 @@ if __name__ == "__main__":
         x_train=x_raw[::skip, :],
         time_array=time_array[::skip],
         # x_dot=x_dot_hat[::skip, :],
-        library_object=library.build,  # Pass the build method
         x_0=x_0,
         x_raw=x_raw[::skip, :],
     )
@@ -89,6 +88,7 @@ if __name__ == "__main__":
         optimizer_settings=optimizer_settings,
         solver_settings=solver_settings,
         formulation_settings=formulation_settings,
+        library_object=library.build,
     )
 
     # Access results via named attributes

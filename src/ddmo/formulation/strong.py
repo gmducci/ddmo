@@ -24,6 +24,7 @@ class StrongFormulation(Formulation):
 
     data_instance: DataConstructor | None = None
     class_attributes: dict[str, Any] | None = None
+    library_object: Builder | None = None
     lhs_builder: Builder | None = None
     rhs_builder: Builder | None = None
 
@@ -51,10 +52,14 @@ class StrongFormulation(Formulation):
 
         # Pass dict to library function (safer than positional list)
         param_dict = kwargs.get("opt_param_dict", None)
+        library_object = kwargs.get("library_object", self.library_object)
+        if library_object is None:
+            msg = "StrongFormulation.get_rhs requires a candidate library callable."
+            raise ValueError(msg)
         if param_dict is not None:
-            named_funcs = data_instance.library_object(param_dict)
+            named_funcs = library_object(param_dict)
         else:
-            named_funcs = data_instance.library_object([*opt_vars])
+            named_funcs = library_object([*opt_vars])
         functions = [func for func, _ in named_funcs]
         raw_names = [name for _, name in named_funcs]
         function_names = [ensure_callable_name(name) for name in raw_names]

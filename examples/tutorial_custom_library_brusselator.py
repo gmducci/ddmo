@@ -144,105 +144,74 @@ def make_plot(
     plt.show()
 
 
-def build_training_data(
-    time: np.ndarray,
-    x_train: np.ndarray,
-    x_dot: np.ndarray,
-    x0: list[float],
-    library: LibraryBuilder,
-) -> DataConstructor:
-    """Create the DDMO data container.
+time, x_train, x_dot, x0 = generate_data(noise_level=0.1, seed=42)
+library = build_custom_library()
 
-    `library.build` is passed as a callable because DDMO rebuilds the candidate
-    library for each optimizer proposal of the library parameters.
-    """
-    return DataConstructor(
-        x_train=x_train,
-        time_array=time,
-        x_dot=x_dot,
-        library_object=library.build,
-        x_0=[x0],
-        x_raw=x_train,
-    )
+data = DataConstructor(
+    x_train=x_train,
+    time_array=time,
+    x_dot=x_dot,
+    x_0=[x0],
+    x_raw=x_train,
+)
 
+# These names must match the keys read inside the custom function:
+# params["g1"] and params["g2"].
+optimizer_settings = OptimizerSettings(
+    library_bounds={
+        "g1": (1.0, 3.0),
+        "g2": (0.5, 2.0),
+    },
+    formulation_bounds={
+        "degree": (2, 7),
+        "stride": (10, 100),
+        "window_length": (30, 240),
+    },
+    solver_bounds={
+        "threshold": (0.001, 0.2),
+        "alpha": (0.0001, 0.1),
+    },
+    n_obj=2,
+    n_gen=15,
+    pop_size=40,
+    algorithm="NSGA3",
+    seed=42,
+    verbose=True,
+)
 
-def build_optimizer_settings() -> OptimizerSettings:
-    """Configure the search over library, weak-form, and solver parameters."""
-    # These names must match the keys read inside the custom function:
-    # params["g1"] and params["g2"].
-    return OptimizerSettings(
-        library_bounds={
-            "g1": (1.0, 3.0),
-            "g2": (0.5, 2.0),
-        },
-        formulation_bounds={
-            "degree": (2, 7),
-            "stride": (10, 100),
-            "window_length": (30, 240),
-        },
-        solver_bounds={
-            "threshold": (0.001, 0.2),
-            "alpha": (0.0001, 0.1),
-        },
-        n_obj=2,
-        n_gen=15,
-        pop_size=40,
-        algorithm="NSGA3",
-        seed=42,
-        verbose=True,
-    )
+solver_settings = SolverSettings(
+    solver_name="pysindy",
+    regularization="STLSQ",
+    regularization_parameters={
+        "fit_intercept": False,
+        "normalize_columns": False,
+    },
+    scale_features=True,
+)
 
+formulation_settings = FormulationSettings(
+    formulation="weak",
+    test_function="PolynomialWindow",
+    degree=2,
+    window_length=65,
+    stride=50,
+)
 
-def build_solver_settings() -> SolverSettings:
-    """Configure the sparse-regression backend."""
-    return SolverSettings(
-        solver_name="pysindy",
-        regularization="STLSQ",
-        regularization_parameters={
-            "fit_intercept": False,
-            "normalize_columns": False,
-        },
-        scale_features=True,
-    )
+result = identify(
+    data_instance=data,
+    optimizer_settings=optimizer_settings,
+    solver_settings=solver_settings,
+    formulation_settings=formulation_settings,
+    library_object=library.build,
+)
 
+print("\nOptimized library/formulation/solver parameters:")
+for row_idx, values in enumerate(result.alphas, start=1):
+    print(f"\nPareto selection {row_idx}:")
+    for name, value in zip(optimizer_settings.all_bounds, values):
+        print(f"  {name}: {float(value):.6g}")
 
-def build_formulation_settings() -> FormulationSettings:
-    """Configure the initial weak formulation used before optimization."""
-    return FormulationSettings(
-        formulation="weak",
-        test_function="PolynomialWindow",
-        degree=2,
-        window_length=65,
-        stride=50,
-    )
-
-
-def main() -> None:
-    """Run DDMO with a custom parameterized library function."""
-    time, x_train, x_dot, x0 = generate_data(noise_level=0.1, seed=42)
-    library = build_custom_library()
-    data = build_training_data(time, x_train, x_dot, x0, library)
-
-    optimizer_settings = build_optimizer_settings()
-    solver_settings = build_solver_settings()
-    formulation_settings = build_formulation_settings()
-
-    result = identify(
-        data_instance=data,
-        optimizer_settings=optimizer_settings,
-        solver_settings=solver_settings,
-        formulation_settings=formulation_settings,
-    )
-
-    print("\nOptimized library/solver parameters:")
-    print("Each row is one selected parameter vector from the Pareto front.")
-    print(result.alphas)
-
-    if len(result.solutions) > 0:
-        make_plot(time, x_train, result.solutions[0])
-    else:
-        print("No solutions found.")
-
-
-if __name__ == "__main__":
-    main()
+if len(result.solutions) > 0:
+    make_plot(time, x_train, result.solutions[0])
+else:
+    print("No solutions found.")

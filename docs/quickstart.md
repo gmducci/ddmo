@@ -26,19 +26,19 @@ python -c "import ddmo; print(ddmo.__all__)"
 
 ## 2. Run an existing example
 
-The fastest way to verify that the package works is to run one of the examples:
+The fastest way to verify that the package works is to run one of the tutorial examples:
 
 ```bash
-python examples/ex_goodwin_weak.py
+python examples/tutorial_goodwin_weak.py
 ```
 
 or:
 
 ```bash
-python examples/ex_goodwin_strong.py
+python examples/tutorial_custom_library_brusselator.py
 ```
 
-These examples load benchmark Goodwin-system data, build a candidate function library, configure the solver and optimizer, and run model identification.
+These examples load or generate trajectory data, build a candidate function library, configure the formulation, solver, and optimizer, and run model identification.
 
 ## 3. Import the public API
 
@@ -114,7 +114,6 @@ skip = 10
 training_data = DataConstructor(
     x_train=x_raw[::skip, :],
     time_array=time_array[::skip],
-    library_object=library.build,
     x_0=[x_0_train],
     x_raw=x_raw[::skip, :],
 )
@@ -127,7 +126,6 @@ training_data = DataConstructor(
     x_train=x_train[20:-20, :],
     time_array=time_array[20:-20],
     x_dot=x_dot_hat[20:-20, :],
-    library_object=library.build,
     x_0=[x_0_train],
     x_raw=x_raw[20:-20, :],
 )
@@ -243,6 +241,7 @@ result = identify(
     optimizer_settings=optimizer_settings,
     solver_settings=solver_settings,
     formulation_settings=formulation_settings,
+    library_object=library.build,
 )
 ```
 
@@ -301,7 +300,6 @@ skip = 10
 training_data = DataConstructor(
     x_train=x_raw[::skip, :],
     time_array=time_array[::skip],
-    library_object=library.build,
     x_0=[x_0_train],
     x_raw=x_raw[::skip, :],
 )
@@ -346,6 +344,7 @@ result = identify(
     optimizer_settings=optimizer_settings,
     solver_settings=solver_settings,
     formulation_settings=formulation_settings,
+    library_object=library.build,
 )
 
 print(result.alphas)

@@ -4,11 +4,12 @@ Tutorials provide guided explanations of selected `ddmo` workflows.
 
 Start here:
 
-- [Minimal identification workflow](minimal_identification.md)
-- [Goodwin weak-formulation example](goodwin_weak_formulation.md)
 - [Minimal workflow](minimal_workflow.md)
+- [Goodwin weak-formulation example](goodwin_weak.md)
 
-Additional tutorials can be added here once the corresponding examples and workflows are stable.
+Executable tutorial scripts live in the repository's `examples/` directory:
 
-The executable scripts associated with these workflows live in the repository's `examples/` directory.
-
+- `examples/tutorial_goodwin_weak.py`
+- `examples/tutorial_goodwin_weak_two_trajectories.py`
+- `examples/tutorial_custom_library_brusselator.py`
+- `examples/tutorial_custom_library_brusselator_two_trajectories.py`

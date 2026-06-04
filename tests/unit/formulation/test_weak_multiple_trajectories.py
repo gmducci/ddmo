@@ -5,17 +5,16 @@ from ddmo.library_functions import LibraryBuilder
 from ddmo.utils.data_constructor import DataConstructor
 
 
-def _make_data(x_train, time, library, x0=None):
+def _make_data(x_train, time, x0=None):
     return DataConstructor(
         x_train=x_train,
         time_array=time,
-        library_object=library.build,
         x_0=x0 or [np.asarray(x_train)[0, 0]],
         x_raw=x_train,
     )
 
 
-def _make_formulation(data):
+def _make_formulation(data, library):
     return WeakFormulation(
         data_instance=data,
         class_attributes={
@@ -24,6 +23,7 @@ def _make_formulation(data):
             "window_length": 3,
             "stride": 1,
         },
+        library_object=library.build,
     )
 
 
@@ -34,13 +34,13 @@ def test_weak_formulation_integrates_multiple_trajectories_independently():
     x_two = (100.0 + np.arange(5, dtype=float)).reshape(-1, 1)
     x_train = np.stack([x_one, x_two], axis=0)
 
-    multi_data = _make_data(x_train, time, library, x0=[x_one[0], x_two[0]])
-    first_data = _make_data(x_one, time, library, x0=[x_one[0]])
-    second_data = _make_data(x_two, time, library, x0=[x_two[0]])
+    multi_data = _make_data(x_train, time, x0=[x_one[0], x_two[0]])
+    first_data = _make_data(x_one, time, x0=[x_one[0]])
+    second_data = _make_data(x_two, time, x0=[x_two[0]])
 
-    multi_formulation = _make_formulation(multi_data)
-    first_formulation = _make_formulation(first_data)
-    second_formulation = _make_formulation(second_data)
+    multi_formulation = _make_formulation(multi_data, library)
+    first_formulation = _make_formulation(first_data, library)
+    second_formulation = _make_formulation(second_data, library)
 
     multi_lhs = multi_formulation.get_lhs(
         multi_data,

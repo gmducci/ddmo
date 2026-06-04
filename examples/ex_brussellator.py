@@ -49,7 +49,6 @@ if __name__ == "__main__":
         x_train=x_noisy,
         time_array=t,
         x_dot=None, # Weak formulation does not strictly need pre-computed derivatives of noisy data
-        library_object=library.build,
         x_0=[x0],
         x_raw=x_noisy 
     )
@@ -113,7 +112,8 @@ if __name__ == "__main__":
         data_instance=data,
         optimizer_settings=optimizer_settings,
         solver_settings=solver_settings,
-        formulation_settings=formulation_settings
+        formulation_settings=formulation_settings,
+        library_object=library.build,
     )
 
     # 6. Visualize Results

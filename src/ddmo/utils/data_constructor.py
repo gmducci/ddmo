@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Optional
 
 import numpy as np
 
@@ -9,7 +9,6 @@ import numpy as np
 class DataConstructor:
     x_train: np.ndarray
     time_array: np.ndarray
-    library_object: Any
     x_0: list
     x_raw: np.ndarray
     x_dot: Optional[np.ndarray] = None

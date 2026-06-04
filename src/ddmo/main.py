@@ -20,7 +20,8 @@ Usage:
   ...     data_instance=training_data,
   ...     optimizer_settings=optimizer_settings,
   ...     solver_settings=solver_settings,
-  ...     formulation_settings=formulation_settings
+  ...     formulation_settings=formulation_settings,
+  ...     library_object=library.build
   ... )
 """
 
@@ -71,6 +72,7 @@ def identify(
     optimizer_settings: OptimizerSettings,
     solver_settings: SolverSettings,
     formulation_settings: FormulationSettings | None = None,
+    library_object: Callable | None = None,
     objective_functions: dict = None,
 ):
     """
@@ -79,8 +81,8 @@ def identify(
     Args:
         data_instance: DataConstructor with training data and library.
         optimizer_settings: Unified optimization configuration.
-        solver_instance: Solver configuration (e.g., pysindy, scikit).
-        formulation_instance: Formulation configuration (e.g., weak, strong).
+        formulation_settings: Formulation configuration (e.g., weak, strong).
+        library_object: Callable that builds candidate library functions from optimizer parameters.
         objective_functions: Optional custom objective functions.
 
     Returns:
@@ -88,6 +90,13 @@ def identify(
             objective_space, solutions, coeff_matrices, alphas, models, theta_matrices.
     """
     from ddmo.optimizer.optimizer import Optimizer
+
+    if formulation_settings is None:
+        raise ValueError(
+            "identify requires a formulation instance (FormulationSettings)."
+        )
+    if library_object is None:
+        raise ValueError("identify requires a candidate library callable (`library_object`).")
 
     # Instantiate Solver
     solver_class = SOLVER_REGISTRY[solver_settings.solver_name]
@@ -97,20 +106,17 @@ def identify(
         solver_parameters=solver_settings.regularization_parameters,
         scale_features=solver_settings.scale_features,
         ensemble_settings=solver_settings.ensemble,
+        library_object=library_object,
     )
 
     # Instantiate Formulation
-    if formulation_settings is None:
-        raise ValueError(
-            "identify requires a formulation instance (FormulationSettings)."
-        )
-
     formulation_class = FORMULATION_REGISTRY[formulation_settings.formulation]
     logger.info("Using formulation: %s", formulation_settings.formulation)
 
     resolved_formulation = formulation_class(
         data_instance=data_instance,
         class_attributes=formulation_settings.to_attributes_dict(),
+        library_object=library_object,
     )
 
     # Build the optimization problem

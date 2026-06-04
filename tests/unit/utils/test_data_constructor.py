@@ -1,6 +1,5 @@
-import pytest
 import numpy as np
-from unittest.mock import MagicMock
+
 from ddmo.utils.data_constructor import DataConstructor
 
 class TestDataConstructor:
@@ -16,7 +15,6 @@ class TestDataConstructor:
             x_train=x_train,
             time_array=time,
             x_dot=x_dot,
-            library_object=MagicMock(),
             x_0=x_0,
             x_raw=x_train
         )
@@ -33,7 +31,6 @@ class TestDataConstructor:
             x_train=x_train,
             time_array=np.zeros(5),
             x_dot=np.zeros((5, 3)),
-            library_object=MagicMock(),
             x_0=[np.zeros(3)] * 5, # 5 initial conditions
             x_raw=x_train
         )

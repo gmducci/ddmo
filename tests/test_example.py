@@ -18,14 +18,14 @@ class TestDDMO:
         # Build a simple library
         library = LibraryBuilder().add_polynomial(max_degree=1)
 
-        return DataConstructor(
+        data = DataConstructor(
             x_train=x,
             time_array=t,
             x_dot=x_dot,
-            library_object=library.build,
             x_0=[x[0]],
             x_raw=x,
         )
+        return data, library.build
 
     def test_smoke_identification(self, synthetic_data):
         """
@@ -65,11 +65,13 @@ class TestDDMO:
         )
 
         # Run identification
+        data, library_object = synthetic_data
         res = identify(
-            data_instance=synthetic_data,
+            data_instance=data,
             optimizer_settings=optimizer_settings,
             solver_settings=solver_settings,
             formulation_settings=formulation_settings,
+            library_object=library_object,
         )
 
         assert res is not None
@@ -80,6 +82,7 @@ class TestDDMO:
         Integration test: verify Pysindy_Solver.solve returns failed SolverResult on timeout.
         """
         from unittest.mock import patch
+        data, _ = synthetic_data
 
         # Mock simulate to raise TimeoutError instantly
         with patch(
@@ -87,7 +90,7 @@ class TestDDMO:
             side_effect=TimeoutError("Mock Timeout"),
         ):
             solver = Pysindy_Solver(
-                data_instance=synthetic_data,
+                data_instance=data,
                 optimizer="STLSQ",
                 solver_parameters={"threshold": 0.01, "alpha": 0.05},
             )

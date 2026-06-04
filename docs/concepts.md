@@ -292,7 +292,7 @@ data_instance = ...
 formulation_settings = ...
 
 # 3. Configure the candidate library
-library_settings = ...
+library = ...
 
 # 4. Configure the sparse-regression solver
 solver_settings = SolverSettings(
@@ -308,10 +308,11 @@ solver_settings = SolverSettings(
 
 # 5. Run model identification
 result = identify(
-    data_instance=data_instance,ƒ
+    data_instance=data_instance,
+    optimizer_settings=optimizer_settings,
     formulation_settings=formulation_settings,
-    library_settings=library_settings,
     solver_settings=solver_settings,
+    library_object=library.build,
 )
 ```
 

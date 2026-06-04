@@ -24,13 +24,15 @@ from ddmo.utils.data_constructor import DataConstructor
 class ScikitSolver(BaseSolver):
     def __init__(
         self, data_instance: DataConstructor, optimizer: str, solver_parameters: dict,
-        scale_features: bool = True
+        scale_features: bool = True,
+        ensemble_settings: dict | None = None,
+        library_object=None,
     ):
         self.data_instance = data_instance
         self.solver_parameters = solver_parameters or {}
         self.optimizer_name = optimizer
         self.scale_features = scale_features
-        self.builder = FeatureMatrixBuilder(data_instance)
+        self.builder = FeatureMatrixBuilder(data_instance, library_object=library_object)
 
         # Validate optimizer
         valid_optimizers = [

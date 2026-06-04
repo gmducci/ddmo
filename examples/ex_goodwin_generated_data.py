@@ -72,7 +72,6 @@ if __name__ == "__main__":
         # User asked for x_dot estimates, usually implies we might want to use strong formulation or at least provide them.
         x_dot =x_dot_hat[20:-20, :],
         time_array=t[20:-20],
-        library_object=library.build,
         x_0=[x0],
         x_raw=x_noisy[20:-20, :]
     )
@@ -146,7 +145,8 @@ if __name__ == "__main__":
         data_instance=data,
         optimizer_settings=optimizer_settings,
         solver_settings=solver_settings,
-        formulation_settings=formulation_settings
+        formulation_settings=formulation_settings,
+        library_object=library.build,
     )
 
     # 6. Visualize Results

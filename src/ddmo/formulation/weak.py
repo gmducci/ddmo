@@ -54,14 +54,18 @@ class WeakFormulation(Formulation):
         # Basic shape checks
         if self.time_array.ndim != 1:
             raise ValueError("time_array must be 1-D.")
-        if any(block.shape[0] != self.time_array.shape[0] for block in self.x_train_blocks):
+        if any(
+            block.shape[0] != self.time_array.shape[0] for block in self.x_train_blocks
+        ):
             raise ValueError(
                 "Each trajectory in x_train must have the same length as time_array."
             )
 
         var_counts = {block.shape[1] for block in self.x_train_blocks}
         if len(var_counts) != 1:
-            raise ValueError("All trajectories in x_train must have the same number of variables.")
+            raise ValueError(
+                "All trajectories in x_train must have the same number of variables."
+            )
 
         self.dt = float(self.time_array[1] - self.time_array[0])
         self.N = self.x_train_blocks[0].shape[0]
@@ -113,9 +117,11 @@ class WeakFormulation(Formulation):
                     continue
 
                 if name == "stride":
-                    params[name] = int(round(val))
+                    params[name] = max(1, int(round(val)))
                 elif name == "window_length":
-                    params[name] = int(round(val)) * 2 + 1
+                    params[name] = _nearest_odd_window_length(val)
+                elif name == "degree":
+                    params[name] = max(0, int(round(val)))
                 else:
                     params[name] = float(val)
 
@@ -221,6 +227,8 @@ class WeakFormulation(Formulation):
             new_family = self.family_builder(param_dict)
             self._configure_from_family(new_family)
 
+        effective_opt_vars = self._effective_opt_vars(param_dict, opt_vars)
+
         # Pass dict to library function (safer than positional list)
         # If param_dict not available, fall back to list for backward compat
         library_object = kwargs.get("library_object", self.library_object)
@@ -259,10 +267,25 @@ class WeakFormulation(Formulation):
         return {
             "theta": np.vstack(rhs_blocks),
             "library": lib_custom,
-            "opt_vars": opt_vars,
+            "opt_vars": effective_opt_vars,
             "named_funcs": named_funcs,
             "colmask": colmask,
         }
+
+    def _effective_opt_vars(
+        self,
+        param_dict: dict[str, float] | None,
+        opt_vars: tuple[float, ...],
+    ) -> tuple[float, ...]:
+        """Return optimizer values with effective discrete settings substituted."""
+        if param_dict is None:
+            return opt_vars
+
+        effective = dict(param_dict)
+        for name in ("degree", "stride", "window_length"):
+            if name in effective and hasattr(self.test_family, name):
+                effective[name] = getattr(self.test_family, name)
+        return tuple(effective[name] for name in param_dict)
 
 
 # ----------------------------------------------------------------------
@@ -298,6 +321,14 @@ def _split_stacked_matrix(
     lengths = [block.shape[0] for block in trajectory_blocks]
     split_points = np.cumsum(lengths)[:-1]
     return list(np.split(stacked, split_points, axis=0))
+
+
+def _nearest_odd_window_length(value: float) -> int:
+    """Map an optimizer value to an actual valid odd window length."""
+    window_length = max(3, int(round(value)))
+    if window_length % 2 == 0:
+        window_length += 1
+    return window_length
 
 
 def _extract_rhs_inputs(*args: Any, **kwargs: Any) -> tuple[Any, tuple[float, ...]]:

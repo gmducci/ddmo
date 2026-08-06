@@ -18,11 +18,11 @@ DDMO. For the default synthetic system, the expected values are close to:
 
 Run from the repository root with:
 
-    PYTHONPATH=src python examples/tutorial_custom_library_brusselator.py
+    PYTHONPATH=src python examples/quickstart/brusselator_custom_library.py
 
 or after installing the package in editable mode:
 
-    python examples/tutorial_custom_library_brusselator.py
+    python examples/quickstart/brusselator_custom_library.py
 
 This compact tutorial trains on one synthetic trajectory. For a real
 identification study, use several trajectories or validation initial
@@ -38,8 +38,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import odeint
 
-from ddmo import DataConstructor, FormulationSettings, OptimizerSettings, SolverSettings
-from ddmo import identify
+from ddmo import (
+    DataConstructor,
+    FormulationSettings,
+    OptimizerSettings,
+    SolverSettings,
+    identify,
+)
 from ddmo.equations.brussellator import Brussellator
 from ddmo.library_functions import LibraryBuilder
 
@@ -171,7 +176,6 @@ optimizer_settings = OptimizerSettings(
         "threshold": (0.001, 0.2),
         "alpha": (0.0001, 0.1),
     },
-    n_obj=2,
     n_gen=15,
     pop_size=40,
     algorithm="NSGA3",

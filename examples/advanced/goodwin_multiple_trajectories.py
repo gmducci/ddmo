@@ -7,11 +7,11 @@ then stacks the resulting regression rows.
 
 Run from the repository root with:
 
-    PYTHONPATH=src python examples/tutorial_goodwin_weak_two_trajectories.py
+    PYTHONPATH=src python examples/advanced/goodwin_multiple_trajectories.py
 
 or after installing the package in editable mode:
 
-    python examples/tutorial_goodwin_weak_two_trajectories.py
+    python examples/advanced/goodwin_multiple_trajectories.py
 """
 
 from __future__ import annotations
@@ -22,8 +22,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import odeint
 
-from ddmo import DataConstructor, FormulationSettings, OptimizerSettings, SolverSettings
-from ddmo import identify
+from ddmo import (
+    DataConstructor,
+    FormulationSettings,
+    OptimizerSettings,
+    SolverSettings,
+    identify,
+)
 from ddmo.equations.goodwin_eqs import GoodwinModel
 from ddmo.library_functions import LibraryBuilder
 
@@ -158,7 +163,6 @@ optimizer_settings = OptimizerSettings(
         "threshold": (0.001, 0.2),
         "alpha": (0.0001, 0.1),
     },
-    n_obj=2,
     n_gen=10,
     pop_size=40,
     algorithm="NSGA3",

@@ -8,6 +8,7 @@ from ddmo import (
     identify,
 )
 from ddmo.library_functions import LibraryBuilder
+from ddmo.optimizer import active_coefficient_count, trajectory_mse
 
 
 def test_identify_strong_formulation_end_to_end():
@@ -33,7 +34,6 @@ def test_identify_strong_formulation_end_to_end():
         library_bounds={},
         formulation_bounds={},
         solver_bounds={"threshold": (0.001, 0.01)},
-        n_obj=2,
         n_gen=1,
         pop_size=4,
         algorithm="NSGA2",
@@ -60,6 +60,10 @@ def test_identify_strong_formulation_end_to_end():
         solver_settings=solver_settings,
         formulation_settings=formulation_settings,
         library_object=library.build,
+        objective_functions={
+            "trajectory_mse": trajectory_mse,
+            "active_coefficients": active_coefficient_count,
+        },
     )
 
     assert result.objective_space.shape == (optimizer_settings.pop_size, 2)

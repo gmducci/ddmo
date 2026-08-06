@@ -69,3 +69,40 @@ def test_weak_formulation_integrates_multiple_trajectories_independently():
     )
 
     np.testing.assert_allclose(multi_rhs, expected_rhs)
+
+
+def test_optimized_window_length_means_actual_number_of_samples():
+    time = np.arange(21, dtype=float)
+    x_train = np.arange(21, dtype=float).reshape(-1, 1)
+    library = LibraryBuilder().add_polynomial(max_degree=1)
+    data = _make_data(x_train, time, x0=[x_train[0]])
+    formulation = _make_formulation(data, library)
+
+    formulation.get_lhs(
+        data,
+        [7.0],
+        opt_param_dict={"window_length": 7.0},
+    )
+    assert formulation.window_length == 7
+
+
+def test_even_optimized_window_length_is_rounded_to_valid_odd_length():
+    time = np.arange(21, dtype=float)
+    x_train = np.arange(21, dtype=float).reshape(-1, 1)
+    library = LibraryBuilder().add_polynomial(max_degree=1)
+    data = _make_data(x_train, time, x0=[x_train[0]])
+    formulation = _make_formulation(data, library)
+
+    formulation.get_lhs(
+        data,
+        [8.0],
+        opt_param_dict={"window_length": 8.0},
+    )
+    assert formulation.window_length == 9
+
+    payload = formulation.get_rhs(
+        data,
+        [8.0],
+        opt_param_dict={"window_length": 8.0},
+    )
+    assert payload["opt_vars"] == (9,)

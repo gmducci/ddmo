@@ -1,20 +1,19 @@
 # optimizer.py
 import logging
 import warnings
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
-import pymoo.gradient.toolbox as anp
 from pymoo.config import Config
 from pymoo.core.problem import Problem
 
 from ddmo.formulation import Formulation
 from ddmo.optimizer.objective_functions import (
-    compute_dw_coefficient,
-    compute_mse,
-    compute_ppcc_matrix,
+    DEFAULT_OBJECTIVES,
+    ObjectiveContext,
+    ObjectiveFunction,
 )
 from ddmo.solver.result import SolverResult
 from ddmo.utils.data_constructor import DataConstructor
@@ -25,10 +24,9 @@ warnings.filterwarnings("ignore")
 Config.warnings['not_compiled'] = False
 
 
-
 @dataclass
 class EvaluationResult:
-    obj_func_score: list[float]
+    obj_func_score: dict[str, float]
     solution: Any | None
     regression_coefficients: Any | None
     opt_vars: np.ndarray
@@ -40,13 +38,11 @@ class Optimizer(Problem):
     def __init__(
         self,
         data_instance: DataConstructor,
-        # library_factory: Callable[[list[float]], list[NamedFunc]],
-        # formution: Formulation,
         solver: Callable,
-        objectives=None,
-        objective_functions=None,
+        objective_functions: Mapping[str, ObjectiveFunction] | None = None,
         formulation: Formulation | None = None,
-        solver_param_names: list[str] = None,
+        solver_param_names: list[str] | None = None,
+        objectives: Mapping[str, ObjectiveFunction] | None = None,
     ):
         super().__init__(
             n_var=1, n_obj=None, n_ieq_constr=0, xl=0.0, xu=1.0, vtype=float
@@ -55,13 +51,22 @@ class Optimizer(Problem):
         self.data_instance = data_instance
         self.solver = solver
         self.formulation = formulation
-        # Named objectives dict for generic handling
-        self.objectives: dict[str, Callable] = (
-            objectives
-            if objectives is not None
-            else {"mse": compute_mse, "dw_coefficient": compute_dw_coefficient}
-        )
-        self.objective_functions = objective_functions
+        if objective_functions is not None and objectives is not None:
+            raise ValueError(
+                "Pass either objective_functions or the legacy objectives argument, not both."
+            )
+        if objective_functions is not None:
+            selected_objectives = objective_functions
+        elif objectives is not None:
+            selected_objectives = objectives
+        else:
+            selected_objectives = DEFAULT_OBJECTIVES
+        if not selected_objectives:
+            raise ValueError("At least one objective function is required.")
+        if any(not callable(function) for function in selected_objectives.values()):
+            raise TypeError("Every objective function must be callable.")
+
+        self.objectives = dict(selected_objectives)
         self.n_obj = len(self.objectives)
         self.solver_param_names = solver_param_names if solver_param_names else []
 
@@ -109,12 +114,16 @@ class Optimizer(Problem):
                 feature_matrix=solver_result.feature_matrix if solver_result else None,
             )
 
-        # Compute objectives using named dict
+        context = ObjectiveContext(
+            data=self.data_instance,
+            solver_result=solver_result,
+        )
         objective_scores = {}
         for name, obj_func in self.objectives.items():
             try:
-                objective_scores[name] = obj_func(self.data_instance, solver_result.solution)
+                objective_scores[name] = float(obj_func(context))
             except Exception:
+                logger.exception("Objective '%s' failed.", name)
                 objective_scores[name] = 1e5
 
         logger.debug("Objective function values: %s", objective_scores)
@@ -184,13 +193,22 @@ class Optimizer(Problem):
         # Convert to numpy array and stack objectives dynamically
         obj_arrays = np.array(objective_values, dtype=float)
 
-        # Monitoring output (use first DW-like objective if present)
-        if "dw_coefficient" in objective_names:
-            dw_idx = objective_names.index("dw_coefficient")
+        dw_name = next(
+            (
+                name
+                for name in ("durbin_watson_deviation", "dw_coefficient")
+                if name in objective_names
+            ),
+            None,
+        )
+        if dw_name is not None:
+            dw_idx = objective_names.index(dw_name)
             dw_stats = obj_arrays[:, dw_idx]
-            max_dw_stats = 2 - np.nanmin(dw_stats)
-            logger.debug("DW statistic monitoring: maximum value = %.4f", max_dw_stats)
-            out["dw_coeff"] = dw_stats
+            logger.debug(
+                "Durbin-Watson deviation monitoring: worst value = %.4f",
+                np.nanmax(dw_stats),
+            )
+            out["durbin_watson_deviation"] = dw_stats
 
         # Store output - dynamically stack all objective columns
         out["F"] = obj_arrays

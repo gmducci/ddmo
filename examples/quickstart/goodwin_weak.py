@@ -11,11 +11,11 @@ oscillator data:
 
 Run from the repository root with:
 
-    PYTHONPATH=src python examples/tutorial_goodwin_weak.py
+    PYTHONPATH=src python examples/quickstart/goodwin_weak.py
 
 or after installing the package in editable mode:
 
-    python examples/tutorial_goodwin_weak.py
+    python examples/quickstart/goodwin_weak.py
 """
 
 from __future__ import annotations
@@ -54,8 +54,7 @@ data = DataConstructor(
 
 library = (
     LibraryBuilder()
-    .add_polynomial(max_degree=2, 
-                    include_interactions=True)
+    .add_polynomial(max_degree=2, include_interactions=True)
     .add_hill(exponent_param="gamma_1")
     .add_exponential(rate_param="gamma_2")
 )
@@ -89,13 +88,11 @@ optimizer_settings = OptimizerSettings(
         "stride": (50, 250),
         "window_length": (127, 801),
     },
-    n_obj=2,
     n_gen=10,
     algorithm="NSGA3",
     pop_size=50,
     seed=RANDOM_SEED,
 )
-
 
 
 result = identify(

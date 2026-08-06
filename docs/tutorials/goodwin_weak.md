@@ -1,6 +1,6 @@
 # Goodwin weak-form tutorial
 
-This tutorial explains `examples/tutorial_goodwin_weak.py`.
+This tutorial explains `examples/quickstart/goodwin_weak.py`.
 
 The script identifies a Goodwin oscillator model from noisy benchmark data
 using the weak formulation. The weak formulation is useful when numerical
@@ -10,13 +10,13 @@ windowed integral quantities.
 Run it from the repository root:
 
 ```bash
-PYTHONPATH=src python examples/tutorial_goodwin_weak.py
+PYTHONPATH=src python examples/quickstart/goodwin_weak.py
 ```
 
 After editable installation:
 
 ```bash
-python examples/tutorial_goodwin_weak.py
+python examples/quickstart/goodwin_weak.py
 ```
 
 ## Workflow
@@ -86,7 +86,6 @@ optimizer_settings = OptimizerSettings(
         "stride": (50, 250),
         "window_length": (127, 801),
     },
-    n_obj=2,
     n_gen=10,
     algorithm="NSGA3",
     pop_size=50,

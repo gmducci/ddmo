@@ -10,7 +10,8 @@ The package is designed around a modular workflow: construct candidate function 
 - **Strong and weak formulations** for sparse model identification.
 - **Sparse-regression solvers** built around PySINDy and related optimization tools.
 - **Multi-objective optimization** of formulation, solver, and library parameters.
-- **Benchmark examples** for Goodwin-type and Brusselator dynamical systems.
+- **Maintained examples** for Goodwin-type and Brusselator dynamical systems.
+- **Reproducible publication benchmarks** kept separate from user tutorials.
 - **Modular package structure** separating data, formulation, solver, optimization, and utilities.
 
 ## Installation
@@ -32,13 +33,13 @@ pip install -e ".[dev]"
 Run one of the example workflows from the repository root:
 
 ```bash
-python examples/tutorial_goodwin_weak.py
+python examples/quickstart/goodwin_weak.py
 ```
 
 or:
 
 ```bash
-python examples/tutorial_custom_library_brusselator.py
+python examples/quickstart/brusselator_custom_library.py
 ```
 
 The main public API can be imported directly from `ddmo`:
@@ -59,7 +60,12 @@ Project documentation is available in [`docs/`](docs/):
 
 - [Installation](docs/installation.md)
 - [Quickstart](docs/quickstart.md)
+- [Optimization objectives](docs/objectives.md)
 - [Development guide](docs/development.md)
+
+Maintained demonstrations are indexed in [`examples/`](examples/README.md).
+Frozen paper experiments and their output contract are documented in
+[`benchmarks/`](benchmarks/README.md).
 
 ## Development
 

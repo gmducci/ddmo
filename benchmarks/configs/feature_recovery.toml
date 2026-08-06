@@ -1,0 +1,44 @@
+schema_version = 1
+
+[experiment]
+name = "feature_recovery"
+system = "brusselator"
+description = "Recover the parameterized interaction x^g1 y^g2."
+methods = ["fixed_library", "adaptive_library"]
+noise_levels = [0.0]
+seeds = [11, 22, 33, 44, 55]
+
+[data]
+t_start = 0.0
+t_end = 25.0
+dt = 0.05
+train_trajectories = 3
+validation_trajectories = 1
+test_trajectories = 2
+noise_scale = "per_state_standard_deviation"
+
+[truth]
+g1 = 2.0
+g2 = 1.0
+
+[fixed_library]
+g1 = 1.0
+g2 = 1.0
+
+[bounds.library]
+g1 = [1.0, 3.0]
+g2 = [0.5, 2.0]
+
+[bounds.solver]
+threshold = [0.001, 0.2]
+alpha = [0.000001, 0.1]
+
+[optimizer]
+algorithm = "NSGA2"
+population = 40
+generations = 15
+objectives = ["trajectory_mse", "active_coefficients"]
+
+[selection]
+metric = "validation_rollout_nrmse"
+coefficient_zero_tolerance = 0.000001

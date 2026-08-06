@@ -7,11 +7,11 @@ integrals rather than pointwise derivative estimates.
 
 Run from the repository root with:
 
-    PYTHONPATH=src python examples/tutorial_custom_library_brusselator_two_trajectories.py
+    PYTHONPATH=src python examples/advanced/brusselator_multiple_trajectories.py
 
 or after installing the package in editable mode:
 
-    python examples/tutorial_custom_library_brusselator_two_trajectories.py
+    python examples/advanced/brusselator_multiple_trajectories.py
 """
 
 from __future__ import annotations
@@ -22,8 +22,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import odeint
 
-from ddmo import DataConstructor, FormulationSettings, OptimizerSettings, SolverSettings
-from ddmo import identify
+from ddmo import (
+    DataConstructor,
+    FormulationSettings,
+    OptimizerSettings,
+    SolverSettings,
+    identify,
+)
 from ddmo.equations.brussellator import Brussellator
 from ddmo.library_functions import LibraryBuilder
 
@@ -182,7 +187,6 @@ optimizer_settings = OptimizerSettings(
         "threshold": (0.5, 2),
         "alpha": (1, 10),
     },
-    n_obj=2,
     n_gen=15,
     pop_size=100,
     algorithm="NSGA3",

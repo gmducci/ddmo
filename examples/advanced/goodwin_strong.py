@@ -3,12 +3,15 @@ import warnings
 import matplotlib.pyplot as plt
 import numpy as np
 
-from ddmo import BENCHMARK_FOLDER, identify
-from ddmo import FormulationSettings
+from ddmo import (
+    BENCHMARK_FOLDER,
+    DataConstructor,
+    FormulationSettings,
+    OptimizerSettings,
+    SolverSettings,
+    identify,
+)
 from ddmo.library_functions import LibraryBuilder
-from ddmo import SolverSettings
-from ddmo import OptimizerSettings
-from ddmo import DataConstructor
 
 warnings.filterwarnings("ignore")
 
@@ -49,16 +52,13 @@ if __name__ == "__main__":
     formulation_bounds = {}
 
     # Solver bounds: Optimize the SINDy threshold!
-    solver_bounds = {
-        "threshold": (0.01, 1.0)
-    }
+    solver_bounds = {"threshold": (0.01, 1.0)}
 
     # Unified optimizer settings with separated bounds
     optimizer_settings = OptimizerSettings(
         library_bounds=library_bounds,
         formulation_bounds=formulation_bounds,
         solver_bounds=solver_bounds,
-        n_obj=2,
         n_gen=3,
         algorithm="NSGA3",
         pop_size=50,
@@ -69,10 +69,10 @@ if __name__ == "__main__":
         regularization="STLSQ",
         regularization_parameters={
             "normalize_columns": False,
-            "alpha": .35,
-            "threshold": .45,
+            "alpha": 0.35,
+            "threshold": 0.45,
         },
-        scale_features=True
+        scale_features=True,
     )
 
     formulation_settings = FormulationSettings(

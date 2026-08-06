@@ -9,14 +9,13 @@ Usage:
   >>> from ddmo.utils.constructors import OptimizerSettings
   >>>
   >>> optimizer_settings = OptimizerSettings(
-  ...     xl={"gamma_1": 1.0, "gamma_2": 1.0},
-  ...     xu={"gamma_1": 10.0, "gamma_2": 10.0},
-  ...     n_obj=2,
+  ...     library_bounds={"gamma_1": (1.0, 10.0)},
+  ...     formulation_bounds={},
   ...     n_gen=100,
   ...     algorithm="NSGA2",
   ...     pop_size=50
   ... )
-  >>> problem, res, ... = identify(
+  >>> result = identify(
   ...     data_instance=training_data,
   ...     optimizer_settings=optimizer_settings,
   ...     solver_settings=solver_settings,
@@ -25,10 +24,10 @@ Usage:
   ... )
 """
 
-from collections.abc import Callable
 import logging
 import multiprocessing as mp
 import platform
+from collections.abc import Callable, Mapping
 
 if mp.current_process().name == "MainProcess":
     _method = "fork" if platform.system() == "Linux" else "spawn"
@@ -73,7 +72,7 @@ def identify(
     solver_settings: SolverSettings,
     formulation_settings: FormulationSettings | None = None,
     library_object: Callable | None = None,
-    objective_functions: dict = None,
+    objective_functions: Mapping[str, Callable] | None = None,
 ):
     """
     Run sparse identification on provided data x(t).
@@ -83,7 +82,9 @@ def identify(
         optimizer_settings: Unified optimization configuration.
         formulation_settings: Formulation configuration (e.g., weak, strong).
         library_object: Callable that builds candidate library functions from optimizer parameters.
-        objective_functions: Optional custom objective functions.
+        objective_functions: Optional mapping of objective names to callables.
+            Each callable receives an ObjectiveContext. The objective count is
+            derived automatically from this mapping.
 
     Returns:
         IdentificationResult: Structured result containing problem, result,
@@ -96,7 +97,9 @@ def identify(
             "identify requires a formulation instance (FormulationSettings)."
         )
     if library_object is None:
-        raise ValueError("identify requires a candidate library callable (`library_object`).")
+        raise ValueError(
+            "identify requires a candidate library callable (`library_object`)."
+        )
 
     # Instantiate Solver
     solver_class = SOLVER_REGISTRY[solver_settings.solver_name]
@@ -123,7 +126,6 @@ def identify(
     problem = Optimizer(
         data_instance=data_instance,
         solver=solver.solve,
-        objectives=None,
         objective_functions=objective_functions,
         formulation=resolved_formulation,
         solver_param_names=optimizer_settings.solver_param_names,
@@ -147,7 +149,15 @@ def identify(
     )
 
     problem.n_var = optimizer_settings.n_var
-    problem.n_obj = optimizer_settings.n_obj
+    if (
+        optimizer_settings.n_obj is not None
+        and optimizer_settings.n_obj != problem.n_obj
+    ):
+        logger.warning(
+            "Ignoring n_obj=%s because %s objective functions were configured.",
+            optimizer_settings.n_obj,
+            problem.n_obj,
+        )
     logger.info("Bounds: xl=%s, xu=%s", xl, xu)
     problem.xl = xl
     problem.xu = xu
@@ -180,7 +190,7 @@ def identify(
     # NSGA3 requires reference directions
     if algorithm_name == "NSGA3":
         ref_dirs = get_reference_directions(
-            "das-dennis", optimizer_settings.n_obj, n_partitions=12
+            "das-dennis", problem.n_obj, n_partitions=12
         )
         algorithm_kwargs["ref_dirs"] = ref_dirs
 

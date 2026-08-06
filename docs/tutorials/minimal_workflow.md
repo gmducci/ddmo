@@ -118,7 +118,6 @@ optimizer_settings = OptimizerSettings(
         "stride": (10, 50),
     },
     solver_bounds={"threshold": (0.001, 0.2)},
-    n_obj=2,
     n_gen=10,
     pop_size=40,
     algorithm="NSGA3",
@@ -159,11 +158,11 @@ print(result.coeff_matrices)
 Run a tutorial script from the repository root:
 
 ```bash
-PYTHONPATH=src python examples/tutorial_goodwin_weak.py
+PYTHONPATH=src python examples/quickstart/goodwin_weak.py
 ```
 
 After installing the package in editable mode, `PYTHONPATH=src` is not needed:
 
 ```bash
-python examples/tutorial_goodwin_weak.py
+python examples/quickstart/goodwin_weak.py
 ```

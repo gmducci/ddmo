@@ -9,7 +9,7 @@ Start here:
 
 Executable tutorial scripts live in the repository's `examples/` directory:
 
-- `examples/tutorial_goodwin_weak.py`
-- `examples/tutorial_goodwin_weak_two_trajectories.py`
-- `examples/tutorial_custom_library_brusselator.py`
-- `examples/tutorial_custom_library_brusselator_two_trajectories.py`
+- `examples/quickstart/goodwin_weak.py`
+- `examples/quickstart/brusselator_custom_library.py`
+- `examples/advanced/goodwin_multiple_trajectories.py`
+- `examples/advanced/brusselator_multiple_trajectories.py`

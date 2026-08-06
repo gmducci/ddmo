@@ -6,11 +6,11 @@ noise level, initial conditions, sampling frequency, and simulation time span.
 
 Run from the repository root with:
 
-    PYTHONPATH=src python examples/tutorial_goodwin_generated_batch.py
+    PYTHONPATH=src python examples/advanced/goodwin_generated_batch.py
 
 or after installing the package in editable mode:
 
-    python examples/tutorial_goodwin_generated_batch.py
+    python examples/advanced/goodwin_generated_batch.py
 """
 
 from __future__ import annotations
@@ -106,7 +106,6 @@ optimizer_settings = OptimizerSettings(
         "threshold": (0.01, 0.2),
         "alpha": (0.01, 0.2),
     },
-    n_obj=2,
     n_gen=10,
     pop_size=100,
     algorithm="NSGA3",

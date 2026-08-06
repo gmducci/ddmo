@@ -45,18 +45,38 @@ x_0_train = np.load(BENCHMARK_FOLDER / "x_0.npy")
 x_train = np.load(BENCHMARK_FOLDER / "x_train_noise.npy")
 time_array = np.load(BENCHMARK_FOLDER / "time.npy")
 
-library = (
-    LibraryBuilder()
-    .add_polynomial(max_degree=2, include_interactions=True)
-    .add_hill(exponent_param="gamma_1")
-    .add_exponential(rate_param="gamma_2")
-)
-
 data = DataConstructor(
     x_train=x_train,
     time_array=time_array,
     x_0=[x_0_train],
     x_raw=x_train,
+)
+
+library = (
+    LibraryBuilder()
+    .add_polynomial(max_degree=2, 
+                    include_interactions=True)
+    .add_hill(exponent_param="gamma_1")
+    .add_exponential(rate_param="gamma_2")
+)
+
+formulation_settings = FormulationSettings(
+    formulation="weak",
+    test_function="PolynomialWindow",
+    degree=2,
+    window_length=65,
+    stride=50,
+)
+
+solver_settings = SolverSettings(
+    solver_name="pysindy",
+    regularization="STLSQ",
+    regularization_parameters={
+        "normalize_columns": False,
+        "alpha": 0.05,
+        "threshold": 0.1,
+    },
+    scale_features=True,
 )
 
 optimizer_settings = OptimizerSettings(
@@ -76,24 +96,7 @@ optimizer_settings = OptimizerSettings(
     seed=RANDOM_SEED,
 )
 
-solver_settings = SolverSettings(
-    solver_name="pysindy",
-    regularization="STLSQ",
-    regularization_parameters={
-        "normalize_columns": False,
-        "alpha": 0.05,
-        "threshold": 0.1,
-    },
-    scale_features=True,
-)
 
-formulation_settings = FormulationSettings(
-    formulation="weak",
-    test_function="PolynomialWindow",
-    degree=2,
-    window_length=65,
-    stride=50,
-)
 
 result = identify(
     data_instance=data,

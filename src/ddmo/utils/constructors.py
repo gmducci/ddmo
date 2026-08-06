@@ -237,3 +237,15 @@ class IdentificationResult:
     alphas: list
     models: list
     theta_matrices: list
+
+    def symbolic_equations(self, **kwargs) -> list[str]:
+        """Format symbolic equations for one fitted Pareto solution."""
+        from ddmo.utils.symbolic_equations import symbolic_equations
+
+        return symbolic_equations(self, **kwargs)
+
+    def print_symbolic_equations(self, **kwargs) -> None:
+        """Print symbolic equations for one fitted Pareto solution."""
+        from ddmo.utils.symbolic_equations import print_symbolic_equations
+
+        print_symbolic_equations(self, **kwargs)

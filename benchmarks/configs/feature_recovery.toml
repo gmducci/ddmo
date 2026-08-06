@@ -16,8 +16,18 @@ train_trajectories = 3
 validation_trajectories = 1
 test_trajectories = 2
 noise_scale = "per_state_standard_deviation"
+initial_conditions = [
+  [1.0, 1.0],
+  [1.2, 2.5],
+  [2.0, 1.5],
+  [0.8, 3.0],
+  [1.5, 1.0],
+  [2.5, 3.0],
+]
 
 [truth]
+a = 1.0
+b = 3.0
 g1 = 2.0
 g2 = 1.0
 

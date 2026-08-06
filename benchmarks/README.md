@@ -34,10 +34,27 @@ python benchmarks/plan_runs.py benchmarks/configs/weak_noise.toml \
   --output benchmarks/results/weak_noise_jobs.csv
 ```
 
-The scientific runner will consume this manifest only after the core objective
-and weak-window semantics are corrected and tested. Final configurations must
-be committed before production runs; configuration changes after inspecting
-final outcomes require a new experiment version.
+Run the first feature-recovery job through the complete pipeline with a small
+smoke budget:
+
+```bash
+python benchmarks/run_job.py benchmarks/configs/feature_recovery.toml \
+  --job-id 0 --smoke
+```
+
+Smoke mode uses one training, validation, and test trajectory, a two-time-unit
+horizon, and a 12-by-3 optimizer budget. It exercises the production code path
+but does not produce scientific evidence. Its output is written to
+`benchmarks/results/raw/feature_recovery/feature_recovery-001-smoke.json`.
+
+After the smoke output has been inspected, run the same job at its committed
+production settings by omitting `--smoke`. Existing outputs are protected from
+accidental replacement; `--force` must be supplied explicitly to overwrite one.
+
+The runner currently supports `feature_recovery`. The weak-noise and joint
+Goodwin runners will be added only after this first pipeline is verified. Final
+configurations must be committed before production runs; configuration changes
+after inspecting final outcomes require a new experiment version.
 
 ## Output contract
 

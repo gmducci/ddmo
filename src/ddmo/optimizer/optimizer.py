@@ -69,8 +69,11 @@ class Optimizer(Problem):
         self.objectives = dict(selected_objectives)
         self.n_obj = len(self.objectives)
         self.solver_param_names = solver_param_names if solver_param_names else []
+        self.n_candidate_evaluations = 0
+        self.n_failed_evaluations = 0
 
     def _compute_metrics(self, optimization_variables, *args):
+        self.n_candidate_evaluations += 1
         # Create param_dict if mapi_label is available
         param_dict = {}
         if hasattr(self, "mapi_label"):
@@ -105,6 +108,7 @@ class Optimizer(Problem):
         solver_result: SolverResult = self.solver(*solver_args, **solver_kwargs)
 
         if solver_result is None or not solver_result.success:
+            self.n_failed_evaluations += 1
             return EvaluationResult(
                 obj_func_score={name: np.nan for name in self.objectives},
                 solution=None,
@@ -119,12 +123,16 @@ class Optimizer(Problem):
             solver_result=solver_result,
         )
         objective_scores = {}
+        objective_failed = False
         for name, obj_func in self.objectives.items():
             try:
                 objective_scores[name] = float(obj_func(context))
             except Exception:
                 logger.exception("Objective '%s' failed.", name)
                 objective_scores[name] = 1e5
+                objective_failed = True
+        if objective_failed:
+            self.n_failed_evaluations += 1
 
         logger.debug("Objective function values: %s", objective_scores)
         return EvaluationResult(

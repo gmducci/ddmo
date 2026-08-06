@@ -32,7 +32,7 @@ g1 = 2.0
 g2 = 1.0
 
 [fixed_library]
-g1 = 1.0
+g1 = 2.0
 g2 = 1.0
 
 [bounds.library]

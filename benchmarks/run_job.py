@@ -347,10 +347,28 @@ def run_feature_recovery(
     if len(result.models) == 0:
         raise RuntimeError("Optimization returned no Pareto solutions.")
 
+    valid_indices = [
+        index
+        for index, (model, coefficients, objective_values) in enumerate(
+            zip(result.models, result.coeff_matrices, result.objective_space)
+        )
+        if hasattr(model, "simulate")
+        and coefficients is not None
+        and np.asarray(coefficients).ndim == 2
+        and np.all(np.isfinite(objective_values))
+    ]
+    if not valid_indices:
+        failed = int(getattr(result.problem, "n_failed_evaluations", 0))
+        raise RuntimeError(
+            "Optimization produced no valid fitted models "
+            f"({failed} failed candidate evaluations)."
+        )
+
     objective_names = list(objectives)
     variable_names = list(optimizer_settings.all_bounds)
     pareto = []
-    for index, model in enumerate(result.models):
+    for index in valid_indices:
+        model = result.models[index]
         validation = _rollout_metrics(model, batch, validation_slice)
         coefficients = np.asarray(result.coeff_matrices[index], dtype=float)
         try:
@@ -432,6 +450,7 @@ def run_feature_recovery(
         "failed_candidate_count": int(
             getattr(result.problem, "n_failed_evaluations", 0)
         ),
+        "excluded_invalid_result_count": len(result.models) - len(valid_indices),
         "wall_time_seconds": elapsed,
         "pareto": pareto,
         "selected_index": selected_index,

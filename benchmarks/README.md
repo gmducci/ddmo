@@ -10,7 +10,8 @@ software-paper validation. It is intentionally separate from `examples/`:
 ## Experiment set
 
 1. `feature_recovery.toml` isolates parameterized-library recovery on the
-   Brusselator.
+   Brusselator by comparing the adaptive library with an oracle library whose
+   exponents are fixed to their known true values.
 2. `weak_noise.toml` compares strong, fixed weak, and optimized weak
    formulations on noisy Goodwin trajectories.
 3. `joint_goodwin.toml` exercises the complete joint library, formulation, and

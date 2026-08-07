@@ -35,3 +35,10 @@ def test_production_plan_preserves_committed_budget_and_splits():
     assert plan.generations == 15
     assert plan.split_counts == (3, 1, 2)
     assert plan.t_end == 25.0
+
+
+def test_fixed_library_is_the_oracle_comparison():
+    config = load_config(CONFIG)
+
+    assert config["fixed_library"]["g1"] == config["truth"]["g1"]
+    assert config["fixed_library"]["g2"] == config["truth"]["g2"]

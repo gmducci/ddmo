@@ -74,3 +74,16 @@ Raw outputs go under `benchmarks/results/raw/`. Aggregated tables and final
 figures go under `benchmarks/results/aggregated/` and
 `benchmarks/results/figures/`. These directories are ignored because archival
 results should be deposited separately from source code.
+
+## Postprocessing previews
+
+Generate the current feature-recovery tables, quality report, and figure
+previews at any point during the campaign:
+
+```bash
+MPLBACKEND=Agg python -m benchmarks.postprocessing.feature_recovery
+```
+
+The postprocessor excludes smoke and failed files and visibly labels figures
+as previews until every configured seed is present with clean Git provenance.
+See `postprocessing/README.md` for the complete output list.

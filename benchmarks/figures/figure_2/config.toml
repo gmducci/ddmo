@@ -1,0 +1,51 @@
+schema_version = 1
+
+[experiment]
+name = "weak_noise"
+system = "goodwin"
+description = "Compare strong, fixed weak, and optimized weak identification under noise."
+methods = ["strong", "weak_fixed", "weak_optimized"]
+noise_levels = [0.0, 0.05, 0.10]
+seeds = [11, 22, 33, 44, 55]
+
+[data]
+t_start = 0.0
+t_end = 100.0
+dt = 0.1
+train_trajectories = 3
+validation_trajectories = 1
+test_trajectories = 2
+noise_scale = "per_state_standard_deviation"
+
+[truth]
+hill_exponent = 9.5
+
+[strong_derivative]
+method = "savitzky_golay"
+window_length = 21
+polynomial_order = 3
+
+[weak_fixed]
+family = "PolynomialWindow"
+degree = 2
+window_length = 61
+stride = 20
+
+[bounds.formulation]
+degree = [2, 6]
+window_length = [21, 151]
+stride = [5, 40]
+
+[bounds.solver]
+threshold = [0.001, 0.2]
+alpha = [0.000001, 0.1]
+
+[optimizer]
+algorithm = "NSGA2"
+population = 40
+generations = 15
+objectives = ["trajectory_mse", "active_coefficients"]
+
+[selection]
+metric = "validation_rollout_nrmse"
+coefficient_zero_tolerance = 0.000001

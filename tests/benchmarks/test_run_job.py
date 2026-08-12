@@ -1,13 +1,15 @@
 from pathlib import Path
 
-from benchmarks.plan_runs import build_jobs, load_config
-from benchmarks.run_job import (
+from benchmarks.common.plan_runs import build_jobs, load_config
+from benchmarks.figures.figure_1.run import (
     SMOKE_GENERATIONS,
     SMOKE_POPULATION,
     make_runtime_plan,
 )
 
-CONFIG = Path(__file__).parents[2] / "benchmarks" / "configs" / "feature_recovery.toml"
+CONFIG = (
+    Path(__file__).parents[2] / "benchmarks" / "figures" / "figure_1" / "config.toml"
+)
 
 
 def test_smoke_plan_is_small_and_does_not_mutate_job():

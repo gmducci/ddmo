@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from benchmarks.postprocessing.feature_recovery import collect_records
+from benchmarks.figures.figure_1.postprocess import collect_records
 
 
 def _config():

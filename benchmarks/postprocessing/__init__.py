@@ -1,1 +1,1 @@
-"""Postprocessing utilities for ddmo publication benchmarks."""
+"""Compatibility namespace; new code lives under ``benchmarks.figures``."""

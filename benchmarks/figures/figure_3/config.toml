@@ -1,13 +1,16 @@
 schema_version = 1
 
 [experiment]
-name = "joint_goodwin_poly2_hill_exp_sg"
+name = "joint_goodwin_lhs_training_size"
 system = "goodwin"
-description = "Jointly optimize Hill and exponential library parameters, weak-form settings, and STLSQ using SG-preprocessed Goodwin data and a degree-2 polynomial candidate library."
+description = "Paired Latin-hypercube study of one, two, and three stacked training trajectories for joint Goodwin library optimization."
 job_id_scheme = "semantic"
 methods = ["weak_joint_sg"]
 noise_levels = [0.10]
-seeds = [11, 22, 33, 44, 55]
+seeds = [101, 102, 103, 104, 105, 106, 107, 108, 109, 110]
+optimizer_seeds = [1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010]
+ic_blocks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+training_sizes = [1, 2, 3]
 
 [data]
 t_start = 0.0
@@ -25,6 +28,10 @@ initial_conditions = [
   [0.7, 1.5, 0.6],
   [1.0, 0.8, 1.2],
 ]
+initial_condition_design = "lhs_initial_conditions.csv"
+initial_condition_design_method = "scipy.stats.qmc.LatinHypercube"
+initial_condition_design_seed = 20260813
+initial_condition_bounds = [[0.2, 1.0], [0.6, 1.5], [0.6, 1.5]]
 
 [truth]
 hill_exponent = 9.5

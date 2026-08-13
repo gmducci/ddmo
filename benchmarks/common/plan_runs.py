@@ -54,18 +54,57 @@ def build_jobs(config: dict, source: Path) -> list[dict]:
     evaluation_budget = int(optimizer["population"]) * int(optimizer["generations"])
 
     jobs = []
-    combinations = itertools.product(
-        experiment["methods"],
-        experiment["noise_levels"],
-        experiment["seeds"],
-    )
-    for index, (method, noise, seed) in enumerate(combinations, start=1):
+    paired_design = "training_sizes" in experiment
+    if paired_design:
+        blocks = experiment["ic_blocks"]
+        optimizer_seeds = experiment["optimizer_seeds"]
+        if not len(blocks) == len(experiment["seeds"]) == len(optimizer_seeds):
+            raise ValueError(
+                "ic_blocks, seeds, and optimizer_seeds must have equal lengths"
+            )
+        replicates = zip(blocks, experiment["seeds"], optimizer_seeds)
+        combinations = (
+            (method, noise, data_seed, optimizer_seed, block, training_size)
+            for method, noise, (
+                block,
+                data_seed,
+                optimizer_seed,
+            ), training_size in itertools.product(
+                experiment["methods"],
+                experiment["noise_levels"],
+                replicates,
+                experiment["training_sizes"],
+            )
+        )
+    else:
+        combinations = (
+            (method, noise, seed, seed, None, None)
+            for method, noise, seed in itertools.product(
+                experiment["methods"],
+                experiment["noise_levels"],
+                experiment["seeds"],
+            )
+        )
+    for index, (
+        method,
+        noise,
+        data_seed,
+        optimizer_seed,
+        block,
+        training_size,
+    ) in enumerate(combinations, start=1):
         if experiment.get("job_id_scheme") == "semantic":
             noise_percent = int(round(100 * float(noise)))
-            job_id = (
-                f"{experiment['name']}-{method}-"
-                f"noise{noise_percent:03d}-seed{int(seed):03d}"
-            )
+            if paired_design:
+                job_id = (
+                    f"{experiment['name']}-{method}-train{int(training_size)}-"
+                    f"block{int(block):02d}-noise{noise_percent:03d}"
+                )
+            else:
+                job_id = (
+                    f"{experiment['name']}-{method}-"
+                    f"noise{noise_percent:03d}-seed{int(data_seed):03d}"
+                )
         else:
             job_id = f"{experiment['name']}-{index:03d}"
         jobs.append(
@@ -75,14 +114,17 @@ def build_jobs(config: dict, source: Path) -> list[dict]:
                 "system": experiment["system"],
                 "method": method,
                 "noise_level": float(noise),
-                "data_seed": int(seed),
-                "optimizer_seed": int(seed),
+                "data_seed": int(data_seed),
+                "optimizer_seed": int(optimizer_seed),
                 "population": int(optimizer["population"]),
                 "generations": int(optimizer["generations"]),
                 "evaluation_budget": evaluation_budget,
                 "config": str(source),
             }
         )
+        if paired_design:
+            jobs[-1]["ic_block"] = int(block)
+            jobs[-1]["training_trajectories"] = int(training_size)
     return jobs
 
 

@@ -72,6 +72,9 @@ def _summary_row(payload: dict[str, Any]) -> dict[str, Any]:
     return {
         "job_id": payload["job"]["job_id"],
         "seed": payload["job"]["data_seed"],
+        "optimizer_seed": payload["job"]["optimizer_seed"],
+        "ic_block": payload["job"].get("ic_block"),
+        "training_trajectories": payload["job"].get("training_trajectories", 3),
         "gamma_1": recovery["recovered"],
         "gamma_1_relative_error": recovery["relative_error"],
         "gamma_1_identifiable": hill_selected,
@@ -294,6 +297,157 @@ def plot_optimization_variables(
         plt.close(fig)
 
 
+def _wilson_interval(successes: int, total: int) -> tuple[float, float]:
+    """Return a 95% Wilson score interval for a binomial proportion."""
+    z = 1.959963984540054
+    proportion = successes / total
+    denominator = 1.0 + z**2 / total
+    center = (proportion + z**2 / (2.0 * total)) / denominator
+    radius = (
+        z
+        * np.sqrt(proportion * (1.0 - proportion) / total + z**2 / (4.0 * total**2))
+        / denominator
+    )
+    return center - radius, center + radius
+
+
+def plot_training_size_study(
+    output_stem: Path,
+    payloads: list[tuple[dict[str, Any], Path]],
+) -> None:
+    """Summarize the paired LHS study across stacked training-set sizes."""
+    sizes = sorted(
+        {int(payload["job"]["training_trajectories"]) for payload, _ in payloads}
+    )
+    grouped = {
+        size: [
+            payload
+            for payload, _ in payloads
+            if int(payload["job"]["training_trajectories"]) == size
+        ]
+        for size in sizes
+    }
+    point_colors = plt.get_cmap("tab10")(np.linspace(0.0, 0.9, 10))
+    with publication_style():
+        fig, axes = plt.subplots(2, 2, figsize=(7.2, 5.3))
+        rate_axis, error_axis, gamma_axis, fp_axis = axes.flat
+        rate_specs = [
+            ("Hill selected", lambda payload: _family_selected(payload, "Hill(")),
+            (
+                "Exact support",
+                lambda payload: bool(
+                    payload["selected"]["coefficient_metrics"]["support_exact"]
+                ),
+            ),
+            (
+                "Exponential selected",
+                lambda payload: _family_selected(payload, "exp("),
+            ),
+        ]
+        rate_colors = [STATE_COLORS[2], STATE_COLORS[1], STATE_COLORS[0]]
+        for offset, ((label, predicate), color) in enumerate(
+            zip(rate_specs, rate_colors)
+        ):
+            x_values = np.asarray(sizes, dtype=float) + (offset - 1) * 0.07
+            rates = []
+            lower_errors = []
+            upper_errors = []
+            for size in sizes:
+                values = grouped[size]
+                successes = sum(predicate(payload) for payload in values)
+                rate = successes / len(values)
+                lower, upper = _wilson_interval(successes, len(values))
+                rates.append(rate)
+                lower_errors.append(rate - lower)
+                upper_errors.append(upper - rate)
+            rate_axis.errorbar(
+                x_values,
+                rates,
+                yerr=np.asarray([lower_errors, upper_errors]),
+                marker="o",
+                color=color,
+                capsize=2.5,
+                label=label,
+            )
+        rate_axis.set(
+            xlabel="Training trajectories",
+            ylabel="Selection probability",
+            xticks=sizes,
+            ylim=(-0.04, 1.04),
+        )
+        rate_axis.legend(frameon=False, fontsize=7)
+
+        metric_specs = [
+            (
+                error_axis,
+                "Held-out test NRMSE",
+                lambda payload: float(payload["test"]["rollout_nrmse"]),
+            ),
+            (
+                fp_axis,
+                "False-positive coefficients",
+                lambda payload: float(
+                    payload["selected"]["coefficient_metrics"][
+                        "false_positive_coefficients"
+                    ]
+                ),
+            ),
+        ]
+        for axis, ylabel, accessor in metric_specs:
+            values_by_size = [
+                np.asarray([accessor(payload) for payload in grouped[size]])
+                for size in sizes
+            ]
+            axis.boxplot(values_by_size, positions=sizes, widths=0.45, showfliers=False)
+            for size, values in zip(sizes, values_by_size):
+                blocks = [int(payload["job"]["ic_block"]) for payload in grouped[size]]
+                jitter = np.linspace(-0.11, 0.11, len(values))
+                for dx, value, block in zip(jitter, values, blocks):
+                    axis.scatter(
+                        size + dx,
+                        value,
+                        color=point_colors[block - 1],
+                        s=18,
+                        edgecolor="white",
+                        linewidth=0.35,
+                        zorder=3,
+                    )
+            axis.set(xlabel="Training trajectories", ylabel=ylabel, xticks=sizes)
+
+        for size in sizes:
+            active = [
+                payload
+                for payload in grouped[size]
+                if _family_selected(payload, "Hill(")
+            ]
+            for dx, payload in zip(
+                np.linspace(-0.11, 0.11, len(active)) if active else [], active
+            ):
+                block = int(payload["job"]["ic_block"])
+                error = abs(float(payload["selected"]["variables"]["gamma_1"]) - 9.5)
+                gamma_axis.scatter(
+                    size + dx,
+                    error,
+                    color=point_colors[block - 1],
+                    s=20,
+                    edgecolor="white",
+                    linewidth=0.35,
+                )
+        gamma_axis.set(
+            xlabel="Training trajectories",
+            ylabel=r"Conditional $|\hat{\gamma}_1-9.5|$",
+            xticks=sizes,
+        )
+        for axis in axes.flat:
+            axis.grid(axis="y", color="#D9D9D9", linewidth=0.6)
+        fig.suptitle("Figure 3 paired Latin-hypercube training-size study", fontsize=10)
+        fig.tight_layout(rect=(0.0, 0.0, 1.0, 0.95), w_pad=1.3, h_pad=1.2)
+        output_stem.parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(output_stem.with_suffix(".png"))
+        fig.savefig(output_stem.with_suffix(".pdf"))
+        plt.close(fig)
+
+
 def plot_joint_result(
     output_stem: Path,
     payload: dict[str, Any],
@@ -322,11 +476,7 @@ def plot_joint_result(
     )
     median_gamma_1 = float(np.median(recovered_gamma_1))
     median_gamma_2 = float(np.median(recovered_gamma_2))
-    state = (
-        "PREVIEW"
-        if payload["provenance"]["git_dirty"] or expected_jobs > 1
-        else "FINAL"
-    )
+    state = "PREVIEW" if payload["provenance"]["git_dirty"] else "FINAL"
     with publication_style():
         fig = plt.figure(figsize=(7.2, 5.2))
         grid = fig.add_gridspec(
@@ -420,11 +570,11 @@ def plot_joint_result(
             0.0,
             0.78,
             "Conditional library-parameter recovery\n"
-            + rf"Hill selected {len(hill_payloads)}/5; $\gamma_1$ median "
+            + rf"Hill selected {len(hill_payloads)}/{expected_jobs}; $\gamma_1$ median "
             + rf"{median_gamma_1:.4g}, range "
             + rf"[{np.min(recovered_gamma_1):.4g}, {np.max(recovered_gamma_1):.4g}]"
             + "\n"
-            + rf"Exponential selected {len(exponential_payloads)}/5; $\gamma_2$ range "
+            + rf"Exponential selected {len(exponential_payloads)}/{expected_jobs}; $\gamma_2$ range "
             + rf"[{np.min(recovered_gamma_2):.4g}, {np.max(recovered_gamma_2):.4g}]"
             + "\n"
             + rf"Representative seed: {payload['job']['data_seed']}, "
@@ -927,6 +1077,8 @@ def main() -> None:
         excluded_pareto_seeds,
         config,
     )
+    if all("training_trajectories" in payload["job"] for payload, _ in payloads):
+        plot_training_size_study(figures / "figure_3_training_size_study", payloads)
     exponential_payloads = [
         pair for pair in payloads if _family_selected(pair[0], "exp(")
     ]

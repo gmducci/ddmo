@@ -1,7 +1,9 @@
+import csv
 from pathlib import Path
 
 import numpy as np
 from pysindy.feature_library import CustomLibrary
+from scipy.stats import qmc
 
 from benchmarks.common.goodwin import (
     build_identification_settings,
@@ -16,6 +18,7 @@ from benchmarks.common.plan_runs import build_jobs, load_config
 ROOT = Path(__file__).parents[2]
 FIGURE_2_CONFIG = ROOT / "benchmarks/figures/figure_2/config.toml"
 FIGURE_3_CONFIG = ROOT / "benchmarks/figures/figure_3/config.toml"
+FIGURE_3_LHS = ROOT / "benchmarks/figures/figure_3/lhs_initial_conditions.csv"
 
 
 def _job_for_method(config, config_path, method):
@@ -212,6 +215,63 @@ def test_figure_3_joint_parameter_set_and_truth_matrix():
     assert np.count_nonzero(truth) == 6
     assert np.allclose(truth[0], [-0.2, 1.0, 0.0])
     assert np.allclose(truth[-1], [1.0, 0.0, 0.0])
+
+
+def test_figure_3_paired_lhs_job_matrix_and_independent_seeds():
+    config = load_config(FIGURE_3_CONFIG)
+    jobs = build_jobs(config, FIGURE_3_CONFIG)
+
+    assert len(jobs) == 30
+    assert {job["training_trajectories"] for job in jobs} == {1, 2, 3}
+    assert {job["ic_block"] for job in jobs} == set(range(1, 11))
+    assert all(job["data_seed"] != job["optimizer_seed"] for job in jobs)
+    for block in range(1, 11):
+        block_jobs = [job for job in jobs if job["ic_block"] == block]
+        assert len({job["data_seed"] for job in block_jobs}) == 1
+        assert len({job["optimizer_seed"] for job in block_jobs}) == 1
+
+
+def test_figure_3_lhs_design_is_frozen_and_reproducible():
+    with FIGURE_3_LHS.open(newline="", encoding="utf-8") as stream:
+        rows = list(csv.DictReader(stream))
+    stored = np.asarray(
+        [[float(row[name]) for name in ("x0", "y0", "z0")] for row in rows]
+    )
+    unit_design = qmc.LatinHypercube(d=3, seed=20260813).random(60)
+    regenerated = qmc.scale(
+        unit_design,
+        [0.2, 0.6, 0.6],
+        [1.0, 1.5, 1.5],
+    )
+
+    assert stored.shape == (60, 3)
+    assert np.allclose(stored, regenerated, atol=5e-13, rtol=0.0)
+    assert [row["role"] for row in rows[:6]] == [
+        "train_1",
+        "train_2",
+        "train_3",
+        "validation",
+        "test_1",
+        "test_2",
+    ]
+
+
+def test_figure_3_lhs_training_sizes_are_nested_and_paired():
+    config = load_config(FIGURE_3_CONFIG)
+    jobs = [job for job in build_jobs(config, FIGURE_3_CONFIG) if job["ic_block"] == 1]
+    batches = {}
+    for job in jobs:
+        plan = make_runtime_plan(config, job, smoke=True)
+        batches[job["training_trajectories"]] = generate_batch(config, plan)
+
+    one, two, three = (batches[size] for size in (1, 2, 3))
+    assert one.x_clean.shape == (4, 201, 3)
+    assert two.x_clean.shape == (5, 201, 3)
+    assert three.x_clean.shape == (6, 201, 3)
+    assert np.array_equal(one.x_noisy[0], three.x_noisy[0])
+    assert np.array_equal(two.x_noisy[:2], three.x_noisy[:2])
+    assert np.array_equal(one.x_noisy[1:], three.x_noisy[3:])
+    assert np.array_equal(two.x_noisy[2:], three.x_noisy[3:])
 
 
 def test_figure_3_uses_sg_and_full_parametric_candidate_library():

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import csv
 import hashlib
 import importlib.metadata
 import json
@@ -65,7 +66,7 @@ def make_runtime_plan(
             population=int(smoke_config.get("population", 12)),
             generations=int(smoke_config.get("generations", 3)),
             t_end=float(smoke_config.get("t_end", 20.0)),
-            split_counts=(1, 1, 1),
+            split_counts=(int(job.get("training_trajectories", 1)), 1, 1),
             mode="smoke",
         )
     return GoodwinRuntimePlan(
@@ -74,7 +75,7 @@ def make_runtime_plan(
         generations=int(config["optimizer"]["generations"]),
         t_end=float(data["t_end"]),
         split_counts=(
-            int(data["train_trajectories"]),
+            int(job.get("training_trajectories", data["train_trajectories"])),
             int(data["validation_trajectories"]),
             int(data["test_trajectories"]),
         ),
@@ -121,6 +122,27 @@ def generate_batch(config: dict, plan: GoodwinRuntimePlan) -> ODEDataBatch:
     truth = config["truth"]
     required = sum(plan.split_counts)
     configured = data.get("initial_conditions", [])
+    design_path = data.get("initial_condition_design")
+    selected_indices = None
+    if design_path:
+        source = Path(plan.job["config"]).resolve().parent / str(design_path)
+        roles = ["train_1", "train_2", "train_3", "validation", "test_1", "test_2"]
+        with source.open(newline="", encoding="utf-8") as stream:
+            rows = [
+                row
+                for row in csv.DictReader(stream)
+                if int(row["block"]) == int(plan.job["ic_block"])
+            ]
+        by_role = {row["role"]: row for row in rows}
+        if set(by_role) != set(roles):
+            raise ValueError(f"Invalid initial-condition block {plan.job['ic_block']}")
+        configured = [
+            [float(by_role[role][name]) for name in ("x0", "y0", "z0")]
+            for role in roles
+        ]
+        n_train = plan.split_counts[0]
+        selected_indices = list(range(n_train)) + [3, 4, 5]
+        required = 6
     if len(configured) < required:
         raise ValueError(
             f"data.initial_conditions needs at least {required} entries; "
@@ -141,7 +163,7 @@ def generate_batch(config: dict, plan: GoodwinRuntimePlan) -> ODEDataBatch:
     )
     dt = float(data["dt"])
     time_array = np.arange(float(data["t_start"]), plan.t_end + 0.5 * dt, dt)
-    return ODEDataGenerator(
+    batch = ODEDataGenerator(
         system.dynamics,
         initial_conditions=initial_conditions,
         time_array=time_array,
@@ -149,6 +171,17 @@ def generate_batch(config: dict, plan: GoodwinRuntimePlan) -> ODEDataBatch:
         seed=int(plan.job["data_seed"]),
         clip_min=1e-10,
     ).generate()
+    if selected_indices is None:
+        return batch
+    return ODEDataBatch(
+        time=batch.time,
+        x_clean=batch.x_clean[selected_indices],
+        x_noisy=batch.x_noisy[selected_indices],
+        x_dot_clean=batch.x_dot_clean[selected_indices],
+        initial_conditions=[
+            batch.initial_conditions[index] for index in selected_indices
+        ],
+    )
 
 
 def split_slices(

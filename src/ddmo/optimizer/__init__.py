@@ -7,6 +7,7 @@ from ddmo.optimizer.objective_functions import (
     durbin_watson_deviation,
     make_active_coefficient_count,
     trajectory_mse,
+    trajectory_rmse,
 )
 
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
     "durbin_watson_deviation",
     "make_active_coefficient_count",
     "trajectory_mse",
+    "trajectory_rmse",
 ]

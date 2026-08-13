@@ -26,7 +26,12 @@ from ddmo import (
 )
 from ddmo.equations.goodwin_eqs import GoodwinModel
 from ddmo.library_functions import LibraryBuilder
-from ddmo.optimizer import make_active_coefficient_count, trajectory_mse
+from ddmo.optimizer import (
+    durbin_watson_deviation,
+    make_active_coefficient_count,
+    trajectory_mse,
+    trajectory_rmse,
+)
 from ddmo.utils.ode_data_generator import ODEDataBatch, ODEDataGenerator
 
 STATE_NAMES = ["x", "y", "z"]
@@ -168,9 +173,7 @@ def build_library(
         library = LibraryBuilder().add_polynomial(
             max_degree=polynomial_degree,
             include_constant=False,
-            include_interactions=bool(
-                library_config.get("include_interactions", True)
-            ),
+            include_interactions=bool(library_config.get("include_interactions", True)),
         )
     else:
         library = LibraryBuilder().add_identity()
@@ -380,6 +383,10 @@ def _objectives(config: dict[str, Any]) -> dict[str, Any]:
     for name in config["optimizer"]["objectives"]:
         if name == "trajectory_mse":
             objectives[name] = trajectory_mse
+        elif name == "trajectory_rmse":
+            objectives[name] = trajectory_rmse
+        elif name in {"durbin_watson_deviation", "dw_coefficient"}:
+            objectives[name] = durbin_watson_deviation
         elif name in {"active_coefficients", "active_coefficient_count"}:
             objectives[name] = make_active_coefficient_count(tolerance=tolerance)
         else:

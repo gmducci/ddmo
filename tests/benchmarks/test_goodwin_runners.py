@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import numpy as np
-
 from pysindy.feature_library import CustomLibrary
 
 from benchmarks.common.goodwin import (
@@ -178,6 +177,11 @@ def test_figure_2_adds_degree_two_polynomials_and_interactions():
 
 def test_figure_3_joint_parameter_set_and_truth_matrix():
     config = load_config(FIGURE_3_CONFIG)
+    assert config["optimizer"]["objectives"] == [
+        "trajectory_rmse",
+        "durbin_watson_deviation",
+        "active_coefficients",
+    ]
     job = _job_for_method(config, FIGURE_3_CONFIG, "weak_joint_sg")
     plan = make_runtime_plan(config, job, smoke=True)
     batch = generate_batch(config, plan)

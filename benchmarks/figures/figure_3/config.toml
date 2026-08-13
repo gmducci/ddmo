@@ -75,7 +75,7 @@ alpha = [0.000001, 1.0]
 algorithm = "NSGA2"
 population = 80
 generations = 30
-objectives = ["trajectory_mse", "active_coefficients"]
+objectives = ["trajectory_rmse", "durbin_watson_deviation", "active_coefficients"]
 
 [selection]
 metric = "validation_rollout_nrmse"

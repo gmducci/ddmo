@@ -7,6 +7,7 @@ from ddmo.optimizer.objective_functions import (
     compute_dw_coefficient,
     compute_mse,
     make_active_coefficient_count,
+    trajectory_rmse,
 )
 from ddmo.solver.result import SolverResult
 from ddmo.utils.data_constructor import DataConstructor
@@ -33,6 +34,24 @@ def test_compute_mse_slices_stacked_solution_by_trajectory_length():
     )
 
     assert compute_mse(data, sol) == 4.0
+
+
+def test_trajectory_rmse_is_root_of_worst_per_state_mse():
+    values = np.array([[1.0], [2.0], [3.0]])
+    data = DataConstructor(
+        x_train=values,
+        time_array=np.arange(3, dtype=float),
+        x_0=[values[0]],
+        x_raw=values,
+    )
+    solver_result = SolverResult(
+        solution=values + 3.0,
+        coefficients=np.ones((1, 1)),
+        opt_vars=(),
+        model=None,
+    )
+
+    assert trajectory_rmse(ObjectiveContext(data, solver_result)) == 3.0
 
 
 def test_durbin_watson_returns_worst_absolute_deviation_from_two():

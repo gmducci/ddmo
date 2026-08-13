@@ -9,6 +9,10 @@ The seven outer variables are `gamma_1`, `gamma_2`, weak-test-function degree,
 window length, stride, STLSQ threshold, and STLSQ alpha. STLSQ fits and
 sparsifies the 45 equation coefficients for every outer candidate.
 
+The three minimized objectives are the worst state-wise training trajectory
+RMSE, the worst absolute Durbin--Watson residual deviation from two, and the
+number of coefficients whose magnitude exceeds `1e-6`.
+
 The Goodwin ground truth contains the Hill term with `gamma_1 = 9.5` but no
 exponential term. Consequently `gamma_2` is an optimized nuisance parameter,
 not an identifiable recovery target when exponential coefficients are zero.

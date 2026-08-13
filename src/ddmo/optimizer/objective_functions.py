@@ -39,6 +39,11 @@ def trajectory_mse(context: ObjectiveContext) -> float:
     return compute_mse(context.data, context.solution)
 
 
+def trajectory_rmse(context: ObjectiveContext) -> float:
+    """Return the worst per-state trajectory root mean squared error."""
+    return float(np.sqrt(compute_mse(context.data, context.solution)))
+
+
 def durbin_watson_deviation(context: ObjectiveContext) -> float:
     """Return the worst absolute residual Durbin-Watson deviation from two."""
     return compute_dw_coefficient(context.data, context.solution)

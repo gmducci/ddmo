@@ -9,9 +9,9 @@ from pathlib import Path
 from typing import Any
 
 import matplotlib.pyplot as plt
-from matplotlib.colors import TwoSlopeNorm
 import numpy as np
 import tomllib
+from matplotlib.colors import TwoSlopeNorm
 
 from benchmarks.common.goodwin import true_coefficient_matrix
 from benchmarks.common.style import publication_style
@@ -19,6 +19,7 @@ from benchmarks.common.style import publication_style
 plt.switch_backend("Agg")
 STATE_NAMES = ["x", "y", "z"]
 STATE_COLORS = ["#3B4CC0", "#00876C", "#B40426"]
+PARETO_SAMPLE_SEED = 20260813
 
 
 def _canonical_feature(name: str) -> str:
@@ -107,6 +108,190 @@ def write_csv(path: Path, payloads: list[tuple[dict[str, Any], Path]]) -> None:
         writer = csv.DictWriter(stream, fieldnames=list(rows[0]))
         writer.writeheader()
         writer.writerows(rows)
+
+
+def sample_hill_active_pareto_solutions(
+    payloads: list[tuple[dict[str, Any], Path]],
+    config: dict[str, Any],
+    random_seed: int = PARETO_SAMPLE_SEED,
+) -> tuple[list[dict[str, Any]], list[int]]:
+    """Select one reproducible Hill-active member from each eligible front."""
+    generator = np.random.default_rng(random_seed)
+    tolerance = float(config["selection"]["coefficient_zero_tolerance"])
+    samples = []
+    excluded_seeds = []
+    for payload, _ in payloads:
+        pareto = payload["pareto"]
+        if not pareto:
+            raise ValueError(f"Empty Pareto front for {payload['job']['job_id']}")
+        eligible = []
+        for solution in pareto:
+            hill_active = any(
+                _canonical_feature(feature).startswith("Hill(")
+                and np.any(np.abs(np.asarray(row, dtype=float)) > tolerance)
+                for feature, row in zip(
+                    solution["feature_names"], solution["coefficients"]
+                )
+            )
+            if hill_active:
+                eligible.append(solution)
+        if not eligible:
+            excluded_seeds.append(int(payload["job"]["data_seed"]))
+            continue
+        solution = eligible[int(generator.integers(len(eligible)))]
+        samples.append(
+            {
+                "job_id": payload["job"]["job_id"],
+                "data_seed": int(payload["job"]["data_seed"]),
+                "pareto_size": len(pareto),
+                "hill_active_pool_size": len(eligible),
+                "pareto_solution_index": int(solution["index"]),
+                "variables": {
+                    name: float(value) for name, value in solution["variables"].items()
+                },
+            }
+        )
+    if not samples:
+        raise ValueError("No Figure 3 Pareto front contains a Hill-active solution")
+    return samples, excluded_seeds
+
+
+def write_pareto_sample_csv(path: Path, samples: list[dict[str, Any]]) -> None:
+    """Record the exact random Pareto members used in the violin plot."""
+    rows = []
+    for sample in samples:
+        rows.append(
+            {
+                "sampling_seed": PARETO_SAMPLE_SEED,
+                "job_id": sample["job_id"],
+                "data_seed": sample["data_seed"],
+                "pareto_size": sample["pareto_size"],
+                "hill_active_pool_size": sample["hill_active_pool_size"],
+                "pareto_solution_index": sample["pareto_solution_index"],
+                **sample["variables"],
+            }
+        )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="", encoding="utf-8") as stream:
+        writer = csv.DictWriter(stream, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def plot_optimization_variables(
+    output_stem: Path,
+    samples: list[dict[str, Any]],
+    total_fronts: int,
+    excluded_seeds: list[int],
+    config: dict[str, Any],
+) -> None:
+    """Plot variables from sampled Hill-active Pareto members."""
+    variable_specs = [
+        ("gamma_1", r"Hill exponent $\gamma_1$", "linear"),
+        ("gamma_2", r"Exponential rate $\gamma_2$", "linear"),
+        ("degree", "Weak polynomial degree", "linear"),
+        ("window_length", "Weak window length", "linear"),
+        ("stride", "Weak stride", "linear"),
+        ("threshold", "STLSQ threshold", "log"),
+        ("alpha", r"STLSQ ridge $\alpha$", "log"),
+    ]
+    bound_sections = {
+        "gamma_1": "library",
+        "gamma_2": "library",
+        "degree": "formulation",
+        "window_length": "formulation",
+        "stride": "formulation",
+        "threshold": "solver",
+        "alpha": "solver",
+    }
+    seeds = [int(sample["data_seed"]) for sample in samples]
+    point_colors = plt.get_cmap("tab10")(np.linspace(0.0, 0.4, len(samples)))
+    with publication_style():
+        fig, axes = plt.subplots(2, 4, figsize=(7.2, 4.8))
+        for axis, (name, label, scale) in zip(axes.flat, variable_specs):
+            values = np.asarray(
+                [sample["variables"][name] for sample in samples], dtype=float
+            )
+            parts = axis.violinplot(
+                values,
+                positions=[0.0],
+                widths=0.72,
+                showmeans=False,
+                showmedians=True,
+                showextrema=True,
+            )
+            for body in parts["bodies"]:
+                body.set_facecolor("#5B8DB8")
+                body.set_edgecolor("#264B6A")
+                body.set_alpha(0.42)
+            for part_name in ("cbars", "cmins", "cmaxes", "cmedians"):
+                parts[part_name].set_color("#264B6A")
+                parts[part_name].set_linewidth(1.0)
+            offsets = np.linspace(-0.11, 0.11, len(values))
+            for offset, value, color in zip(offsets, values, point_colors):
+                axis.scatter(
+                    offset,
+                    value,
+                    s=22,
+                    color=color,
+                    edgecolor="white",
+                    linewidth=0.45,
+                    zorder=3,
+                )
+            section = bound_sections[name]
+            lower, upper = map(float, config["bounds"][section][name])
+            axis.set_ylim(lower, upper)
+            axis.set_yscale(scale)
+            axis.set_xlim(-0.52, 0.52)
+            axis.set_xticks([])
+            axis.set_title(label, fontweight="bold")
+            axis.grid(axis="y", color="#D9D9D9", linewidth=0.6)
+            if name == "gamma_1":
+                axis.axhline(
+                    float(config["truth"]["hill_exponent"]),
+                    color="#222222",
+                    linestyle="--",
+                    linewidth=0.9,
+                    label="Ground truth",
+                )
+        unused_axis = axes.flat[-1]
+        unused_axis.axis("off")
+        seed_handles = [
+            plt.Line2D(
+                [],
+                [],
+                marker="o",
+                linestyle="none",
+                color=color,
+                markeredgecolor="white",
+                markeredgewidth=0.45,
+                label=f"seed {seed}",
+            )
+            for seed, color in zip(seeds, point_colors)
+        ]
+        unused_axis.legend(
+            handles=seed_handles,
+            loc="center",
+            title=f"Hill-active fronts ({len(samples)}/{total_fronts})",
+            ncol=1,
+        )
+        fig.suptitle(
+            "Figure 3 optimization variables — Hill-active Pareto samples",
+            fontsize=10,
+        )
+        fig.text(
+            0.5,
+            0.012,
+            f"Fixed sampling seed: {PARETO_SAMPLE_SEED}; "
+            + f"excluded fronts without an active Hill term: {excluded_seeds}",
+            ha="center",
+            fontsize=7.5,
+        )
+        fig.tight_layout(rect=(0.0, 0.045, 1.0, 0.94), w_pad=1.25, h_pad=1.15)
+        output_stem.parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(output_stem.with_suffix(".png"))
+        fig.savefig(output_stem.with_suffix(".pdf"))
+        plt.close(fig)
 
 
 def plot_joint_result(
@@ -271,6 +456,165 @@ def plot_joint_result(
         plt.close(fig)
 
 
+def plot_exponential_substitution(
+    output_stem: Path,
+    payload: dict[str, Any],
+    artifact_path: Path,
+    config: dict[str, Any],
+) -> None:
+    """Plot a held-out rollout for a model that substitutes an exponential term."""
+    selected = payload["selected"]
+    tolerance = float(config["selection"]["coefficient_zero_tolerance"])
+    coefficients = np.asarray(selected["coefficients"], dtype=float)
+    exponential_terms = []
+    for feature_index, feature in enumerate(selected["feature_names"]):
+        canonical = _canonical_feature(feature)
+        if not canonical.startswith("exp("):
+            continue
+        for equation_index, coefficient in enumerate(coefficients[feature_index]):
+            if abs(coefficient) > tolerance:
+                exponential_terms.append(
+                    (canonical, equation_index, float(coefficient))
+                )
+    if not exponential_terms:
+        raise ValueError("Selected Figure 3 model has no active exponential term")
+
+    feature, equation_index, coefficient = exponential_terms[0]
+    gamma_2 = float(selected["variables"]["gamma_2"])
+    gamma_truth = float(config["truth"]["hill_exponent"])
+    arrays = np.load(artifact_path)
+    time = arrays["time"]
+    clean = arrays["test_clean"][0]
+    noisy = arrays["test_noisy"][0]
+    prediction = arrays["test_prediction"][0]
+    observed_z = np.concatenate(
+        [
+            arrays["train_clean"][:, :, 2].ravel(),
+            arrays["validation_clean"][:, :, 2].ravel(),
+            arrays["test_clean"][:, :, 2].ravel(),
+        ]
+    )
+    plot_min = max(0.0, float(np.min(observed_z)))
+    plot_max = min(2.0, float(np.max(observed_z)))
+    library_input = np.linspace(plot_min, plot_max, 500)
+    learned_source = coefficient * np.exp(-gamma_2 * library_input)
+    truth_source = 1.0 / (1.0 + library_input**gamma_truth)
+    training_min_z = float(np.min(arrays["train_clean"][:, :, 2]))
+    learned_at_training_min = coefficient * np.exp(-gamma_2 * training_min_z)
+    truth_at_training_min = 1.0 / (1.0 + training_min_z**gamma_truth)
+    test_nrmse = float(payload["test"]["rollout_nrmse"])
+
+    with publication_style():
+        fig = plt.figure(figsize=(7.2, 5.2))
+        grid = fig.add_gridspec(
+            3, 2, width_ratios=[2.1, 1.55], hspace=0.28, wspace=0.34
+        )
+        handles = labels = None
+        for state_index, (state_name, color) in enumerate(
+            zip(STATE_NAMES, STATE_COLORS)
+        ):
+            axis = fig.add_subplot(grid[state_index, 0])
+            axis.plot(
+                time,
+                clean[:, state_index],
+                color="#222222",
+                label="Clean reference",
+            )
+            axis.scatter(
+                time[::10],
+                noisy[::10, state_index],
+                color=color,
+                s=8,
+                alpha=0.3,
+                label="Noisy observations",
+            )
+            axis.plot(
+                time,
+                prediction[:, state_index],
+                color=color,
+                linestyle="--",
+                label="Identified rollout",
+            )
+            axis.set_ylabel(state_name)
+            axis.grid(axis="y", color="#D9D9D9", linewidth=0.6)
+            if state_index < 2:
+                axis.tick_params(labelbottom=False)
+            else:
+                axis.set_xlabel("Time")
+            if state_index == 0:
+                handles, labels = axis.get_legend_handles_labels()
+
+        source_axis = fig.add_subplot(grid[0:2, 1])
+        source_axis.plot(
+            library_input,
+            truth_source,
+            color="#222222",
+            linewidth=1.6,
+            label=rf"Truth: $1/(1+z^{{{gamma_truth:.3g}}})$",
+        )
+        source_axis.plot(
+            library_input,
+            learned_source,
+            color=STATE_COLORS[2],
+            linewidth=1.6,
+            linestyle="--",
+            label=rf"Selected: ${coefficient:.3g}e^{{-{gamma_2:.3g}z}}$",
+        )
+        source_axis.axhline(0.0, color="#BDBDBD", linewidth=0.7, zorder=0)
+        source_axis.set(
+            xlabel="z (observed switching region)",
+            ylabel=r"Contribution to $\dot{x}$",
+            xlim=(plot_min, plot_max),
+        )
+        source_axis.axvline(
+            training_min_z,
+            color="#808080",
+            linewidth=0.8,
+            linestyle=":",
+            label="Minimum training z",
+        )
+        source_axis.set_title("Source terms near switching region", loc="left")
+        source_axis.grid(axis="y", color="#D9D9D9", linewidth=0.6)
+        source_axis.legend(frameon=False, fontsize=7)
+
+        detail_axis = fig.add_subplot(grid[2, 1])
+        detail_axis.axis("off")
+        detail_axis.text(
+            0.0,
+            0.82,
+            rf"Selected term: {feature} in $\dot{{{STATE_NAMES[equation_index]}}}$"
+            + "\n"
+            + rf"coefficient={coefficient:.6g}, $\gamma_2$={gamma_2:.6g}"
+            + "\n"
+            + rf"at min training z={training_min_z:.3g}: selected="
+            + rf"{learned_at_training_min:.3g}, truth={truth_at_training_min:.3g}"
+            + "\n"
+            + rf"held-out test NRMSE={test_nrmse:.4g}",
+            ha="left",
+            va="top",
+            fontsize=7.5,
+            linespacing=1.5,
+        )
+        fig.suptitle(
+            f"Exponential-substitution rollout — seed {payload['job']['data_seed']}",
+            fontsize=10,
+            y=0.995,
+        )
+        if handles is not None and labels is not None:
+            fig.legend(
+                handles,
+                labels,
+                loc="upper left",
+                bbox_to_anchor=(0.06, 0.955),
+                ncol=3,
+                frameon=False,
+            )
+        output_stem.parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(output_stem.with_suffix(".png"))
+        fig.savefig(output_stem.with_suffix(".pdf"))
+        plt.close(fig)
+
+
 def write_coefficient_csv(
     path: Path, payloads: list[tuple[dict[str, Any], Path]], config: dict[str, Any]
 ) -> None:
@@ -312,9 +656,7 @@ def plot_full_library(
     estimates = []
     for payload, _ in payloads:
         selected = payload["selected"]
-        current_names = [
-            _canonical_feature(name) for name in selected["feature_names"]
-        ]
+        current_names = [_canonical_feature(name) for name in selected["feature_names"]]
         if set(current_names) != set(names):
             raise ValueError("Inconsistent Figure 3 feature order")
         matrix = np.asarray(selected["coefficients"], dtype=float)
@@ -340,9 +682,13 @@ def plot_full_library(
             axis.set_yticks(np.arange(-0.5, len(names), 1), minor=True)
             axis.grid(which="minor", color="white", linewidth=0.4)
             axis.tick_params(which="minor", bottom=False, left=False)
-        colorbar = fig.colorbar(image, ax=axes, orientation="horizontal", fraction=0.045, pad=0.10)
+        colorbar = fig.colorbar(
+            image, ax=axes, orientation="horizontal", fraction=0.045, pad=0.10
+        )
         colorbar.set_label("Coefficient")
-        fig.suptitle("Figure 3 complete polynomial + Hill + exponential library", fontsize=10)
+        fig.suptitle(
+            "Figure 3 complete polynomial + Hill + exponential library", fontsize=10
+        )
         fig.subplots_adjust(left=0.24, right=0.98, top=0.90, bottom=0.18, wspace=0.12)
         output_stem.parent.mkdir(parents=True, exist_ok=True)
         fig.savefig(output_stem.with_suffix(".png"))
@@ -358,19 +704,45 @@ def plot_selection_frequency(
     reference_names = list(payloads[0][0]["selected"]["feature_names"])
     names = [_canonical_feature(name) for name in reference_names]
     tolerance = float(config["selection"]["coefficient_zero_tolerance"])
-    supports = []
+    estimates = []
     for payload, _ in payloads:
         selected = payload["selected"]
-        current_names = [
-            _canonical_feature(name) for name in selected["feature_names"]
-        ]
+        current_names = [_canonical_feature(name) for name in selected["feature_names"]]
         matrix = np.asarray(selected["coefficients"], dtype=float)
         order = [current_names.index(name) for name in names]
-        supports.append(np.abs(matrix[order]) > tolerance)
+        estimates.append(matrix[order])
+    estimates_array = np.asarray(estimates, dtype=float)
+    supports = np.abs(estimates_array) > tolerance
     frequency = np.mean(supports, axis=0)
+    conditional_median = np.full(frequency.shape, np.nan, dtype=float)
+    for feature_index, equation_index in np.ndindex(frequency.shape):
+        selected_coefficients = estimates_array[
+            supports[:, feature_index, equation_index],
+            feature_index,
+            equation_index,
+        ]
+        if selected_coefficients.size:
+            conditional_median[feature_index, equation_index] = np.median(
+                selected_coefficients
+            )
+    truth = true_coefficient_matrix(reference_names, config)
+    coefficient_limit = float(np.max(np.abs(truth)))
+    coefficients_clipped = bool(
+        np.nanmax(np.abs(conditional_median)) > coefficient_limit
+    )
+    coefficient_norm = TwoSlopeNorm(
+        vmin=-coefficient_limit, vcenter=0.0, vmax=coefficient_limit
+    )
     with publication_style():
-        fig, axis = plt.subplots(figsize=(4.4, 4.9))
-        image = axis.imshow(
+        fig, axes = plt.subplots(
+            1,
+            3,
+            figsize=(7.2, 5.2),
+            sharey=True,
+            gridspec_kw={"width_ratios": [1.08, 1.0, 1.0]},
+        )
+        frequency_axis, coefficient_axis, truth_axis = axes
+        frequency_image = frequency_axis.imshow(
             frequency,
             cmap="viridis",
             vmin=0.0,
@@ -378,10 +750,30 @@ def plot_selection_frequency(
             aspect="auto",
             interpolation="nearest",
         )
-        axis.set_xticks(range(3), [r"$\dot{x}$", r"$\dot{y}$", r"$\dot{z}$"])
-        axis.set_yticks(range(len(names)), names)
+        coefficient_image = coefficient_axis.imshow(
+            conditional_median,
+            cmap="RdBu_r",
+            norm=coefficient_norm,
+            aspect="auto",
+            interpolation="nearest",
+        )
+        truth_axis.imshow(
+            truth,
+            cmap="RdBu_r",
+            norm=coefficient_norm,
+            aspect="auto",
+            interpolation="nearest",
+        )
+        equation_labels = [r"$\dot{x}$", r"$\dot{y}$", r"$\dot{z}$"]
+        for axis in axes:
+            axis.set_xticks(range(3), equation_labels)
+            axis.set_yticks(range(len(names)), names)
+            axis.set_xticks(np.arange(-0.5, 3, 1), minor=True)
+            axis.set_yticks(np.arange(-0.5, len(names), 1), minor=True)
+            axis.grid(which="minor", color="white", linewidth=0.4)
+            axis.tick_params(which="minor", bottom=False, left=False)
         for row, column in zip(*np.where(frequency > 0)):
-            axis.text(
+            frequency_axis.text(
                 column,
                 row,
                 f"{100 * frequency[row, column]:.0f}%",
@@ -390,10 +782,54 @@ def plot_selection_frequency(
                 color="white" if frequency[row, column] < 0.65 else "black",
                 fontsize=7,
             )
-        colorbar = fig.colorbar(image, ax=axis, fraction=0.05, pad=0.04)
-        colorbar.set_label("Selection frequency across five seeds")
-        axis.set_title("Figure 3 term-selection stability", fontweight="bold")
-        fig.tight_layout()
+        for axis, matrix in (
+            (coefficient_axis, conditional_median),
+            (truth_axis, truth),
+        ):
+            for row, column in np.ndindex(matrix.shape):
+                value = matrix[row, column]
+                if np.isfinite(value):
+                    axis.text(
+                        column,
+                        row,
+                        f"{value:.2g}",
+                        ha="center",
+                        va="center",
+                        color="white"
+                        if abs(value) > 0.55 * coefficient_limit
+                        else "black",
+                        fontsize=6.5,
+                    )
+        frequency_axis.set_title("Selection frequency", fontweight="bold")
+        coefficient_axis.set_title(
+            "Median coefficient\nwhen selected", fontweight="bold"
+        )
+        truth_axis.set_title("Ground-truth\ncoefficient", fontweight="bold")
+        frequency_colorbar = fig.colorbar(
+            frequency_image,
+            ax=frequency_axis,
+            orientation="horizontal",
+            fraction=0.045,
+            pad=0.10,
+        )
+        frequency_colorbar.set_label("Fraction of seeds")
+        coefficient_colorbar = fig.colorbar(
+            coefficient_image,
+            ax=[coefficient_axis, truth_axis],
+            orientation="horizontal",
+            fraction=0.045,
+            pad=0.10,
+        )
+        coefficient_colorbar.set_label(
+            "Coefficient"
+            + (
+                " (colors clipped to ground-truth range)"
+                if coefficients_clipped
+                else ""
+            )
+        )
+        fig.suptitle("Figure 3 term-selection and coefficient stability", fontsize=10)
+        fig.subplots_adjust(left=0.20, right=0.985, top=0.88, bottom=0.18, wspace=0.12)
         output_stem.parent.mkdir(parents=True, exist_ok=True)
         fig.savefig(output_stem.with_suffix(".png"))
         fig.savefig(output_stem.with_suffix(".pdf"))
@@ -457,6 +893,12 @@ def main() -> None:
     figures = args.output_directory / "figures"
     write_csv(aggregate / "figure_3_runs.csv", payloads)
     write_coefficient_csv(aggregate / "figure_3_coefficients.csv", payloads, config)
+    pareto_samples, excluded_pareto_seeds = sample_hill_active_pareto_solutions(
+        payloads, config
+    )
+    write_pareto_sample_csv(
+        aggregate / "figure_3_random_pareto_variables.csv", pareto_samples
+    )
     report = write_quality(aggregate / "figure_3_quality.json", payloads, config)
     median_validation = float(
         np.median(
@@ -477,9 +919,28 @@ def main() -> None:
         len(config["experiment"]["seeds"]),
     )
     plot_full_library(figures / "figure_3_full_library", payloads, config)
-    plot_selection_frequency(
-        figures / "figure_3_selection_frequency", payloads, config
+    plot_selection_frequency(figures / "figure_3_selection_frequency", payloads, config)
+    plot_optimization_variables(
+        figures / "figure_3_optimization_variables",
+        pareto_samples,
+        len(payloads),
+        excluded_pareto_seeds,
+        config,
     )
+    exponential_payloads = [
+        pair for pair in payloads if _family_selected(pair[0], "exp(")
+    ]
+    if exponential_payloads:
+        representative_exponential = min(
+            exponential_payloads,
+            key=lambda pair: pair[0]["selected"]["validation"]["rollout_nrmse"],
+        )
+        plot_exponential_substitution(
+            figures / "figure_3_exponential_substitution_dynamics",
+            representative_exponential[0],
+            representative_exponential[1],
+            config,
+        )
     print(f"processed {len(payloads)} production results")
     print(f"publication ready: {report['publication_ready']}")
     print(f"wrote {figures / 'figure_3_joint_goodwin.png'}")

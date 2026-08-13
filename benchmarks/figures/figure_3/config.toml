@@ -11,7 +11,7 @@ seeds = [11, 22, 33, 44, 55]
 
 [data]
 t_start = 0.0
-t_end = 100.0
+t_end = 200.0
 dt = 0.1
 train_trajectories = 3
 validation_trajectories = 1

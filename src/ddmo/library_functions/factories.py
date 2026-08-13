@@ -113,10 +113,13 @@ class PolynomialFactory(LibraryFactory):
     def _make_power_cross_name(px: int, py: int) -> Callable[[str, str], str]:
         """Create a name generator for powered cross-product."""
         a, b = px, py
-        x_part = "x" if a == 1 else f"x^{a}"
-        y_part = "y" if b == 1 else f"y^{b}"
-        # Replace placeholders at call time
-        return lambda x, y: f"{x_part}*{y_part}".replace("x", x).replace("y", y)
+
+        def name(x: str, y: str) -> str:
+            x_part = x if a == 1 else f"{x}^{a}"
+            y_part = y if b == 1 else f"{y}^{b}"
+            return f"{x_part}*{y_part}"
+
+        return name
 
 
 @dataclass
@@ -239,9 +242,12 @@ class PowerCrossProductFactory(LibraryFactory):
             return lambda x, y: (x**a) * (y**b)
 
         def make_name(a, b):
-            x_part = "x" if a == 1 else f"x^{a}"
-            y_part = "y" if b == 1 else f"y^{b}"
-            return lambda x, y: f"{x_part}*{y_part}".replace("x", x).replace("y", y)
+            def name(x: str, y: str) -> str:
+                x_part = x if a == 1 else f"{x}^{a}"
+                y_part = y if b == 1 else f"{y}^{b}"
+                return f"{x_part}*{y_part}"
+
+            return name
 
         return [(make_func(px, py), make_name(px, py))]
 

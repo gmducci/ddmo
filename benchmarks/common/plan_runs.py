@@ -41,6 +41,9 @@ def load_config(path: Path) -> dict:
         raise ValueError("methods and seeds must not be empty")
     if any(float(noise) < 0 for noise in experiment["noise_levels"]):
         raise ValueError("noise levels must be non-negative")
+    job_id_scheme = experiment.get("job_id_scheme", "sequential")
+    if job_id_scheme not in {"sequential", "semantic"}:
+        raise ValueError("experiment.job_id_scheme must be sequential or semantic")
 
     return config
 
@@ -57,9 +60,17 @@ def build_jobs(config: dict, source: Path) -> list[dict]:
         experiment["seeds"],
     )
     for index, (method, noise, seed) in enumerate(combinations, start=1):
+        if experiment.get("job_id_scheme") == "semantic":
+            noise_percent = int(round(100 * float(noise)))
+            job_id = (
+                f"{experiment['name']}-{method}-"
+                f"noise{noise_percent:03d}-seed{int(seed):03d}"
+            )
+        else:
+            job_id = f"{experiment['name']}-{index:03d}"
         jobs.append(
             {
-                "job_id": f"{experiment['name']}-{index:03d}",
+                "job_id": job_id,
                 "experiment": experiment["name"],
                 "system": experiment["system"],
                 "method": method,

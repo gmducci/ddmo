@@ -18,9 +18,11 @@ benchmarks/
 │   │   └── README.md
 │   ├── figure_2/
 │   │   ├── config.toml
+│   │   ├── run.py
 │   │   └── README.md
 │   └── figure_3/
 │       ├── config.toml
+│       ├── run.py
 │       └── README.md
 └── results/
     ├── raw/
@@ -33,8 +35,8 @@ benchmarks/
 | Folder | Intended figure | Status |
 |---|---|---|
 | `figure_1` | Brusselator parameter recovery and predictive accuracy | Runner and postprocessor ready |
-| `figure_2` | Goodwin noise and formulation robustness | Configuration ready; runner pending |
-| `figure_3` | Complete joint Goodwin optimization | Configuration ready; runner pending |
+| `figure_2` | Goodwin noise and formulation robustness | Runner and postprocessor ready |
+| `figure_3` | Complete joint Goodwin optimization | Runner, artifacts, and postprocessor ready |
 
 The individual figure README is the authoritative run guide and explicitly
 lists anything still missing. This prevents a configuration-only campaign from

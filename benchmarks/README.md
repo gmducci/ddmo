@@ -42,6 +42,10 @@ The individual figure README is the authoritative run guide and explicitly
 lists anything still missing. This prevents a configuration-only campaign from
 being mistaken for an executable benchmark.
 
+For the complete collaborator and reviewer execution pipeline—from job-matrix
+planning through provenance checks and postprocessing—see
+[`WORKFLOW.md`](WORKFLOW.md).
+
 ## Data split
 
 Every experiment is designed around three training trajectories, one separate

@@ -32,6 +32,19 @@ def _canonical_feature(name: str) -> str:
     return name
 
 
+def _library_feature_label(name: str) -> str:
+    """Render polynomial library terms with math-text typography."""
+    rendered_factors = []
+    for factor in name.split("*"):
+        variable, separator, exponent = factor.partition("^")
+        if variable not in STATE_NAMES or (separator and not exponent.isdigit()):
+            return name
+        rendered_factors.append(
+            variable if not separator else rf"{variable}^{{{exponent}}}"
+        )
+    return "$" + r"\,".join(rendered_factors) + "$"
+
+
 def _family_selected(payload: dict[str, Any], family: str) -> bool:
     selected = payload["selected"]
     tolerance = 1e-6
@@ -765,6 +778,158 @@ def plot_exponential_substitution(
         plt.close(fig)
 
 
+def plot_library_identifiability(
+    output_stem: Path,
+    payload: dict[str, Any],
+    artifact_path: Path,
+    config: dict[str, Any],
+) -> None:
+    """Compare fitted Hill and exponential source contributions on observed z."""
+    selected = payload["selected"]
+    tolerance = float(config["selection"]["coefficient_zero_tolerance"])
+    coefficients = np.asarray(selected["coefficients"], dtype=float)
+    hill_index = next(
+        (
+            index
+            for index, feature in enumerate(selected["feature_names"])
+            if _canonical_feature(feature) == "Hill(z)"
+            and abs(coefficients[index, 0]) > tolerance
+        ),
+        None,
+    )
+    exponential_index = next(
+        (
+            index
+            for index, feature in enumerate(selected["feature_names"])
+            if _canonical_feature(feature) == "exp(z)"
+            and abs(coefficients[index, 0]) > tolerance
+        ),
+        None,
+    )
+    if hill_index is None or exponential_index is None:
+        raise ValueError(
+            "Selected model must contain active z-Hill and z-exponential terms "
+            "in dx/dt"
+        )
+
+    gamma_1 = float(selected["variables"]["gamma_1"])
+    gamma_2 = float(selected["variables"]["gamma_2"])
+    gamma_truth = float(config["truth"]["hill_exponent"])
+    hill_coefficient = float(coefficients[hill_index, 0])
+    exponential_coefficient = float(coefficients[exponential_index, 0])
+    arrays = np.load(artifact_path)
+    training_z = arrays["train_clean"][:, :, 2].ravel()
+
+    plot_min = max(0.0, float(np.min(training_z)) * 0.97)
+    plot_max = float(np.quantile(training_z, 0.85))
+    library_input = np.linspace(plot_min, plot_max, 600)
+    truth = 1.0 / (1.0 + library_input**gamma_truth)
+    fitted_hill = hill_coefficient / (1.0 + library_input**gamma_1)
+    fitted_exponential = exponential_coefficient * np.exp(-gamma_2 * library_input)
+    fitted_sum = fitted_hill + fitted_exponential
+
+    observed_hill = 1.0 / (1.0 + training_z**gamma_1)
+    observed_exponential = np.exp(-gamma_2 * training_z)
+    column_correlation = float(np.corrcoef(observed_hill, observed_exponential)[0, 1])
+    observed_truth = 1.0 / (1.0 + training_z**gamma_truth)
+    observed_sum = (
+        hill_coefficient * observed_hill
+        + exponential_coefficient * observed_exponential
+    )
+    contribution_rmse = float(np.sqrt(np.mean((observed_sum - observed_truth) ** 2)))
+
+    with publication_style():
+        fig, (axis, density_axis) = plt.subplots(
+            2,
+            1,
+            figsize=(6.5, 4.6),
+            sharex=True,
+            gridspec_kw={"height_ratios": [4.0, 1.0], "hspace": 0.08},
+        )
+        axis.plot(
+            library_input,
+            truth,
+            color="#222222",
+            linewidth=1.8,
+            label=rf"Ground truth Hill ($\gamma={gamma_truth:.3g}$)",
+        )
+        axis.plot(
+            library_input,
+            fitted_hill,
+            color=STATE_COLORS[0],
+            linewidth=1.4,
+            linestyle="--",
+            label=(
+                rf"Fitted Hill ($c={hill_coefficient:.3g}$, "
+                rf"$\gamma_1={gamma_1:.3g}$)"
+            ),
+        )
+        axis.plot(
+            library_input,
+            fitted_exponential,
+            color=STATE_COLORS[2],
+            linewidth=1.4,
+            linestyle=":",
+            label=(
+                rf"Fitted exponential ($c={exponential_coefficient:.3g}$, "
+                rf"$\gamma_2={gamma_2:.3g}$)"
+            ),
+        )
+        axis.plot(
+            library_input,
+            fitted_sum,
+            color=STATE_COLORS[1],
+            linewidth=1.8,
+            label="Fitted Hill + exponential",
+        )
+        axis.set_ylabel(r"Contribution to $\dot{x}$")
+        axis.set_ylim(bottom=min(0.0, float(np.min(fitted_sum))))
+        axis.grid(axis="y", color="#D9D9D9", linewidth=0.6)
+        axis.legend(frameon=False, fontsize=7.5)
+        axis.set_title(
+            rf"Representative mixed model ($N_{{train}}="
+            + f"{payload['job']['training_trajectories']}$, "
+            + f"block {payload['job']['ic_block']})",
+            loc="left",
+            fontsize=8,
+        )
+        axis.text(
+            0.98,
+            0.96,
+            rf"library-column $r={column_correlation:.3f}$"
+            + "\n"
+            + rf"combined contribution RMSE={contribution_rmse:.3g}",
+            transform=axis.transAxes,
+            ha="right",
+            va="top",
+            fontsize=7.5,
+        )
+
+        density_axis.hist(
+            training_z,
+            bins=45,
+            range=(plot_min, plot_max),
+            density=True,
+            color="#BDBDBD",
+            edgecolor="none",
+        )
+        density_axis.set(
+            xlabel=r"Observed training state $z$ (through the 85th percentile)",
+            ylabel="Density",
+            xlim=(plot_min, plot_max),
+        )
+        density_axis.grid(False)
+        fig.suptitle(
+            "Hill--exponential identifiability on the observed domain",
+            fontsize=10,
+            y=0.995,
+        )
+        output_stem.parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(output_stem.with_suffix(".png"))
+        fig.savefig(output_stem.with_suffix(".pdf"))
+        plt.close(fig)
+
+
 def write_coefficient_csv(
     path: Path, payloads: list[tuple[dict[str, Any], Path]], config: dict[str, Any]
 ) -> None:
@@ -803,6 +968,7 @@ def plot_full_library(
     first = payloads[0][0]["selected"]
     reference_names = list(first["feature_names"])
     names = [_canonical_feature(name) for name in reference_names]
+    labels = [_library_feature_label(name) for name in names]
     estimates = []
     for payload, _ in payloads:
         selected = payload["selected"]
@@ -827,7 +993,7 @@ def plot_full_library(
             )
             axis.set_title(title, fontweight="bold")
             axis.set_xticks(range(3), [r"$\dot{x}$", r"$\dot{y}$", r"$\dot{z}$"])
-            axis.set_yticks(range(len(names)), names)
+            axis.set_yticks(range(len(names)), labels)
             axis.set_xticks(np.arange(-0.5, 3, 1), minor=True)
             axis.set_yticks(np.arange(-0.5, len(names), 1), minor=True)
             axis.grid(which="minor", color="white", linewidth=0.4)
@@ -853,6 +1019,7 @@ def plot_selection_frequency(
 ) -> None:
     reference_names = list(payloads[0][0]["selected"]["feature_names"])
     names = [_canonical_feature(name) for name in reference_names]
+    labels = [_library_feature_label(name) for name in names]
     tolerance = float(config["selection"]["coefficient_zero_tolerance"])
     estimates = []
     for payload, _ in payloads:
@@ -884,13 +1051,7 @@ def plot_selection_frequency(
         vmin=-coefficient_limit, vcenter=0.0, vmax=coefficient_limit
     )
     with publication_style():
-        fig, axes = plt.subplots(
-            1,
-            3,
-            figsize=(7.2, 5.2),
-            sharey=True,
-            gridspec_kw={"width_ratios": [1.08, 1.0, 1.0]},
-        )
+        fig, axes = plt.subplots(1, 3, figsize=(7.2, 5.0), sharey=True)
         frequency_axis, coefficient_axis, truth_axis = axes
         frequency_image = frequency_axis.imshow(
             frequency,
@@ -917,7 +1078,7 @@ def plot_selection_frequency(
         equation_labels = [r"$\dot{x}$", r"$\dot{y}$", r"$\dot{z}$"]
         for axis in axes:
             axis.set_xticks(range(3), equation_labels)
-            axis.set_yticks(range(len(names)), names)
+            axis.set_yticks(range(len(names)), labels)
             axis.set_xticks(np.arange(-0.5, 3, 1), minor=True)
             axis.set_yticks(np.arange(-0.5, len(names), 1), minor=True)
             axis.grid(which="minor", color="white", linewidth=0.4)
@@ -955,20 +1116,45 @@ def plot_selection_frequency(
             "Median coefficient\nwhen selected", fontweight="bold"
         )
         truth_axis.set_title("Ground-truth\ncoefficient", fontweight="bold")
+        fig.subplots_adjust(
+            left=0.20, right=0.985, top=0.92, bottom=0.22, wspace=0.12
+        )
+
+        frequency_bounds = frequency_axis.get_position()
+        coefficient_bounds = coefficient_axis.get_position()
+        truth_bounds = truth_axis.get_position()
+        colorbar_width = frequency_bounds.width
+        colorbar_height = 0.022
+        colorbar_bottom = 0.085
+        frequency_colorbar_axis = fig.add_axes(
+            (
+                frequency_bounds.x0,
+                colorbar_bottom,
+                colorbar_width,
+                colorbar_height,
+            )
+        )
+        coefficient_group_center = (
+            coefficient_bounds.x0 + truth_bounds.x1
+        ) / 2.0
+        coefficient_colorbar_axis = fig.add_axes(
+            (
+                coefficient_group_center - colorbar_width / 2.0,
+                colorbar_bottom,
+                colorbar_width,
+                colorbar_height,
+            )
+        )
         frequency_colorbar = fig.colorbar(
             frequency_image,
-            ax=frequency_axis,
+            cax=frequency_colorbar_axis,
             orientation="horizontal",
-            fraction=0.045,
-            pad=0.10,
         )
         frequency_colorbar.set_label("Fraction of seeds")
         coefficient_colorbar = fig.colorbar(
             coefficient_image,
-            ax=[coefficient_axis, truth_axis],
+            cax=coefficient_colorbar_axis,
             orientation="horizontal",
-            fraction=0.045,
-            pad=0.10,
         )
         coefficient_colorbar.set_label(
             "Coefficient"
@@ -978,8 +1164,6 @@ def plot_selection_frequency(
                 else ""
             )
         )
-        fig.suptitle("Figure 3 term-selection and coefficient stability", fontsize=10)
-        fig.subplots_adjust(left=0.20, right=0.985, top=0.88, bottom=0.18, wspace=0.12)
         output_stem.parent.mkdir(parents=True, exist_ok=True)
         fig.savefig(output_stem.with_suffix(".png"))
         fig.savefig(output_stem.with_suffix(".pdf"))
@@ -1091,6 +1275,34 @@ def main() -> None:
             figures / "figure_3_exponential_substitution_dynamics",
             representative_exponential[0],
             representative_exponential[1],
+            config,
+        )
+    tolerance = float(config["selection"]["coefficient_zero_tolerance"])
+    mixed_payloads = []
+    for pair in payloads:
+        selected = pair[0]["selected"]
+        coefficients = np.asarray(selected["coefficients"], dtype=float)
+        has_hill = any(
+            _canonical_feature(feature) == "Hill(z)"
+            and abs(coefficients[index, 0]) > tolerance
+            for index, feature in enumerate(selected["feature_names"])
+        )
+        has_exponential = any(
+            _canonical_feature(feature) == "exp(z)"
+            and abs(coefficients[index, 0]) > tolerance
+            for index, feature in enumerate(selected["feature_names"])
+        )
+        if has_hill and has_exponential:
+            mixed_payloads.append(pair)
+    if mixed_payloads:
+        representative_mixed = min(
+            mixed_payloads,
+            key=lambda pair: pair[0]["selected"]["validation"]["rollout_nrmse"],
+        )
+        plot_library_identifiability(
+            figures / "figure_3_library_identifiability",
+            representative_mixed[0],
+            representative_mixed[1],
             config,
         )
     print(f"processed {len(payloads)} production results")

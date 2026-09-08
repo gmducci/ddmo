@@ -212,13 +212,6 @@ def plot_summary(
     config: dict[str, Any],
 ) -> None:
     noise_levels = [float(value) for value in config["experiment"]["noise_levels"]]
-    expected = (
-        len(config["experiment"]["methods"])
-        * len(noise_levels)
-        * len(config["experiment"]["seeds"])
-    )
-    clean = sum(not record.git_dirty for record in records)
-    state = "FINAL" if len(records) == expected and clean == expected else "PREVIEW"
     with publication_style():
         fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.55))
         _plot_metric(
@@ -245,15 +238,26 @@ def plot_summary(
             "False-positive coefficients",
             logarithmic=False,
         )
-        for label, axis in zip("abc", axes):
-            axis.set_title(label, loc="left", fontweight="bold")
-        axes[0].legend(loc="best")
-        fig.suptitle(
-            f"Goodwin noise robustness  |  {state} — {len(records)}/{expected} jobs",
-            fontsize=10,
-            y=1.03,
+        handles, labels = axes[0].get_legend_handles_labels()
+        fig.legend(
+            handles,
+            labels,
+            loc="upper center",
+            ncol=len(METHODS),
+            frameon=False,
+            bbox_to_anchor=(0.5, 0.995),
         )
-        fig.tight_layout(w_pad=1.5)
+        fig.tight_layout(rect=(0.0, 0.0, 1.0, 0.82), w_pad=1.5)
+        for label, axis in zip("abc", axes):
+            bounds = axis.get_position()
+            fig.text(
+                bounds.x0,
+                bounds.y1 + 0.025,
+                label,
+                ha="left",
+                va="bottom",
+                fontweight="bold",
+            )
         _save(fig, output_stem)
 
 

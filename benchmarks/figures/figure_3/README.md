@@ -41,7 +41,29 @@ The runner saves selected train, validation, and test trajectories alongside
 scalar metrics so the final figure can show observed, reference, and model
 rollouts.
 
-Inspect the planned five-job matrix with:
+## Reviewer workflow
+
+Generate the reviewer-facing computational workflow, including the source
+files, classes, and methods used at every stage, with:
+
+```bash
+MPLBACKEND=Agg python -m benchmarks.figures.figure_3.workflow
+```
+
+This writes publication-ready SVG, PDF, and PNG files named
+`figure_3_computational_workflow` under `benchmarks/results/figures/`.
+
+Generate the supplementary plate containing all 30 selected validation
+reconstructions with:
+
+```bash
+MPLBACKEND=Agg python -m benchmarks.figures.figure_3.si_validation
+```
+
+This writes SVG, PDF, and PNG files named
+`figure_si_validation_reconstructions` under `benchmarks/results/figures/`.
+
+Inspect the planned 30-job paired matrix with:
 
 ```bash
 python -m benchmarks.common.plan_runs \
@@ -52,8 +74,10 @@ Run its smoke job with:
 
 ```bash
 MPLBACKEND=Agg python -m benchmarks.figures.figure_3.run \
-  --job-id joint_goodwin_poly2_hill_exp_sg-weak_joint_sg-noise010-seed011 \
-  --smoke
+  --job-id joint_goodwin_lhs_training_size-weak_joint_sg-train1-block01-noise010 \
+  --smoke \
+  --output /tmp/figure_3_smoke.json \
+  --artifact-output /tmp/figure_3_smoke.npz
 ```
 
 Generate the current figure preview with:

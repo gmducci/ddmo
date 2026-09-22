@@ -1,4 +1,4 @@
-"""Portable, checksummed numerical inputs for the three publication figures."""
+"""Portable, checksummed numerical inputs for the publication figures."""
 
 import hashlib
 import json
@@ -18,6 +18,26 @@ DATA = ROOT / "benchmarks/data"
 
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+@contextmanager
+def trajectory_data(experiment):
+    """Load the deduplicated, exact saved trajectories for the SI diagnostics."""
+    info = json.loads((DATA / "manifest.json").read_text())["datasets"][experiment]["trajectories"]
+    path = DATA / info["file"]
+    if digest(path) != info["sha256"]:
+        raise ValueError(f"Saved trajectory data changed: {path}")
+    with np.load(path, allow_pickle=False) as archive:
+        runs = {}
+        for job, mapping in info["arrays"].items():
+            arrays = {name: archive[key] for name, key in mapping.items()}
+            splits = {"test": 2} if experiment == "noise" else {"train": 2, "validation": 1, "test": 2}
+            for split, count in splits.items():
+                for kind in ("clean", "noisy", "prediction"):
+                    if arrays[f"{split}_{kind}"].shape != (count, len(arrays["time"]), 3):
+                        raise ValueError(f"Trajectory shape mismatch: {job}, {split}, {kind}")
+            runs[job] = arrays
+        yield runs
 
 
 def validate(config, raw, methods, config_hash, commits=None):

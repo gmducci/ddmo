@@ -8,11 +8,12 @@ benchmarks/
   README.md
   run.py                 # production campaigns
   plot.py                # regenerate or verify the paper figures
+  diagnostics.py         # shared supplementary trajectory diagnostics
   noise/                 # Figure 1 + Figure S1: config, runner, plotting
   joint/                 # Figure 2: config, initial conditions, runner, plotting
   common/                # shared execution, data checks, and styling
-  data/                  # two compact saved-result bundles + provenance manifest
-  figures/               # three selected figures, PDF + PNG, and hash manifest
+  data/                  # result ZIPs, trajectory NPZs, provenance manifest
+  figures/               # six selected figures, PDF + PNG, and hash manifest
 ```
 
 | Figure | Content | Files |
@@ -20,6 +21,22 @@ benchmarks/
 | 1 | Noise robustness: Strong, Weak optimized, Weak optimized + SG | [PDF](figures/figure_1_noise_robustness.pdf), [PNG](figures/figure_1_noise_robustness.png) |
 | 2 | Selection frequency, conditional median coefficients, ground truth | [PDF](figures/figure_2_library_recovery.pdf), [PNG](figures/figure_2_library_recovery.png) |
 | S1 | All library coefficients for the three noise-benchmark methods | [PDF](figures/figure_s1_full_coefficient_recovery.pdf), [PNG](figures/figure_s1_full_coefficient_recovery.png) |
+| S2 | Figure 1 diagnostics: all noise/seed pairs, three methods, both test trajectories (25 pages) | [PDF](figures/figure_s2_noise_diagnostics.pdf), [Preview](figures/figure_s2_noise_diagnostics.png) |
+| S3 | Figure 2 diagnostics: all ten runs, including training, validation, and test trajectories (10 pages) | [PDF](figures/figure_s3_joint_diagnostics.pdf), [Preview](figures/figure_s3_joint_diagnostics.png) |
+| S4 | Figure 2 overview: representative test rollout with Hill/exponential shapes on the right | [PDF](figures/figure_s4_joint_library_shapes.pdf), [PNG](figures/figure_s4_joint_library_shapes.png) |
+
+Each S2/S3 diagnostic page also includes the three-objective Pareto projection and
+selected coefficients. S2 excludes fixed weak and labels failed rollouts.
+Diagnostic PNGs preview the first page; the PDFs contain all pages.
+
+S4 restores the former Figure 2 trajectory/library layout for the current ten-run
+campaign. The example is repetition 4, test trajectory 1: the run closest to the
+median validation NRMSE (repetition order breaks ties). Reported test NRMSE covers
+both test trajectories. The right panel shows unweighted library functions, not
+coefficient-weighted contributions to the ODE: `1/(1+s**gamma_1)` and
+`exp(-gamma_2*s)`. Faint curves show individual active-family parameters; bold
+curves use their conditional median. Hill is active in 6/10 runs and exponential
+in 4/10. Parameters from inactive families are excluded.
 
 ## Regenerate figures
 
@@ -31,21 +48,25 @@ python -m benchmarks.plot
 ```
 
 The first command checks the selected files, numerical inputs, and run provenance.
-The second regenerates all three figures from numerical results into
+The second regenerates all six figures from numerical results into
 `.local/benchmark_plots/`. It does not run optimization or overwrite the selected
 figures. Use `noise` or `joint` to render only one experiment:
 
 ```bash
 python -m benchmarks.plot joint --output-directory .local/joint_preview
+python -m benchmarks.plot --diagnostics
+python -m benchmarks.plot joint --library-overview
 ```
 
-Both data bundles are versioned and total less than 1 MB. They contain the exact
+The two result ZIPs are versioned and total less than 1 MB. They contain the exact
 production JSON results and original configuration; the joint bundle also includes
 the original initial-condition design. Individual file hashes and original source
 commits are in `data/manifest.json`. Archived source paths inside result metadata
 are provenance only: figure regeneration does not read those paths or the local archive.
-Trajectory NPZ files and full historical source snapshots are preserved locally,
-outside this folder; they are not needed to regenerate these three figures.
+Two deduplicated trajectory NPZs (about 11 MB total) supply the exact saved arrays
+for S2-S4. All six figures regenerate without the local archive. Page-to-run
+assignments are recorded in `figures/manifest.json`; regeneration also writes
+page-index JSON files alongside the generated diagnostics in `.local/`.
 
 ## Run new production campaigns
 

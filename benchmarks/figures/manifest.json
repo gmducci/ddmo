@@ -3,46 +3,13 @@
   "figures": [
     "figure_1_noise_robustness",
     "figure_2_library_recovery",
-    "figure_s1_full_coefficient_recovery"
+    "figure_s1_full_coefficient_recovery",
+    "figure_s2_noise_diagnostics",
+    "figure_s3_joint_diagnostics",
+    "figure_s4_joint_library_shapes"
   ],
-  "regeneration_check": "All three PNGs regenerated pixel-identically from bundled numerical inputs on 2026-09-22. Selected original PDF/PNG files preserved byte-for-byte.",
+  "regeneration_check": "Original Figures 1, 2, and S1 remain byte-identical; their PNGs regenerated pixel-identically on 2026-09-22. S2 and S3 rendered from exact saved production trajectories on 2026-09-22; all 35 PDF pages visually reviewed. Trajectory-derived test scores verified against saved production results. S4 restored from the current ten-run joint campaign on 2026-09-22; exported PDF visually reviewed.",
   "files": [
-    {
-      "path": "benchmarks/figures/figure_1_noise_robustness.pdf",
-      "sha256": "803dd4ed10e4780527a7f032f49aff0e882ca048cc362618e6b9be8ccb44b552"
-    },
-    {
-      "path": "benchmarks/figures/figure_2_library_recovery.pdf",
-      "sha256": "f958ff68273753a63e931802e60ab1515fc1caa9396a7f22ca52f4fda8032f31"
-    },
-    {
-      "path": "benchmarks/figures/figure_s1_full_coefficient_recovery.pdf",
-      "sha256": "940300ded9678dcab4cdaa8fb24a67aa66e8c1ec2531fbdefac24eb1b8b8dfc0"
-    },
-    {
-      "path": "benchmarks/figures/figure_1_noise_robustness.png",
-      "sha256": "ebb7089c432997dccfc5b6f5bbe14938d39c28c4804c42482e8c6c987ac2866d"
-    },
-    {
-      "path": "benchmarks/figures/figure_2_library_recovery.png",
-      "sha256": "ff3b4e1a11f8e473f90378b9ab76fa41b6cca67b010dad5e3e0d1c56f3e35e9e"
-    },
-    {
-      "path": "benchmarks/figures/figure_s1_full_coefficient_recovery.png",
-      "sha256": "32ad0b4a08d16a3a5b275c58bf2976af304858acaf8f6838b71a69ce62b27228"
-    },
-    {
-      "path": "benchmarks/data/joint.zip",
-      "sha256": "1a5f76a2316c4a6182e2690c612fe959680167c44dccb825bf5662b7fa446b21"
-    },
-    {
-      "path": "benchmarks/data/manifest.json",
-      "sha256": "c3572bb08b491cb24c94844703d0f294d05c2a3f08bee8bf714fd5600bfea86b"
-    },
-    {
-      "path": "benchmarks/data/noise.zip",
-      "sha256": "b644cfe3d620eef4fc3595ac8b122bf88fd2afcba8e67afb04b85045f82c84bf"
-    },
     {
       "path": "benchmarks/__init__.py",
       "sha256": "c7d3291368279700b90102c001381abc16488cedd692ad7dd46f9d1c1cd26305"
@@ -53,7 +20,7 @@
     },
     {
       "path": "benchmarks/common/data.py",
-      "sha256": "c6a04fd30812aa1d31bcfe3d862c4d71a62d47ab8b240c390c19b1a565d2f465"
+      "sha256": "ab53d44519a9a15cad81cff7e7a12137ef3ec88a0c185258cce9509f255fef99"
     },
     {
       "path": "benchmarks/common/goodwin.py",
@@ -72,8 +39,88 @@
       "sha256": "0b0420d5740aa5e08b86dc4ac57e5a85786c239a3e0e608ef4ceef81af17d330"
     },
     {
+      "path": "benchmarks/data/joint.zip",
+      "sha256": "1a5f76a2316c4a6182e2690c612fe959680167c44dccb825bf5662b7fa446b21"
+    },
+    {
+      "path": "benchmarks/data/joint_trajectories.npz",
+      "sha256": "7e087fc2c6700b890041f3d977a53c86c898087f2529f840a523f1da1768ec98"
+    },
+    {
+      "path": "benchmarks/data/manifest.json",
+      "sha256": "1d72225fbd955fab617e5c0b96c75e6dc864bf148ef67f1f05b26ca78a04ca66"
+    },
+    {
+      "path": "benchmarks/data/noise.zip",
+      "sha256": "b644cfe3d620eef4fc3595ac8b122bf88fd2afcba8e67afb04b85045f82c84bf"
+    },
+    {
+      "path": "benchmarks/data/noise_trajectories.npz",
+      "sha256": "1b334500ef8d321568958601ae4b0c4647f5a92fec8605243384ca00bd491d13"
+    },
+    {
+      "path": "benchmarks/diagnostics.py",
+      "sha256": "74f0959046a787820e6bee5d5edef6f9318d24b804bbd91e984971fa56d82fcb"
+    },
+    {
+      "path": "benchmarks/figures/figure_1_noise_robustness.pdf",
+      "sha256": "803dd4ed10e4780527a7f032f49aff0e882ca048cc362618e6b9be8ccb44b552"
+    },
+    {
+      "path": "benchmarks/figures/figure_1_noise_robustness.png",
+      "sha256": "ebb7089c432997dccfc5b6f5bbe14938d39c28c4804c42482e8c6c987ac2866d"
+    },
+    {
+      "path": "benchmarks/figures/figure_2_library_recovery.pdf",
+      "sha256": "f958ff68273753a63e931802e60ab1515fc1caa9396a7f22ca52f4fda8032f31"
+    },
+    {
+      "path": "benchmarks/figures/figure_2_library_recovery.png",
+      "sha256": "ff3b4e1a11f8e473f90378b9ab76fa41b6cca67b010dad5e3e0d1c56f3e35e9e"
+    },
+    {
+      "path": "benchmarks/figures/figure_s1_full_coefficient_recovery.pdf",
+      "sha256": "940300ded9678dcab4cdaa8fb24a67aa66e8c1ec2531fbdefac24eb1b8b8dfc0"
+    },
+    {
+      "path": "benchmarks/figures/figure_s1_full_coefficient_recovery.png",
+      "sha256": "32ad0b4a08d16a3a5b275c58bf2976af304858acaf8f6838b71a69ce62b27228"
+    },
+    {
+      "path": "benchmarks/figures/figure_s2_noise_diagnostics.pdf",
+      "sha256": "0052f834a697283516361f16a70983204dfe20f832b591800a1a37fcbc35c4aa"
+    },
+    {
+      "path": "benchmarks/figures/figure_s2_noise_diagnostics.png",
+      "sha256": "04f745c8b561d83c171d24a90aa8071db29a303d8e35dde89814684839f89578"
+    },
+    {
+      "path": "benchmarks/figures/figure_s3_joint_diagnostics.pdf",
+      "sha256": "7968c1dc3e23eb8201d6221b6bd67503aa7a2f3f3aee0d87f4565689bf2ca613"
+    },
+    {
+      "path": "benchmarks/figures/figure_s3_joint_diagnostics.png",
+      "sha256": "e626aa1bbf062fd489d1a2a427b5373e8aec150e6c3f3fb61357f46e5cfd7c42"
+    },
+    {
+      "path": "benchmarks/figures/figure_s4_joint_library_shapes.pdf",
+      "sha256": "b2fa8afc7bff741e2da348ed59f9ad3656a41a6e264c8d4c29113aa17c51102e"
+    },
+    {
+      "path": "benchmarks/figures/figure_s4_joint_library_shapes.png",
+      "sha256": "152af8ce4591128f70dc35b13c7cba3ae55e7808e1aee32932e50d271cc360f1"
+    },
+    {
       "path": "benchmarks/joint/__init__.py",
       "sha256": "c7d3291368279700b90102c001381abc16488cedd692ad7dd46f9d1c1cd26305"
+    },
+    {
+      "path": "benchmarks/joint/config.toml",
+      "sha256": "f8f847d38e94bf60e13cc8a0ff339cd092389c4e7852a7e1803d987b3ad411ec"
+    },
+    {
+      "path": "benchmarks/joint/lhs_initial_conditions.csv",
+      "sha256": "88c3777be44919da7ff0f4a12f8b6d2d2edd090b657a006e441500bfc3098a74"
     },
     {
       "path": "benchmarks/joint/postprocess.py",
@@ -88,6 +135,10 @@
       "sha256": "c7d3291368279700b90102c001381abc16488cedd692ad7dd46f9d1c1cd26305"
     },
     {
+      "path": "benchmarks/noise/config.toml",
+      "sha256": "148fc275bedd92b160e5f14590846b024d387900813b85a7a729faa397203356"
+    },
+    {
       "path": "benchmarks/noise/postprocess.py",
       "sha256": "383b56e68d4c9f647ba608574fa7ee2feaceabb52e7937fce627793963b54476"
     },
@@ -97,23 +148,291 @@
     },
     {
       "path": "benchmarks/plot.py",
-      "sha256": "b204a21d79eb2f0954a40ef61f4f2570c11e68280c49c33988bf67213d6c38e5"
+      "sha256": "ff063325da3dd96401fe281b95cb8c0793f5807ac247a3bd6bbd361bc3630e6b"
     },
     {
       "path": "benchmarks/run.py",
       "sha256": "79f3e69271c1fe76423e3cc06383927a4e14f2cf21bfea3c29ecf96bb2b83402"
-    },
-    {
-      "path": "benchmarks/joint/config.toml",
-      "sha256": "f8f847d38e94bf60e13cc8a0ff339cd092389c4e7852a7e1803d987b3ad411ec"
-    },
-    {
-      "path": "benchmarks/noise/config.toml",
-      "sha256": "148fc275bedd92b160e5f14590846b024d387900813b85a7a729faa397203356"
-    },
-    {
-      "path": "benchmarks/joint/lhs_initial_conditions.csv",
-      "sha256": "88c3777be44919da7ff0f4a12f8b6d2d2edd090b657a006e441500bfc3098a74"
     }
-  ]
+  ],
+  "diagnostic_pages": {
+    "figure_s2_noise_diagnostics": [
+      {
+        "page": 1,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise000-seed011",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise000-seed011",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise000-seed011"
+        ]
+      },
+      {
+        "page": 2,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise000-seed022",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise000-seed022",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise000-seed022"
+        ]
+      },
+      {
+        "page": 3,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise000-seed033",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise000-seed033",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise000-seed033"
+        ]
+      },
+      {
+        "page": 4,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise000-seed044",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise000-seed044",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise000-seed044"
+        ]
+      },
+      {
+        "page": 5,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise000-seed055",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise000-seed055",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise000-seed055"
+        ]
+      },
+      {
+        "page": 6,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise005-seed011",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise005-seed011",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise005-seed011"
+        ]
+      },
+      {
+        "page": 7,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise005-seed022",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise005-seed022",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise005-seed022"
+        ]
+      },
+      {
+        "page": 8,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise005-seed033",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise005-seed033",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise005-seed033"
+        ]
+      },
+      {
+        "page": 9,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise005-seed044",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise005-seed044",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise005-seed044"
+        ]
+      },
+      {
+        "page": 10,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise005-seed055",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise005-seed055",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise005-seed055"
+        ]
+      },
+      {
+        "page": 11,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise010-seed011",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise010-seed011",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise010-seed011"
+        ]
+      },
+      {
+        "page": 12,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise010-seed022",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise010-seed022",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise010-seed022"
+        ]
+      },
+      {
+        "page": 13,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise010-seed033",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise010-seed033",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise010-seed033"
+        ]
+      },
+      {
+        "page": 14,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise010-seed044",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise010-seed044",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise010-seed044"
+        ]
+      },
+      {
+        "page": 15,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise010-seed055",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise010-seed055",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise010-seed055"
+        ]
+      },
+      {
+        "page": 16,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise015-seed011",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise015-seed011",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise015-seed011"
+        ]
+      },
+      {
+        "page": 17,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise015-seed022",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise015-seed022",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise015-seed022"
+        ]
+      },
+      {
+        "page": 18,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise015-seed033",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise015-seed033",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise015-seed033"
+        ]
+      },
+      {
+        "page": 19,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise015-seed044",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise015-seed044",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise015-seed044"
+        ]
+      },
+      {
+        "page": 20,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise015-seed055",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise015-seed055",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise015-seed055"
+        ]
+      },
+      {
+        "page": 21,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise020-seed011",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise020-seed011",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise020-seed011"
+        ]
+      },
+      {
+        "page": 22,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise020-seed022",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise020-seed022",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise020-seed022"
+        ]
+      },
+      {
+        "page": 23,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise020-seed033",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise020-seed033",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise020-seed033"
+        ]
+      },
+      {
+        "page": 24,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise020-seed044",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise020-seed044",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise020-seed044"
+        ]
+      },
+      {
+        "page": 25,
+        "job_ids": [
+          "weak_noise_poly2_three_objectives_20260915-strong-noise020-seed055",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise020-seed055",
+          "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise020-seed055"
+        ]
+      }
+    ],
+    "figure_s3_joint_diagnostics": [
+      {
+        "page": 1,
+        "job_ids": [
+          "joint_goodwin_fixed_pair-weak_joint_sg-train2-block01-noise010"
+        ]
+      },
+      {
+        "page": 2,
+        "job_ids": [
+          "joint_goodwin_fixed_pair-weak_joint_sg-train2-block02-noise010"
+        ]
+      },
+      {
+        "page": 3,
+        "job_ids": [
+          "joint_goodwin_fixed_pair-weak_joint_sg-train2-block03-noise010"
+        ]
+      },
+      {
+        "page": 4,
+        "job_ids": [
+          "joint_goodwin_fixed_pair-weak_joint_sg-train2-block04-noise010"
+        ]
+      },
+      {
+        "page": 5,
+        "job_ids": [
+          "joint_goodwin_fixed_pair-weak_joint_sg-train2-block05-noise010"
+        ]
+      },
+      {
+        "page": 6,
+        "job_ids": [
+          "joint_goodwin_fixed_pair-weak_joint_sg-train2-block06-noise010"
+        ]
+      },
+      {
+        "page": 7,
+        "job_ids": [
+          "joint_goodwin_fixed_pair-weak_joint_sg-train2-block07-noise010"
+        ]
+      },
+      {
+        "page": 8,
+        "job_ids": [
+          "joint_goodwin_fixed_pair-weak_joint_sg-train2-block08-noise010"
+        ]
+      },
+      {
+        "page": 9,
+        "job_ids": [
+          "joint_goodwin_fixed_pair-weak_joint_sg-train2-block09-noise010"
+        ]
+      },
+      {
+        "page": 10,
+        "job_ids": [
+          "joint_goodwin_fixed_pair-weak_joint_sg-train2-block10-noise010"
+        ]
+      }
+    ]
+  },
+  "library_overview": {
+    "figure": "figure_s4_joint_library_shapes",
+    "experiment": "joint",
+    "representative_repetition": 4,
+    "test_trajectory": 1,
+    "representative_rule": "Closest to median validation NRMSE; repetition order breaks ties",
+    "parameter_summary": "Conditional on an active coefficient in the corresponding family, using the configured support tolerance",
+    "functions": "Unweighted Hill and exponential library functions; individual parameters and conditional median parameters",
+    "active_runs": {
+      "Hill": 6,
+      "exponential": 4
+    },
+    "total_runs": 10
+  }
 }

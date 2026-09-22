@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "figures": [
+    "figure_1_noise_robustness",
+    "figure_2_library_recovery",
+    "figure_s1_full_coefficient_recovery"
+  ],
+  "regeneration_check": "All three PNGs regenerated pixel-identically from bundled numerical inputs on 2026-09-22. Selected original PDF/PNG files preserved byte-for-byte.",
+  "files": [
+    {
+      "path": "benchmarks/figures/figure_1_noise_robustness.pdf",
+      "sha256": "803dd4ed10e4780527a7f032f49aff0e882ca048cc362618e6b9be8ccb44b552"
+    },
+    {
+      "path": "benchmarks/figures/figure_2_library_recovery.pdf",
+      "sha256": "f958ff68273753a63e931802e60ab1515fc1caa9396a7f22ca52f4fda8032f31"
+    },
+    {
+      "path": "benchmarks/figures/figure_s1_full_coefficient_recovery.pdf",
+      "sha256": "940300ded9678dcab4cdaa8fb24a67aa66e8c1ec2531fbdefac24eb1b8b8dfc0"
+    },
+    {
+      "path": "benchmarks/figures/figure_1_noise_robustness.png",
+      "sha256": "ebb7089c432997dccfc5b6f5bbe14938d39c28c4804c42482e8c6c987ac2866d"
+    },
+    {
+      "path": "benchmarks/figures/figure_2_library_recovery.png",
+      "sha256": "ff3b4e1a11f8e473f90378b9ab76fa41b6cca67b010dad5e3e0d1c56f3e35e9e"
+    },
+    {
+      "path": "benchmarks/figures/figure_s1_full_coefficient_recovery.png",
+      "sha256": "32ad0b4a08d16a3a5b275c58bf2976af304858acaf8f6838b71a69ce62b27228"
+    },
+    {
+      "path": "benchmarks/data/joint.zip",
+      "sha256": "1a5f76a2316c4a6182e2690c612fe959680167c44dccb825bf5662b7fa446b21"
+    },
+    {
+      "path": "benchmarks/data/manifest.json",
+      "sha256": "c3572bb08b491cb24c94844703d0f294d05c2a3f08bee8bf714fd5600bfea86b"
+    },
+    {
+      "path": "benchmarks/data/noise.zip",
+      "sha256": "b644cfe3d620eef4fc3595ac8b122bf88fd2afcba8e67afb04b85045f82c84bf"
+    },
+    {
+      "path": "benchmarks/__init__.py",
+      "sha256": "c7d3291368279700b90102c001381abc16488cedd692ad7dd46f9d1c1cd26305"
+    },
+    {
+      "path": "benchmarks/common/__init__.py",
+      "sha256": "c7d3291368279700b90102c001381abc16488cedd692ad7dd46f9d1c1cd26305"
+    },
+    {
+      "path": "benchmarks/common/data.py",
+      "sha256": "c6a04fd30812aa1d31bcfe3d862c4d71a62d47ab8b240c390c19b1a565d2f465"
+    },
+    {
+      "path": "benchmarks/common/goodwin.py",
+      "sha256": "661f501abb28737261c2c6477d5d3fa06766ea742a02f005964931f84b19873f"
+    },
+    {
+      "path": "benchmarks/common/plan_runs.py",
+      "sha256": "931c91087d7791792754415463bab59adec8fb702092b44cfa85d337da0396c3"
+    },
+    {
+      "path": "benchmarks/common/run_campaign.py",
+      "sha256": "6df6998c09e0373205fccfd0c74c7a3cd079c849f3bb2ac0810827d85bb99ba5"
+    },
+    {
+      "path": "benchmarks/common/style.py",
+      "sha256": "0b0420d5740aa5e08b86dc4ac57e5a85786c239a3e0e608ef4ceef81af17d330"
+    },
+    {
+      "path": "benchmarks/joint/__init__.py",
+      "sha256": "c7d3291368279700b90102c001381abc16488cedd692ad7dd46f9d1c1cd26305"
+    },
+    {
+      "path": "benchmarks/joint/postprocess.py",
+      "sha256": "d1299b26ad5d00b0234ca2cd0afc6ff9be95b57108b97eeb7fc6d88eaf4c55a5"
+    },
+    {
+      "path": "benchmarks/joint/run.py",
+      "sha256": "ef22c3f8ccb3b0a2694ec602f15e067122314acd2e6a564619c05f9b504203f0"
+    },
+    {
+      "path": "benchmarks/noise/__init__.py",
+      "sha256": "c7d3291368279700b90102c001381abc16488cedd692ad7dd46f9d1c1cd26305"
+    },
+    {
+      "path": "benchmarks/noise/postprocess.py",
+      "sha256": "383b56e68d4c9f647ba608574fa7ee2feaceabb52e7937fce627793963b54476"
+    },
+    {
+      "path": "benchmarks/noise/run.py",
+      "sha256": "cf6d4b5e738658885bcfc21c3fc27bbacdaafedc30854d13a6d8efb5417dc096"
+    },
+    {
+      "path": "benchmarks/plot.py",
+      "sha256": "b204a21d79eb2f0954a40ef61f4f2570c11e68280c49c33988bf67213d6c38e5"
+    },
+    {
+      "path": "benchmarks/run.py",
+      "sha256": "79f3e69271c1fe76423e3cc06383927a4e14f2cf21bfea3c29ecf96bb2b83402"
+    },
+    {
+      "path": "benchmarks/joint/config.toml",
+      "sha256": "f8f847d38e94bf60e13cc8a0ff339cd092389c4e7852a7e1803d987b3ad411ec"
+    },
+    {
+      "path": "benchmarks/noise/config.toml",
+      "sha256": "148fc275bedd92b160e5f14590846b024d387900813b85a7a729faa397203356"
+    },
+    {
+      "path": "benchmarks/joint/lhs_initial_conditions.csv",
+      "sha256": "88c3777be44919da7ff0f4a12f8b6d2d2edd090b657a006e441500bfc3098a74"
+    }
+  ]
+}

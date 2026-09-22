@@ -57,7 +57,9 @@ Documentation lives under:
 docs/
 ```
 
-Generated outputs should be kept out of version control.
+Exploratory outputs should be kept out of version control. The selected PDF/PNG
+publication assets and provenance manifest in `benchmarks/figures/`
+are the deliberate exception.
 
 ## Public API
 
@@ -78,7 +80,7 @@ Do not commit:
 - `.DS_Store`;
 - virtual environments;
 - logs;
-- generated figures;
+- exploratory generated figures outside `benchmarks/figures/`;
 - generated `.npy`, `.pkl`, `.csv`, or checkpoint files;
 - local result folders.
 

@@ -1,0 +1,90 @@
+schema_version = 1
+
+[experiment]
+name = "joint_identification"
+system = "goodwin"
+description = "Ten repetitions of the full Goodwin optimization loop with two training, one validation, and two test trajectories at 10% noise."
+job_id_scheme = "semantic"
+methods = ["weak_joint_sg"]
+noise_levels = [0.10]
+seeds = [101, 102, 103, 104, 105, 106, 107, 108, 109, 110]
+optimizer_seeds = [1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010]
+ic_blocks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+# Single fixed size; retained list syntax is required by the existing IC-block planner.
+training_sizes = [2]
+
+[data]
+t_start = 0.0
+t_end = 200.0
+dt = 0.1
+train_trajectories = 2
+validation_trajectories = 1
+test_trajectories = 2
+noise_scale = "per_state_standard_deviation"
+initial_conditions = [
+  [0.5, 1.0, 1.0],
+  [0.2, 1.4, 0.8],
+  [0.8, 0.6, 1.5],
+  [0.35, 1.2, 1.4],
+  [0.7, 1.5, 0.6],
+  [1.0, 0.8, 1.2],
+]
+initial_condition_design = "lhs_initial_conditions.csv"
+initial_condition_design_method = "scipy.stats.qmc.LatinHypercube"
+initial_condition_design_seed = 20260813
+initial_condition_bounds = [[0.2, 1.0], [0.6, 1.5], [0.6, 1.5]]
+
+[truth]
+hill_exponent = 9.5
+k1 = 1.0
+k2 = 0.2
+k3 = 1.0
+k4 = 0.15
+k5 = 1.0
+k6 = 0.1
+K1 = 1.0
+
+[library]
+polynomial_degree = 2
+include_interactions = true
+hill_exponent_param = "gamma_1"
+exponential_rate_param = "gamma_2"
+
+[smoke]
+population = 12
+generations = 3
+t_end = 20.0
+
+[strong_derivative]
+method = "savitzky_golay"
+window_length = 21
+polynomial_order = 3
+
+[weak_initial]
+family = "PolynomialWindow"
+degree = 2
+window_length = 61
+stride = 20
+
+[bounds.library]
+gamma_1 = [4.0, 12.0]
+gamma_2 = [0.1, 10.0]
+
+[bounds.formulation]
+degree = [2, 6]
+window_length = [21, 151]
+stride = [5, 40]
+
+[bounds.solver]
+threshold = [0.001, 1.0]
+alpha = [0.000001, 1.0]
+
+[optimizer]
+algorithm = "NSGA2"
+population = 80
+generations = 30
+objectives = ["trajectory_rmse", "durbin_watson_deviation", "active_coefficients"]
+
+[selection]
+metric = "validation_rollout_nrmse"
+coefficient_zero_tolerance = 0.000001

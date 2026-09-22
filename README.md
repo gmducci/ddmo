@@ -67,6 +67,9 @@ Maintained demonstrations are indexed in [`examples/`](examples/README.md).
 Frozen paper experiments and their output contract are documented in
 [`benchmarks/`](benchmarks/README.md).
 
+The selected, renumbered paper artwork is collected in
+[publication figures](benchmarks/figures).
+
 ## Development
 
 Run the test suite with:

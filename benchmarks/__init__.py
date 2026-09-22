@@ -1,1 +1,1 @@
-"""Reproducible benchmark tooling for the ddmo software paper."""
+"""Current software-paper benchmarks."""

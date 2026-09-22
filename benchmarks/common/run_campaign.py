@@ -114,7 +114,7 @@ def run_campaign(
     jobs = build_jobs(config, config_path)
     config_hash = hashlib.sha256(config_path.read_bytes()).hexdigest()
     raw_directory = (
-        repo_root / "benchmarks/results/raw" / str(config["experiment"]["name"])
+        repo_root / ".local/benchmark_runs" / str(config["experiment"]["name"]) / "raw"
     )
 
     pending: list[tuple[dict[str, Any], bool]] = []
@@ -191,7 +191,8 @@ def run_campaign(
         )
 
     subprocess.run(
-        [sys.executable, "-m", postprocess_module], cwd=repo_root, check=True
+        [sys.executable, "-m", postprocess_module, "--raw-directory", str(raw_directory),
+         "--output-directory", str(raw_directory.parent / "figures")], cwd=repo_root, check=True
     )
     manifest = {
         "schema_version": 1,

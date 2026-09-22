@@ -107,10 +107,10 @@ def default_output_paths(
     suffix = "-smoke" if plan.mode == "smoke" else ""
     stem = (
         repo_root
-        / "benchmarks"
-        / "results"
-        / "raw"
+        / ".local"
+        / "benchmark_runs"
         / plan.job["experiment"]
+        / "raw"
         / f"{plan.job['job_id']}{suffix}"
     )
     return stem.with_suffix(".json"), stem.with_suffix(".npz")

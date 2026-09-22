@@ -16,9 +16,9 @@ from benchmarks.common.goodwin import (
 from benchmarks.common.plan_runs import build_jobs, load_config
 
 ROOT = Path(__file__).parents[2]
-FIGURE_2_CONFIG = ROOT / "benchmarks/figures/figure_2/config.toml"
-FIGURE_3_CONFIG = ROOT / "benchmarks/figures/figure_3/config.toml"
-FIGURE_3_LHS = ROOT / "benchmarks/figures/figure_3/lhs_initial_conditions.csv"
+NOISE_CONFIG = ROOT / "benchmarks/noise/config.toml"
+JOINT_CONFIG = ROOT / "benchmarks/joint/config.toml"
+JOINT_LHS = ROOT / "benchmarks/joint/lhs_initial_conditions.csv"
 
 
 def _job_for_method(config, config_path, method):
@@ -27,9 +27,9 @@ def _job_for_method(config, config_path, method):
     )
 
 
-def test_figure_2_smoke_plan_and_frozen_split():
-    config = load_config(FIGURE_2_CONFIG)
-    job = _job_for_method(config, FIGURE_2_CONFIG, "strong")
+def test_noise_smoke_plan_and_frozen_split():
+    config = load_config(NOISE_CONFIG)
+    job = _job_for_method(config, NOISE_CONFIG, "strong")
 
     plan = make_runtime_plan(config, job, smoke=True)
     batch = generate_batch(config, plan)
@@ -44,25 +44,24 @@ def test_figure_2_smoke_plan_and_frozen_split():
     assert np.allclose(batch.initial_conditions[2], [0.8, 0.6, 1.5])
 
 
-def test_figure_2_uses_stable_semantic_ids_through_twenty_percent_noise():
-    config = load_config(FIGURE_2_CONFIG)
-    jobs = build_jobs(config, FIGURE_2_CONFIG)
+def test_noise_uses_stable_semantic_ids_through_twenty_percent_noise():
+    config = load_config(NOISE_CONFIG)
+    jobs = build_jobs(config, NOISE_CONFIG)
 
-    assert len(jobs) == 100
+    assert len(jobs) == 75
     assert config["experiment"]["noise_levels"] == [0.0, 0.05, 0.10, 0.15, 0.20]
     assert len({job["job_id"] for job in jobs}) == len(jobs)
     assert any(
-        job["job_id"] == "weak_noise_poly2-weak_optimized-noise020-seed055"
+        job["job_id"] == "noise_robustness-weak_optimized-noise020-seed055"
         and job["noise_level"] == 0.20
         for job in jobs
     )
 
 
-def test_figure_2_methods_optimize_only_their_configured_parameters():
-    config = load_config(FIGURE_2_CONFIG)
+def test_noise_methods_optimize_only_their_configured_parameters():
+    config = load_config(NOISE_CONFIG)
     for method, expected_names in {
         "strong": ["threshold", "alpha"],
-        "weak_fixed": ["threshold", "alpha"],
         "weak_optimized": ["degree", "window_length", "stride", "threshold", "alpha"],
         "weak_optimized_sg": [
             "degree",
@@ -72,7 +71,7 @@ def test_figure_2_methods_optimize_only_their_configured_parameters():
             "alpha",
         ],
     }.items():
-        job = _job_for_method(config, FIGURE_2_CONFIG, method)
+        job = _job_for_method(config, NOISE_CONFIG, method)
         plan = make_runtime_plan(config, job, smoke=True)
         batch = generate_batch(config, plan)
         train_slice, _, _ = split_slices(plan.split_counts)
@@ -88,10 +87,10 @@ def test_figure_2_methods_optimize_only_their_configured_parameters():
 
 
 def test_strong_preprocessing_preserves_positive_hill_domain_at_high_noise():
-    config = load_config(FIGURE_2_CONFIG)
+    config = load_config(NOISE_CONFIG)
     job = next(
         job
-        for job in build_jobs(config, FIGURE_2_CONFIG)
+        for job in build_jobs(config, NOISE_CONFIG)
         if job["method"] == "strong" and job["noise_level"] == 0.20
     )
     plan = make_runtime_plan(config, job, smoke=True)
@@ -111,10 +110,10 @@ def test_strong_preprocessing_preserves_positive_hill_domain_at_high_noise():
 
 
 def test_sg_preprocessed_weak_uses_filtered_states_for_fit_and_objective():
-    config = load_config(FIGURE_2_CONFIG)
+    config = load_config(NOISE_CONFIG)
     job = next(
         job
-        for job in build_jobs(config, FIGURE_2_CONFIG)
+        for job in build_jobs(config, NOISE_CONFIG)
         if job["method"] == "weak_optimized_sg" and job["noise_level"] == 0.20
     )
     plan = make_runtime_plan(config, job, smoke=True)
@@ -134,12 +133,12 @@ def test_sg_preprocessed_weak_uses_filtered_states_for_fit_and_objective():
 
 
 def test_goodwin_hill_libraries_are_finite_outside_positive_domain():
-    figure_2 = load_config(FIGURE_2_CONFIG)
-    fixed_library, _ = build_library(figure_2, adaptive_exponent=False)
+    noise = load_config(NOISE_CONFIG)
+    fixed_library, _ = build_library(noise, adaptive_exponent=False)
     fixed_hill = fixed_library.build({})[-1][0]
 
-    figure_3 = load_config(FIGURE_3_CONFIG)
-    adaptive_library, _ = build_library(figure_3, adaptive_exponent=True)
+    joint = load_config(JOINT_CONFIG)
+    adaptive_library, _ = build_library(joint, adaptive_exponent=True)
     adaptive_hill = adaptive_library.build({"gamma_1": 9.5, "gamma_2": 2.0})[-2][0]
 
     values = np.asarray([-0.1, 0.0, 0.1])
@@ -147,8 +146,8 @@ def test_goodwin_hill_libraries_are_finite_outside_positive_domain():
     assert np.all(np.isfinite(adaptive_hill(values)))
 
 
-def test_figure_2_adds_degree_two_polynomials_and_interactions():
-    config = load_config(FIGURE_2_CONFIG)
+def test_noise_adds_degree_two_polynomials_and_interactions():
+    config = load_config(NOISE_CONFIG)
     library, _ = build_library(config, adaptive_exponent=False)
     functions = library.build({})
 
@@ -178,14 +177,14 @@ def test_figure_2_adds_degree_two_polynomials_and_interactions():
     ]
 
 
-def test_figure_3_joint_parameter_set_and_truth_matrix():
-    config = load_config(FIGURE_3_CONFIG)
+def test_joint_joint_parameter_set_and_truth_matrix():
+    config = load_config(JOINT_CONFIG)
     assert config["optimizer"]["objectives"] == [
         "trajectory_rmse",
         "durbin_watson_deviation",
         "active_coefficients",
     ]
-    job = _job_for_method(config, FIGURE_3_CONFIG, "weak_joint_sg")
+    job = _job_for_method(config, JOINT_CONFIG, "weak_joint_sg")
     plan = make_runtime_plan(config, job, smoke=True)
     batch = generate_batch(config, plan)
     train_slice, _, _ = split_slices(plan.split_counts)
@@ -217,12 +216,12 @@ def test_figure_3_joint_parameter_set_and_truth_matrix():
     assert np.allclose(truth[-1], [1.0, 0.0, 0.0])
 
 
-def test_figure_3_paired_lhs_job_matrix_and_independent_seeds():
-    config = load_config(FIGURE_3_CONFIG)
-    jobs = build_jobs(config, FIGURE_3_CONFIG)
+def test_joint_paired_lhs_job_matrix_and_independent_seeds():
+    config = load_config(JOINT_CONFIG)
+    jobs = build_jobs(config, JOINT_CONFIG)
 
-    assert len(jobs) == 30
-    assert {job["training_trajectories"] for job in jobs} == {1, 2, 3}
+    assert len(jobs) == 10
+    assert {job["training_trajectories"] for job in jobs} == {2}
     assert {job["ic_block"] for job in jobs} == set(range(1, 11))
     assert all(job["data_seed"] != job["optimizer_seed"] for job in jobs)
     for block in range(1, 11):
@@ -231,8 +230,8 @@ def test_figure_3_paired_lhs_job_matrix_and_independent_seeds():
         assert len({job["optimizer_seed"] for job in block_jobs}) == 1
 
 
-def test_figure_3_lhs_design_is_frozen_and_reproducible():
-    with FIGURE_3_LHS.open(newline="", encoding="utf-8") as stream:
+def test_joint_lhs_design_is_frozen_and_reproducible():
+    with JOINT_LHS.open(newline="", encoding="utf-8") as stream:
         rows = list(csv.DictReader(stream))
     stored = np.asarray(
         [[float(row[name]) for name in ("x0", "y0", "z0")] for row in rows]
@@ -256,27 +255,11 @@ def test_figure_3_lhs_design_is_frozen_and_reproducible():
     ]
 
 
-def test_figure_3_lhs_training_sizes_are_nested_and_paired():
-    config = load_config(FIGURE_3_CONFIG)
-    jobs = [job for job in build_jobs(config, FIGURE_3_CONFIG) if job["ic_block"] == 1]
-    batches = {}
-    for job in jobs:
-        plan = make_runtime_plan(config, job, smoke=True)
-        batches[job["training_trajectories"]] = generate_batch(config, plan)
-
-    one, two, three = (batches[size] for size in (1, 2, 3))
-    assert one.x_clean.shape == (4, 201, 3)
-    assert two.x_clean.shape == (5, 201, 3)
-    assert three.x_clean.shape == (6, 201, 3)
-    assert np.array_equal(one.x_noisy[0], three.x_noisy[0])
-    assert np.array_equal(two.x_noisy[:2], three.x_noisy[:2])
-    assert np.array_equal(one.x_noisy[1:], three.x_noisy[3:])
-    assert np.array_equal(two.x_noisy[2:], three.x_noisy[3:])
 
 
-def test_figure_3_uses_sg_and_full_parametric_candidate_library():
-    config = load_config(FIGURE_3_CONFIG)
-    job = _job_for_method(config, FIGURE_3_CONFIG, "weak_joint_sg")
+def test_joint_uses_sg_and_full_parametric_candidate_library():
+    config = load_config(JOINT_CONFIG)
+    job = _job_for_method(config, JOINT_CONFIG, "weak_joint_sg")
     plan = make_runtime_plan(config, job, smoke=True)
     batch = generate_batch(config, plan)
     train_slice, _, _ = split_slices(plan.split_counts)

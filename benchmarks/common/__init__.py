@@ -1,1 +1,1 @@
-"""Shared planning and plotting helpers for all benchmark figures."""
+"""Current software-paper benchmarks."""

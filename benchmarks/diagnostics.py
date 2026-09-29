@@ -1,4 +1,4 @@
-"""Supplementary S2-S4 diagnostics from the saved production trajectories."""
+"""Supplementary S2-S5 diagnostics from the saved production trajectories."""
 
 from __future__ import annotations
 
@@ -372,7 +372,7 @@ def noise_plate(
         "A dash denotes a coefficient below the configured support tolerance.\n"
         "Test data are shared across methods and used for reporting, not selection.\n"
         "Pareto color: DW deviation (lower is better); star: validation-selected model.\n"
-        "Fit/DW references: noisy observations for Strong/raw Weak; smoothed for Weak + SG.",
+        "Fit/DW references: noisy observations for Strong + SG/raw Weak; smoothed for Weak + SG.",
         ha="left",
         va="top",
         fontsize=7.6,
@@ -588,3 +588,5 @@ def render(experiment, raw, config, output):
     print(f"Wrote {len(pages)} diagnostic pages: {output / (stem + '.pdf')}")
     if experiment == "joint":
         render_library_overview(raw, config, output)
+        from benchmarks.joint.feedback_comparison import render as render_feedback_comparison
+        render_feedback_comparison(raw, config, output)

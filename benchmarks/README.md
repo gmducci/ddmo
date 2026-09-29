@@ -13,17 +13,18 @@ benchmarks/
   joint/                 # Figure 2: config, initial conditions, runner, plotting
   common/                # shared execution, data checks, and styling
   data/                  # result ZIPs, trajectory NPZs, provenance manifest
-  figures/               # six selected figures, PDF + PNG, and hash manifest
+  figures/               # seven selected figures, PDF + PNG, and hash manifest
 ```
 
 | Figure | Content | Files |
 |---|---|---|
-| 1 | Noise robustness: Strong, Weak optimized, Weak optimized + SG | [PDF](figures/figure_1_noise_robustness.pdf), [PNG](figures/figure_1_noise_robustness.png) |
+| 1 | Noise robustness: Strong + SG, Weak optimized, Weak optimized + SG | [PDF](figures/figure_1_noise_robustness.pdf), [PNG](figures/figure_1_noise_robustness.png) |
 | 2 | Selection frequency, conditional median coefficients, ground truth | [PDF](figures/figure_2_library_recovery.pdf), [PNG](figures/figure_2_library_recovery.png) |
 | S1 | All library coefficients for the three noise-benchmark methods | [PDF](figures/figure_s1_full_coefficient_recovery.pdf), [PNG](figures/figure_s1_full_coefficient_recovery.png) |
 | S2 | Figure 1 diagnostics: all noise/seed pairs, three methods, both test trajectories (25 pages) | [PDF](figures/figure_s2_noise_diagnostics.pdf), [Preview](figures/figure_s2_noise_diagnostics.png) |
 | S3 | Figure 2 diagnostics: all ten runs, including training, validation, and test trajectories (10 pages) | [PDF](figures/figure_s3_joint_diagnostics.pdf), [Preview](figures/figure_s3_joint_diagnostics.png) |
 | S4 | Figure 2 overview: representative test rollout with Hill/exponential shapes on the right | [PDF](figures/figure_s4_joint_library_shapes.pdf), [PNG](figures/figure_s4_joint_library_shapes.png) |
+| S5 | True Hill and fitted exponential feedback as functions of time on both held-out test trajectories | [PDF](figures/figure_s5_exponential_feedback.pdf), [PNG](figures/figure_s5_exponential_feedback.png) |
 
 Each S2/S3 diagnostic page also includes the three-objective Pareto projection and
 selected coefficients. S2 excludes fixed weak and labels failed rollouts.
@@ -38,6 +39,23 @@ coefficient-weighted contributions to the ODE: `1/(1+s**gamma_1)` and
 curves use their conditional median. Hill is active in 6/10 runs and exponential
 in 4/10. Parameters from inactive families are excluded.
 
+S5 compares the **coefficient-weighted** terms in the $\dot x$ equation for all
+four exponential-selected models (repetitions 2, 3, 5, and 10): the true
+$k_1/[1+(z/K_1)^{\gamma}]$ evaluated on the clean reference $z(t)$ and each
+fitted $c\exp(-\gamma_2\hat z(t))$ evaluated on the identified model's test
+rollout $\hat z(t)$.
+Each row is one repetition, with test trajectory 1 on the left and test
+trajectory 2 on the right. Each panel shows the full $0$--$200$ interval with
+one true and one fitted curve. The ordinate is linear from 0 to 1. For each
+trajectory, reference peaks define cycle boundaries at their
+midpoints. Within each cycle, both true and fitted feedback are divided by the
+same maximum of the two curves. This retains their relative pulse heights and
+timing while removing the large change in absolute amplitude from the initial
+transient to later cycles. It is a comparison of pulse shape, not absolute
+feedback magnitude. The fitted terms often underestimate feedback pulse peaks.
+This comparison includes errors in the identified $z$ rollout as well as errors
+in the fitted feedback function.
+
 ## Regenerate figures
 
 Use the project environment (Python 3.11+, tested on 3.12) from the repository root:
@@ -48,7 +66,7 @@ python -m benchmarks.plot
 ```
 
 The first command checks the selected files, numerical inputs, and run provenance.
-The second regenerates all six figures from numerical results into
+The second regenerates all seven figures from numerical results into
 `.local/benchmark_plots/`. It does not run optimization or overwrite the selected
 figures. Use `noise` or `joint` to render only one experiment:
 
@@ -64,7 +82,7 @@ the original initial-condition design. Individual file hashes and original sourc
 commits are in `data/manifest.json`. Archived source paths inside result metadata
 are provenance only: figure regeneration does not read those paths or the local archive.
 Two deduplicated trajectory NPZs (about 11 MB total) supply the exact saved arrays
-for S2-S4. All six figures regenerate without the local archive. Page-to-run
+for S2-S5. All seven figures regenerate without the local archive. Page-to-run
 assignments are recorded in `figures/manifest.json`; regeneration also writes
 page-index JSON files alongside the generated diagnostics in `.local/`.
 
@@ -94,7 +112,7 @@ weak-formulation settings, and STLSQ settings. Configurations are in
 
 The saved noise data are the 75 displayed runs from the original 100-run campaign;
 fixed weak is excluded. New noise runs execute only the three retained methods.
-Two saved Strong test rollouts failed at 20% noise: that test-error median uses
+Two saved Strong + SG test rollouts failed at 20% noise: that test-error median uses
 three successful runs; coefficient statistics include all five fitted models.
 SG weak objectives use smoothed observations. Validation/test NRMSE uses clean
 synthetic references. These scientific choices have not changed during cleanup.

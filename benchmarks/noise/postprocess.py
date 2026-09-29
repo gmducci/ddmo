@@ -21,7 +21,7 @@ plt.switch_backend("Agg")
 
 METHODS = ["strong", "weak_optimized", "weak_optimized_sg"]
 METHOD_LABELS = {
-    "strong": "Strong",
+    "strong": "Strong + SG",
     "weak_fixed": "Weak, fixed",
     "weak_optimized": "Weak, optimized",
     "weak_optimized_sg": "Weak, optimized + SG",
@@ -159,9 +159,8 @@ def _plot_metric(
             finite = values[np.isfinite(values)]
             if finite.size == 0:
                 continue
-            offsets = np.linspace(-0.0025, 0.0025, len(finite))
             axis.scatter(
-                noise + offsets,
+                np.full(finite.shape, noise),
                 finite,
                 color=METHOD_COLORS[method],
                 marker=METHOD_MARKERS[method],

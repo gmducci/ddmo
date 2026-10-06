@@ -22,7 +22,8 @@ def check():
         with trajectory_data(name):
             pass
     expected = {Path(item["path"]).name for item in manifest["files"]
-                if Path(item["path"]).parent == Path("benchmarks/figures")}
+                if Path(item["path"]).parent == Path("benchmarks/figures")
+                and Path(item["path"]).suffix in (".pdf", ".png")}
     actual = {p.name for p in FIGURES.iterdir() if p.suffix in (".pdf", ".png")}
     if actual != expected:
         raise ValueError("Unexpected publication artwork")
@@ -54,6 +55,10 @@ def main():
                 module.render(raw, config, args.output_directory)
             from benchmarks.diagnostics import render
             render(name, raw, config, args.output_directory)
+            if name == "noise":
+                from benchmarks.noise.equation_mismatch import render as render_mismatch
+
+                render_mismatch(config, raw, args.output_directory)
     print(f"Regenerated figures in {args.output_directory}")
 
 

@@ -36,6 +36,8 @@ Run one of the example workflows from the repository root:
 python examples/quickstart/goodwin_weak.py
 ```
 
+This reproduces one full Figure 1 weak-form run and may take several minutes.
+
 or:
 
 ```bash

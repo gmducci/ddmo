@@ -7,9 +7,10 @@
     "figure_s2_noise_diagnostics",
     "figure_s3_joint_diagnostics",
     "figure_s4_joint_library_shapes",
-    "figure_s5_exponential_feedback"
+    "figure_s5_exponential_feedback",
+    "figure_s6_equation_mismatch"
   ],
-  "regeneration_check": "Figure 1 and S1 regenerated from the exact saved production results on 2026-09-29 after display updates. S2 regenerated from the exact saved trajectories on 2026-09-29; its 25-page PDF and first-page preview were generated together. S5 generated from the exact saved joint models and clean test trajectories on 2026-09-29. Figure 2 and S3-S4 artwork remain unchanged.",
+  "regeneration_check": "Figure 1 regenerated from the saved noise campaign on 2026-10-01 with a separate, explicitly labelled zero-noise strong finite-difference diagnostic. Its STLSQ parameters were selected on the validation trajectory from a 13-by-5 grid; the selected metrics, coefficients, and grid are saved in figure_1_strong_fd_reference.json. This reference is not a production campaign run. S1 regenerated from the exact saved production results on 2026-09-29. S2 regenerated from the exact saved trajectories on 2026-09-29; its 25-page PDF and first-page preview were generated together. S5 generated from the exact saved joint models and clean test trajectories on 2026-09-29. Figure 2 and S3-S4 artwork remain unchanged. S6 generated from the exact saved noise test trajectories on 2026-10-02, using true Goodwin parameters and the saved selected weak-window settings; per-run summary values are archived in figure_s6_equation_mismatch.json.",
   "files": [
     {
       "path": "benchmarks/__init__.py",
@@ -65,11 +66,15 @@
     },
     {
       "path": "benchmarks/figures/figure_1_noise_robustness.pdf",
-      "sha256": "df550de08ff8193d900300d6db14bcd1723fef075823f8e3468729c7cee7c539"
+      "sha256": "a45e89e84de08408cf16138861342a1b78cfc316bc96ac23aec7c9b918a3bb7d"
     },
     {
       "path": "benchmarks/figures/figure_1_noise_robustness.png",
-      "sha256": "a75d96e862ebb5d9bf2529b471ae21e632b19ce7194eb19b716e92a91e6fdb13"
+      "sha256": "f3dd9ebc06faba960443722345a348785d8d6dde128e65f6b01400c7111b56a1"
+    },
+    {
+      "path": "benchmarks/figures/figure_1_strong_fd_reference.json",
+      "sha256": "604273a9123e3af2ad351ce43c58aa06fd21dcbe217dea08cf940fcacff5865a"
     },
     {
       "path": "benchmarks/figures/figure_2_library_recovery.pdf",
@@ -120,16 +125,28 @@
       "sha256": "7d524260cebaaf7018706ab0cb8a25971ae79539f81668aa40e66abb58cf3556"
     },
     {
+      "path": "benchmarks/figures/figure_s6_equation_mismatch.json",
+      "sha256": "308bb9c6b0189898ec2bad70323893f5db9b3c14fba20816b8a59c951f511841"
+    },
+    {
+      "path": "benchmarks/figures/figure_s6_equation_mismatch.pdf",
+      "sha256": "9b8cbe8a5742a9b766a4245c307679593f1d2ff0271d99f6b70fad0864251444"
+    },
+    {
+      "path": "benchmarks/figures/figure_s6_equation_mismatch.png",
+      "sha256": "a7a5632113af9e695f8066b32f144ec68865e7cba99f9d47e0b84944b71fba12"
+    },
+    {
       "path": "benchmarks/joint/__init__.py",
       "sha256": "c7d3291368279700b90102c001381abc16488cedd692ad7dd46f9d1c1cd26305"
     },
     {
-      "path": "benchmarks/joint/feedback_comparison.py",
-      "sha256": "436a448b2abeb66245adaaa3a3f03f70c05aa591370c79db13a4d1efe55d9eaa"
-    },
-    {
       "path": "benchmarks/joint/config.toml",
       "sha256": "f8f847d38e94bf60e13cc8a0ff339cd092389c4e7852a7e1803d987b3ad411ec"
+    },
+    {
+      "path": "benchmarks/joint/feedback_comparison.py",
+      "sha256": "436a448b2abeb66245adaaa3a3f03f70c05aa591370c79db13a4d1efe55d9eaa"
     },
     {
       "path": "benchmarks/joint/lhs_initial_conditions.csv",
@@ -152,8 +169,12 @@
       "sha256": "148fc275bedd92b160e5f14590846b024d387900813b85a7a729faa397203356"
     },
     {
+      "path": "benchmarks/noise/equation_mismatch.py",
+      "sha256": "984152738dcca5714ea879e08490f4959edc160f0776d1c1c43866c55791dbe4"
+    },
+    {
       "path": "benchmarks/noise/postprocess.py",
-      "sha256": "40d941d0b86a9451e93e5a07a91778cdedaa3e2d0104651119ba1ef55aa89b44"
+      "sha256": "c9f5b2393bec78f02c60aa232435c0f5010ba56f1b0d0fe14b838d87d7f1151b"
     },
     {
       "path": "benchmarks/noise/run.py",
@@ -161,7 +182,7 @@
     },
     {
       "path": "benchmarks/plot.py",
-      "sha256": "ff063325da3dd96401fe281b95cb8c0793f5807ac247a3bd6bbd361bc3630e6b"
+      "sha256": "66f964ca571824c27c5182189db491fe22e93944e2361120da2fad2f0f2c0fa9"
     },
     {
       "path": "benchmarks/run.py",
@@ -451,7 +472,12 @@
   "feedback_comparison": {
     "figure": "figure_s5_exponential_feedback",
     "experiment": "joint",
-    "selected_repetitions": [2, 3, 5, 10],
+    "selected_repetitions": [
+      2,
+      3,
+      5,
+      10
+    ],
     "functions": "True Hill contribution evaluated on clean z(t), and the coefficient-weighted exponential contribution evaluated on identified z-hat(t), both in the x equation",
     "trajectories": "Both held-out test trajectories of each exponential-selected run; clean reference and identified rollout",
     "layout": "One row per repetition; test trajectory 1 in the left column and test trajectory 2 in the right column",

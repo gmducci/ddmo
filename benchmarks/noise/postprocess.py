@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
@@ -14,8 +14,20 @@ from matplotlib.lines import Line2D
 from matplotlib.ticker import MaxNLocator
 
 from benchmarks.common.data import result_data
-from benchmarks.common.goodwin import true_coefficient_matrix
+from benchmarks.common.goodwin import (
+    _feature_names,
+    build_library,
+    coefficient_metrics,
+    generate_batch,
+    make_runtime_plan,
+    rollout,
+    split_slices,
+    true_coefficient_matrix,
+)
 from benchmarks.common.style import publication_style
+from ddmo.formulation.strong import StrongFormulation
+from ddmo.solver.pysindy_solver import Pysindy_Solver
+from ddmo.utils.data_constructor import DataConstructor
 
 plt.switch_backend("Agg")
 
@@ -40,6 +52,19 @@ METHOD_MARKERS = {
 }
 STATE_NAMES = ["x", "y", "z"]
 STATE_COLORS = ["#3B4CC0", "#00876C", "#B40426"]
+NUMERICAL_STRONG_LABEL = "Strong FD (diagnostic)"
+
+
+@dataclass(frozen=True)
+class NumericalStrongReference:
+    test_nrmse: float
+    coefficient_relative_l2_error: float
+    false_positive_coefficients: int
+    validation_nrmse: float
+    threshold: float
+    alpha: float
+    feature_names: list[str]
+    coefficients: list[list[float]]
 
 
 @dataclass(frozen=True)
@@ -142,6 +167,85 @@ def _values(
     )
 
 
+def numerical_derivative_strong_reference(config: dict[str, Any]) -> NumericalStrongReference:
+    """Fit the strong model at zero noise with derivatives of clean samples.
+
+    The candidate library and STLSQ solver match the benchmark. Threshold and
+    alpha are selected from a deterministic log-spaced grid by validation
+    rollout NRMSE; this reference is not another production campaign run.
+    """
+    job = {
+        "method": "strong",
+        "noise_level": 0.0,
+        "data_seed": int(config["experiment"]["seeds"][0]),
+    }
+    plan = make_runtime_plan(config, job, smoke=False)
+    batch = generate_batch(config, plan)
+    train_slice, validation_slice, test_slice = split_slices(plan.split_counts)
+    clean_states = batch.x_clean[train_slice]
+    numerical_derivatives = np.gradient(
+        clean_states,
+        float(batch.time[1] - batch.time[0]),
+        axis=1,
+        edge_order=2,
+    )
+    training = DataConstructor(
+        x_train=clean_states,
+        time_array=batch.time,
+        x_dot=numerical_derivatives,
+        x_0=batch.initial_conditions[train_slice],
+        x_raw=clean_states,
+    )
+    library, _ = build_library(config, adaptive_exponent=False)
+    formulation = StrongFormulation(data_instance=training, library_object=library.build)
+    rhs = formulation.get_rhs(training, [], opt_param_dict={})
+    solver = Pysindy_Solver(
+        training,
+        "STLSQ",
+        {"fit_intercept": False, "normalize_columns": False},
+        scale_features=True,
+        library_object=library.build,
+    )
+    lhs = formulation.get_lhs(training)
+    bounds = config["bounds"]["solver"]
+    thresholds = np.geomspace(*bounds["threshold"], num=13)
+    alphas = np.geomspace(*bounds["alpha"], num=5)
+    tolerance = float(config["selection"]["coefficient_zero_tolerance"])
+    best = None
+    for threshold in thresholds:
+        for alpha in alphas:
+            candidate = solver.solve(lhs, rhs, threshold=float(threshold), alpha=float(alpha))
+            if candidate.model is None:
+                continue
+            validation = float(
+                rollout(candidate.model, batch, validation_slice)[0]["rollout_nrmse"]
+            )
+            if not math.isfinite(validation):
+                continue
+            active = int(np.count_nonzero(np.abs(candidate.coefficients) > tolerance))
+            rank = (validation, active, float(threshold), float(alpha))
+            if best is None or rank < best[0]:
+                best = (rank, candidate)
+    if best is None:
+        raise RuntimeError("Numerical-derivative strong reference search failed")
+    (validation, _, threshold, alpha), fit = best
+    score = float(rollout(fit.model, batch, test_slice)[0]["rollout_nrmse"])
+    if not math.isfinite(score) or score <= 0.0:
+        raise ValueError("Numerical-derivative strong reference needs a positive finite NRMSE")
+    feature_names = _feature_names(fit.model)
+    metrics = coefficient_metrics(fit.coefficients, feature_names, config)
+    return NumericalStrongReference(
+        test_nrmse=score,
+        coefficient_relative_l2_error=float(metrics["relative_l2_error"]),
+        false_positive_coefficients=int(metrics["false_positive_coefficients"]),
+        validation_nrmse=validation,
+        threshold=threshold,
+        alpha=alpha,
+        feature_names=feature_names,
+        coefficients=np.asarray(fit.coefficients, dtype=float).tolist(),
+    )
+
+
 def _plot_metric(
     axis: plt.Axes,
     records: list[NoiseRecord],
@@ -195,6 +299,7 @@ def plot_summary(
     output_stem: Path,
     records: list[NoiseRecord],
     config: dict[str, Any],
+    numerical_strong: NumericalStrongReference,
 ) -> None:
     noise_levels = [float(value) for value in config["experiment"]["noise_levels"]]
     with publication_style():
@@ -207,6 +312,17 @@ def plot_summary(
             "Test rollout NRMSE",
             logarithmic=True,
         )
+        axes[0].scatter(
+            [0.0],
+            [numerical_strong.test_nrmse],
+            color=METHOD_COLORS["strong"],
+            edgecolor="white",
+            linewidth=0.6,
+            marker="*",
+            s=120,
+            zorder=7,
+            label=NUMERICAL_STRONG_LABEL,
+        )
         _plot_metric(
             axes[1],
             records,
@@ -214,6 +330,16 @@ def plot_summary(
             "coefficient_relative_l2_error",
             "Coefficient relative error",
             logarithmic=True,
+        )
+        axes[1].scatter(
+            [0.0],
+            [numerical_strong.coefficient_relative_l2_error],
+            color=METHOD_COLORS["strong"],
+            edgecolor="white",
+            linewidth=0.6,
+            marker="*",
+            s=120,
+            zorder=7,
         )
         _plot_metric(
             axes[2],
@@ -223,12 +349,22 @@ def plot_summary(
             "False-positive coefficients",
             logarithmic=False,
         )
+        axes[2].scatter(
+            [0.0],
+            [numerical_strong.false_positive_coefficients],
+            color=METHOD_COLORS["strong"],
+            edgecolor="white",
+            linewidth=0.6,
+            marker="*",
+            s=120,
+            zorder=7,
+        )
         handles, labels = axes[0].get_legend_handles_labels()
         fig.legend(
             handles,
             labels,
             loc="upper center",
-            ncol=len(METHODS),
+            ncol=len(METHODS) + 1,
             frameon=False,
             bbox_to_anchor=(0.5, 0.995),
         )
@@ -352,7 +488,23 @@ def plot_coefficients(stem, records, config):
 def render(raw, config, output):
     records = collect_records(raw, config["experiment"]["name"])
     output.mkdir(parents=True, exist_ok=True)
-    plot_summary(output / "figure_1_noise_robustness", records, config)
+    numerical_strong = numerical_derivative_strong_reference(config)
+    plot_summary(output / "figure_1_noise_robustness", records, config, numerical_strong)
+    bounds = config["bounds"]["solver"]
+    reference_record = {
+        "status": "separate_diagnostic_not_in_saved_campaign",
+        "noise_level": 0.0,
+        "data_seed": int(config["experiment"]["seeds"][0]),
+        "derivative_method": "numpy.gradient(clean_training_states, dt, axis=1, edge_order=2)",
+        "selection_metric": "validation_rollout_nrmse",
+        "test_used_for_selection": False,
+        "threshold_grid": np.geomspace(*bounds["threshold"], num=13).tolist(),
+        "alpha_grid": np.geomspace(*bounds["alpha"], num=5).tolist(),
+        "reference": asdict(numerical_strong),
+    }
+    (output / "figure_1_strong_fd_reference.json").write_text(
+        json.dumps(reference_record, indent=2) + "\n", encoding="utf-8"
+    )
     plot_coefficients(output / "figure_s1_full_coefficient_recovery", records, config)
 
 

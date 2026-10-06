@@ -1,12 +1,11 @@
 # Examples
 
-Examples are small, maintained demonstrations of the public `ddmo` API. They
-are not publication benchmarks and do not store generated results in this
-directory.
+Examples are small demonstrations of the public `ddmo` API. They do not store
+generated results in this directory.
 
 ## Quickstart
 
-- `quickstart/goodwin_weak.py` demonstrates the standard weak-form workflow.
+- `quickstart/goodwin_weak.py` reproduces one Figure 1 “Weak, optimized” run.
 - `quickstart/brusselator_custom_library.py` demonstrates a parameterized
   custom feature library.
 
@@ -27,5 +26,5 @@ Run an example from the repository root after installing the package:
 python examples/quickstart/goodwin_weak.py
 ```
 
-Reproducible paper experiments, fixed configurations, and result-generation
-tools belong in `benchmarks/`.
+The full paper campaigns, fixed configurations, and saved results are in
+`benchmarks/`.

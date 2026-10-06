@@ -26,7 +26,7 @@ python -c "import ddmo; print(ddmo.__all__)"
 
 ## 2. Run an existing example
 
-The fastest way to verify that the package works is to run one of the tutorial examples:
+Run one of the tutorial examples:
 
 ```bash
 python examples/quickstart/goodwin_weak.py
@@ -39,6 +39,7 @@ python examples/quickstart/brusselator_custom_library.py
 ```
 
 These examples load or generate trajectory data, build a candidate function library, configure the formulation, solver, and optimizer, and run model identification.
+The Goodwin example reproduces a full Figure 1 case and may take several minutes.
 
 ## 3. Import the public API
 

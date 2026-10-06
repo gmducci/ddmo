@@ -1,0 +1,1017 @@
+{
+  "status": "diagnostic_at_true_parameters_with_saved_selected_weak_windows",
+  "source": "saved held-out Goodwin trajectories in benchmarks/data/noise_trajectories.npz",
+  "normalization": "RMS of each state mismatch divided by RMS of its exact clean derivative; then RMS across states",
+  "figure_1_metric": "Test rollout NRMSE is the mean across states of fitted-rollout RMSE divided by clean-state standard deviation; it is a different quantity",
+  "weak_window": "production-selected degree, length, and stride from each archived result; family is PolynomialWindow",
+  "strong_sg": {
+    "method": "savitzky_golay",
+    "window_length": 21,
+    "polynomial_order": 3
+  },
+  "strong_fd": "numpy.gradient(states, dt, axis=1, edge_order=2)",
+  "weak_quadrature": "production WeakFormulation LHS and RHS weights",
+  "example_job_id": "weak_noise_poly2_three_objectives_20260915-strong-noise000-seed011",
+  "records": [
+    {
+      "noise_level": 0.0,
+      "seed": 11,
+      "method": "strong_sg",
+      "relative_equation_rms": 0.18122892389588455,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.0,
+      "seed": 11,
+      "method": "strong_fd",
+      "relative_equation_rms": 0.019730136922037237,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.0,
+      "seed": 11,
+      "method": "weak_raw",
+      "relative_equation_rms": 8.304862422608689e-05,
+      "number_of_constraints": 58,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 5,
+        "window_length": 97,
+        "stride": 32
+      }
+    },
+    {
+      "noise_level": 0.0,
+      "seed": 11,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.0002930476911725288,
+      "number_of_constraints": 52,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 5,
+        "window_length": 73,
+        "stride": 36
+      }
+    },
+    {
+      "noise_level": 0.0,
+      "seed": 22,
+      "method": "strong_sg",
+      "relative_equation_rms": 0.18122892389588455,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.0,
+      "seed": 22,
+      "method": "strong_fd",
+      "relative_equation_rms": 0.019730136922037237,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.0,
+      "seed": 22,
+      "method": "weak_raw",
+      "relative_equation_rms": 0.00014190425338217583,
+      "number_of_constraints": 58,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 6,
+        "window_length": 47,
+        "stride": 34
+      }
+    },
+    {
+      "noise_level": 0.0,
+      "seed": 22,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.00028079213367026857,
+      "number_of_constraints": 78,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 5,
+        "window_length": 71,
+        "stride": 24
+      }
+    },
+    {
+      "noise_level": 0.0,
+      "seed": 33,
+      "method": "strong_sg",
+      "relative_equation_rms": 0.18122892389588455,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.0,
+      "seed": 33,
+      "method": "strong_fd",
+      "relative_equation_rms": 0.019730136922037237,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.0,
+      "seed": 33,
+      "method": "weak_raw",
+      "relative_equation_rms": 0.00011333858573949618,
+      "number_of_constraints": 62,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 6,
+        "window_length": 65,
+        "stride": 31
+      }
+    },
+    {
+      "noise_level": 0.0,
+      "seed": 33,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.00019139217286394278,
+      "number_of_constraints": 62,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 4,
+        "window_length": 93,
+        "stride": 30
+      }
+    },
+    {
+      "noise_level": 0.0,
+      "seed": 44,
+      "method": "strong_sg",
+      "relative_equation_rms": 0.18122892389588455,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.0,
+      "seed": 44,
+      "method": "strong_fd",
+      "relative_equation_rms": 0.019730136922037237,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.0,
+      "seed": 44,
+      "method": "weak_raw",
+      "relative_equation_rms": 0.00011358842712090909,
+      "number_of_constraints": 62,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 6,
+        "window_length": 63,
+        "stride": 31
+      }
+    },
+    {
+      "noise_level": 0.0,
+      "seed": 44,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.0002563238852534237,
+      "number_of_constraints": 48,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 4,
+        "window_length": 89,
+        "stride": 39
+      }
+    },
+    {
+      "noise_level": 0.0,
+      "seed": 55,
+      "method": "strong_sg",
+      "relative_equation_rms": 0.18122892389588455,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.0,
+      "seed": 55,
+      "method": "strong_fd",
+      "relative_equation_rms": 0.019730136922037237,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.0,
+      "seed": 55,
+      "method": "weak_raw",
+      "relative_equation_rms": 9.433906512413921e-05,
+      "number_of_constraints": 54,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 4,
+        "window_length": 91,
+        "stride": 35
+      }
+    },
+    {
+      "noise_level": 0.0,
+      "seed": 55,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.00028079213367026857,
+      "number_of_constraints": 78,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 5,
+        "window_length": 71,
+        "stride": 24
+      }
+    },
+    {
+      "noise_level": 0.05,
+      "seed": 11,
+      "method": "strong_sg",
+      "relative_equation_rms": 0.3829421690701178,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.05,
+      "seed": 11,
+      "method": "strong_fd",
+      "relative_equation_rms": 2.3971737885023012,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.05,
+      "seed": 11,
+      "method": "weak_raw",
+      "relative_equation_rms": 0.34295192791965345,
+      "number_of_constraints": 64,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 3,
+        "window_length": 33,
+        "stride": 31
+      }
+    },
+    {
+      "noise_level": 0.05,
+      "seed": 11,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.08053046644189008,
+      "number_of_constraints": 68,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 4,
+        "window_length": 67,
+        "stride": 28
+      }
+    },
+    {
+      "noise_level": 0.05,
+      "seed": 22,
+      "method": "strong_sg",
+      "relative_equation_rms": 0.3523269789536663,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.05,
+      "seed": 22,
+      "method": "strong_fd",
+      "relative_equation_rms": 2.324413233313754,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.05,
+      "seed": 22,
+      "method": "weak_raw",
+      "relative_equation_rms": 0.27702989801317257,
+      "number_of_constraints": 54,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 5,
+        "window_length": 85,
+        "stride": 35
+      }
+    },
+    {
+      "noise_level": 0.05,
+      "seed": 22,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.08734154854369519,
+      "number_of_constraints": 50,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 4,
+        "window_length": 63,
+        "stride": 39
+      }
+    },
+    {
+      "noise_level": 0.05,
+      "seed": 33,
+      "method": "strong_sg",
+      "relative_equation_rms": 0.37017844576403086,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.05,
+      "seed": 33,
+      "method": "strong_fd",
+      "relative_equation_rms": 2.4002360924199233,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.05,
+      "seed": 33,
+      "method": "weak_raw",
+      "relative_equation_rms": 0.38280223053891227,
+      "number_of_constraints": 48,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 5,
+        "window_length": 65,
+        "stride": 40
+      }
+    },
+    {
+      "noise_level": 0.05,
+      "seed": 33,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.08048698054655226,
+      "number_of_constraints": 48,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 3,
+        "window_length": 83,
+        "stride": 39
+      }
+    },
+    {
+      "noise_level": 0.05,
+      "seed": 44,
+      "method": "strong_sg",
+      "relative_equation_rms": 0.3778752730697203,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.05,
+      "seed": 44,
+      "method": "strong_fd",
+      "relative_equation_rms": 2.4584637574522055,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.05,
+      "seed": 44,
+      "method": "weak_raw",
+      "relative_equation_rms": 0.41765800879621273,
+      "number_of_constraints": 52,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 4,
+        "window_length": 25,
+        "stride": 39
+      }
+    },
+    {
+      "noise_level": 0.05,
+      "seed": 44,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.08732798586014127,
+      "number_of_constraints": 56,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 4,
+        "window_length": 63,
+        "stride": 34
+      }
+    },
+    {
+      "noise_level": 0.05,
+      "seed": 55,
+      "method": "strong_sg",
+      "relative_equation_rms": 0.34629123882824775,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.05,
+      "seed": 55,
+      "method": "strong_fd",
+      "relative_equation_rms": 2.495049660439317,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.05,
+      "seed": 55,
+      "method": "weak_raw",
+      "relative_equation_rms": 0.43627564701516164,
+      "number_of_constraints": 60,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 6,
+        "window_length": 55,
+        "stride": 32
+      }
+    },
+    {
+      "noise_level": 0.05,
+      "seed": 55,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.06652201949369675,
+      "number_of_constraints": 62,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 5,
+        "window_length": 95,
+        "stride": 30
+      }
+    },
+    {
+      "noise_level": 0.1,
+      "seed": 11,
+      "method": "strong_sg",
+      "relative_equation_rms": 0.7148136340702257,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.1,
+      "seed": 11,
+      "method": "strong_fd",
+      "relative_equation_rms": 4.894366836473151,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.1,
+      "seed": 11,
+      "method": "weak_raw",
+      "relative_equation_rms": 0.835540109144562,
+      "number_of_constraints": 84,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 6,
+        "window_length": 121,
+        "stride": 21
+      }
+    },
+    {
+      "noise_level": 0.1,
+      "seed": 11,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.2055071745956647,
+      "number_of_constraints": 48,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 4,
+        "window_length": 57,
+        "stride": 40
+      }
+    },
+    {
+      "noise_level": 0.1,
+      "seed": 22,
+      "method": "strong_sg",
+      "relative_equation_rms": 0.6353823626252663,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.1,
+      "seed": 22,
+      "method": "strong_fd",
+      "relative_equation_rms": 4.781064414762601,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.1,
+      "seed": 22,
+      "method": "weak_raw",
+      "relative_equation_rms": 0.8281250422924983,
+      "number_of_constraints": 50,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 6,
+        "window_length": 135,
+        "stride": 36
+      }
+    },
+    {
+      "noise_level": 0.1,
+      "seed": 22,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.19940739474764504,
+      "number_of_constraints": 48,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 5,
+        "window_length": 67,
+        "stride": 39
+      }
+    },
+    {
+      "noise_level": 0.1,
+      "seed": 33,
+      "method": "strong_sg",
+      "relative_equation_rms": 0.7186161084808325,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.1,
+      "seed": 33,
+      "method": "strong_fd",
+      "relative_equation_rms": 4.86381222195635,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.1,
+      "seed": 33,
+      "method": "weak_raw",
+      "relative_equation_rms": 1.0316795119119102,
+      "number_of_constraints": 56,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 6,
+        "window_length": 63,
+        "stride": 34
+      }
+    },
+    {
+      "noise_level": 0.1,
+      "seed": 33,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.21479360705335032,
+      "number_of_constraints": 48,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 3,
+        "window_length": 85,
+        "stride": 39
+      }
+    },
+    {
+      "noise_level": 0.1,
+      "seed": 44,
+      "method": "strong_sg",
+      "relative_equation_rms": 0.6820286800434295,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.1,
+      "seed": 44,
+      "method": "strong_fd",
+      "relative_equation_rms": 5.000210584740041,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.1,
+      "seed": 44,
+      "method": "weak_raw",
+      "relative_equation_rms": 0.6773390908180481,
+      "number_of_constraints": 56,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 6,
+        "window_length": 73,
+        "stride": 34
+      }
+    },
+    {
+      "noise_level": 0.1,
+      "seed": 44,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.19621814876261648,
+      "number_of_constraints": 56,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 5,
+        "window_length": 67,
+        "stride": 34
+      }
+    },
+    {
+      "noise_level": 0.1,
+      "seed": 55,
+      "method": "strong_sg",
+      "relative_equation_rms": 0.6373045310994079,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.1,
+      "seed": 55,
+      "method": "strong_fd",
+      "relative_equation_rms": 5.116170250049715,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.1,
+      "seed": 55,
+      "method": "weak_raw",
+      "relative_equation_rms": 1.0592766692560165,
+      "number_of_constraints": 60,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 6,
+        "window_length": 141,
+        "stride": 29
+      }
+    },
+    {
+      "noise_level": 0.1,
+      "seed": 55,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.356601535497811,
+      "number_of_constraints": 122,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 6,
+        "window_length": 33,
+        "stride": 16
+      }
+    },
+    {
+      "noise_level": 0.15,
+      "seed": 11,
+      "method": "strong_sg",
+      "relative_equation_rms": 1.0803678780703863,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.15,
+      "seed": 11,
+      "method": "strong_fd",
+      "relative_equation_rms": 7.220922971219488,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.15,
+      "seed": 11,
+      "method": "weak_raw",
+      "relative_equation_rms": 1.3013362608816306,
+      "number_of_constraints": 54,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 5,
+        "window_length": 127,
+        "stride": 33
+      }
+    },
+    {
+      "noise_level": 0.15,
+      "seed": 11,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.32518986627271773,
+      "number_of_constraints": 58,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 6,
+        "window_length": 137,
+        "stride": 30
+      }
+    },
+    {
+      "noise_level": 0.15,
+      "seed": 22,
+      "method": "strong_sg",
+      "relative_equation_rms": 0.9478256288695907,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.15,
+      "seed": 22,
+      "method": "strong_fd",
+      "relative_equation_rms": 7.172520057638884,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.15,
+      "seed": 22,
+      "method": "weak_raw",
+      "relative_equation_rms": 1.3614666977355219,
+      "number_of_constraints": 50,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 4,
+        "window_length": 113,
+        "stride": 37
+      }
+    },
+    {
+      "noise_level": 0.15,
+      "seed": 22,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.33582754771581413,
+      "number_of_constraints": 54,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 4,
+        "window_length": 59,
+        "stride": 36
+      }
+    },
+    {
+      "noise_level": 0.15,
+      "seed": 33,
+      "method": "strong_sg",
+      "relative_equation_rms": 1.1571272095990053,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.15,
+      "seed": 33,
+      "method": "strong_fd",
+      "relative_equation_rms": 7.232383268391088,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.15,
+      "seed": 33,
+      "method": "weak_raw",
+      "relative_equation_rms": 1.4097476260491926,
+      "number_of_constraints": 50,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 5,
+        "window_length": 97,
+        "stride": 37
+      }
+    },
+    {
+      "noise_level": 0.15,
+      "seed": 33,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.5249440611560163,
+      "number_of_constraints": 64,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 4,
+        "window_length": 67,
+        "stride": 30
+      }
+    },
+    {
+      "noise_level": 0.15,
+      "seed": 44,
+      "method": "strong_sg",
+      "relative_equation_rms": 1.1065113683458339,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.15,
+      "seed": 44,
+      "method": "strong_fd",
+      "relative_equation_rms": 7.443590396688733,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.15,
+      "seed": 44,
+      "method": "weak_raw",
+      "relative_equation_rms": 1.4883824610547158,
+      "number_of_constraints": 48,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 6,
+        "window_length": 63,
+        "stride": 40
+      }
+    },
+    {
+      "noise_level": 0.15,
+      "seed": 44,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.4806557356819996,
+      "number_of_constraints": 46,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 6,
+        "window_length": 105,
+        "stride": 39
+      }
+    },
+    {
+      "noise_level": 0.15,
+      "seed": 55,
+      "method": "strong_sg",
+      "relative_equation_rms": 1.0206815055501082,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.15,
+      "seed": 55,
+      "method": "strong_fd",
+      "relative_equation_rms": 7.5615066453115425,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.15,
+      "seed": 55,
+      "method": "weak_raw",
+      "relative_equation_rms": 1.5776156664964436,
+      "number_of_constraints": 46,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 5,
+        "window_length": 143,
+        "stride": 39
+      }
+    },
+    {
+      "noise_level": 0.15,
+      "seed": 55,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.3126868836444923,
+      "number_of_constraints": 56,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 3,
+        "window_length": 39,
+        "stride": 35
+      }
+    },
+    {
+      "noise_level": 0.2,
+      "seed": 11,
+      "method": "strong_sg",
+      "relative_equation_rms": 1.4212370494732336,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.2,
+      "seed": 11,
+      "method": "strong_fd",
+      "relative_equation_rms": 9.45339484080447,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.2,
+      "seed": 11,
+      "method": "weak_raw",
+      "relative_equation_rms": 1.6923418313866425,
+      "number_of_constraints": 84,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 5,
+        "window_length": 83,
+        "stride": 22
+      }
+    },
+    {
+      "noise_level": 0.2,
+      "seed": 11,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.32066000021958546,
+      "number_of_constraints": 70,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 3,
+        "window_length": 117,
+        "stride": 26
+      }
+    },
+    {
+      "noise_level": 0.2,
+      "seed": 22,
+      "method": "strong_sg",
+      "relative_equation_rms": 1.2994227206519493,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.2,
+      "seed": 22,
+      "method": "strong_fd",
+      "relative_equation_rms": 9.395343103008027,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.2,
+      "seed": 22,
+      "method": "weak_raw",
+      "relative_equation_rms": 1.7702590785052195,
+      "number_of_constraints": 50,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 6,
+        "window_length": 133,
+        "stride": 36
+      }
+    },
+    {
+      "noise_level": 0.2,
+      "seed": 22,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.5108646370263443,
+      "number_of_constraints": 82,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 5,
+        "window_length": 61,
+        "stride": 23
+      }
+    },
+    {
+      "noise_level": 0.2,
+      "seed": 33,
+      "method": "strong_sg",
+      "relative_equation_rms": 1.5374718957652151,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.2,
+      "seed": 33,
+      "method": "strong_fd",
+      "relative_equation_rms": 9.464721373889823,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.2,
+      "seed": 33,
+      "method": "weak_raw",
+      "relative_equation_rms": 2.1663333949546653,
+      "number_of_constraints": 46,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 5,
+        "window_length": 89,
+        "stride": 40
+      }
+    },
+    {
+      "noise_level": 0.2,
+      "seed": 33,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.744099336739461,
+      "number_of_constraints": 72,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 6,
+        "window_length": 85,
+        "stride": 26
+      }
+    },
+    {
+      "noise_level": 0.2,
+      "seed": 44,
+      "method": "strong_sg",
+      "relative_equation_rms": 1.4972700120489046,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.2,
+      "seed": 44,
+      "method": "strong_fd",
+      "relative_equation_rms": 9.725991530670354,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.2,
+      "seed": 44,
+      "method": "weak_raw",
+      "relative_equation_rms": 1.830598208766475,
+      "number_of_constraints": 52,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 5,
+        "window_length": 111,
+        "stride": 35
+      }
+    },
+    {
+      "noise_level": 0.2,
+      "seed": 44,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.4775217838436911,
+      "number_of_constraints": 56,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 6,
+        "window_length": 67,
+        "stride": 34
+      }
+    },
+    {
+      "noise_level": 0.2,
+      "seed": 55,
+      "method": "strong_sg",
+      "relative_equation_rms": 1.4011898649867578,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.2,
+      "seed": 55,
+      "method": "strong_fd",
+      "relative_equation_rms": 9.85477350403468,
+      "number_of_constraints": 2002
+    },
+    {
+      "noise_level": 0.2,
+      "seed": 55,
+      "method": "weak_raw",
+      "relative_equation_rms": 2.026986528858727,
+      "number_of_constraints": 74,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 5,
+        "window_length": 137,
+        "stride": 24
+      }
+    },
+    {
+      "noise_level": 0.2,
+      "seed": 55,
+      "method": "weak_sg",
+      "relative_equation_rms": 0.657232046046802,
+      "number_of_constraints": 60,
+      "weak_settings": {
+        "family": "PolynomialWindow",
+        "degree": 5,
+        "window_length": 51,
+        "stride": 32
+      }
+    }
+  ]
+}

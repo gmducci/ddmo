@@ -54,6 +54,8 @@ class WeakFormulation(Formulation):
         # Basic shape checks
         if self.time_array.ndim != 1:
             raise ValueError("time_array must be 1-D.")
+        if self.time_array.size < 2 or not np.all(np.isfinite(self.time_array)):
+            raise ValueError("time_array must contain at least two finite points.")
         if any(
             block.shape[0] != self.time_array.shape[0] for block in self.x_train_blocks
         ):
@@ -67,7 +69,12 @@ class WeakFormulation(Formulation):
                 "All trajectories in x_train must have the same number of variables."
             )
 
-        self.dt = float(self.time_array[1] - self.time_array[0])
+        steps = np.diff(self.time_array)
+        self.dt = float(steps[0])
+        if self.dt <= 0 or not np.allclose(
+            steps, self.dt, rtol=1e-10, atol=1e-12 * self.dt
+        ):
+            raise ValueError("WeakFormulation requires a strictly increasing uniform time_array.")
         self.N = self.x_train_blocks[0].shape[0]
         self.var_numbers = self.x_train_blocks[0].shape[1]
 
@@ -130,7 +137,7 @@ class WeakFormulation(Formulation):
         self.family_builder = builder
 
     # ------------------------------------------------------------------
-    # Configuration from a TestFunctionFamily (unchanged)
+    # Configuration from a TestFunctionFamily
     # ------------------------------------------------------------------
     def _configure_from_family(self, family: TestFunctionFamily) -> None:
         self.test_family = family
@@ -149,6 +156,8 @@ class WeakFormulation(Formulation):
                 "test_family.phi and test_family.dphi must be 1-D arrays "
                 "of the same length."
             )
+        if phi.size < 2 or not np.all(np.isfinite(phi)):
+            raise ValueError("test_family.phi must contain at least two finite samples.")
 
         window_length = phi.shape[0]
 
@@ -156,24 +165,10 @@ class WeakFormulation(Formulation):
         self.phi = phi
         self.dphi = dphi
         self.half = window_length // 2
-        # 1) quadrature weights (currently: trapezoidal rule)
-        q = np.full(window_length, self.dt)  # q_k = dt for all k
-        q[0] = q[-1] = 0.5 * self.dt  # end points have half weight
-
-        # precompute weights for this family (current rectangle rule)
-        # 2) combine quadrature with test function
-        refinement = getattr(family, "refinement", 16)
-
-        self.w_rhs = _build_rhs_weights_with_interpolation(
-            phi=self.phi,
-            dt=self.dt,
-            refinement=refinement,
-        )
-        self.w_lhs = _build_lhs_weights_with_interpolation(
-            dphi=self.dphi,
-            dt=self.dt,
-            refinement=refinement,
-        )
+        # The same piecewise-linear phi defines both sides of the discrete
+        # weak identity. With linearly interpolated state data these weights
+        # integrate x_dot * phi and f(x) * phi exactly on each grid interval.
+        self.w_lhs, self.w_rhs = _build_consistent_weak_weights(self.phi, self.dt)
 
         try:
             centers_by_trajectory = [
@@ -289,7 +284,7 @@ class WeakFormulation(Formulation):
 
 
 # ----------------------------------------------------------------------
-# Helpers (unchanged)
+# Helpers
 # ----------------------------------------------------------------------
 def _as_trajectory_blocks(values: Any) -> list[np.ndarray]:
     """Normalize trajectory data to a list of 2-D arrays."""
@@ -383,154 +378,26 @@ def _sliding_integral(
     return out
 
 
-def _build_lhs_weights_with_interpolation(
-    dphi: np.ndarray,
-    dt: float,
-    refinement: int = 4,
-) -> np.ndarray:
-    """
-    Build left-hand-side weak weights w_lhs for one window, using
-    piecewise-linear interpolation in time and a refined quadrature.
+def _build_consistent_weak_weights(
+    phi: np.ndarray, dt: float
+) -> tuple[np.ndarray, np.ndarray]:
+    """Exact nodal weights for linear state and test-function interpolants.
 
-    Parameters
-    ----------
-    dphi : (L,)
-        Discrete samples of φ'(t) on the window (prototype test function derivative).
-    dt : float
-        Coarse time step between consecutive samples t_n.
-    refinement : int, optional
-        Number of fine evaluation points per coarse interval [t_n, t_{n+1}].
-        Must be >= 2. refinement=2 reduces to a coarse trapezoid-like rule.
-
-    Returns
-    -------
-    w_lhs : (L,)
-        Weights such that, for a windowed signal x[n],
-            ∫ x_t(t) φ(t) dt  ≈  sum_k x_k * w_lhs[k]
-        (over that window).
-    """
-    dphi = np.asarray(dphi, dtype=float)
-    L = dphi.shape[0]
-
-    if L < 2:
-        raise ValueError("Window length must be at least 2 to build LHS weights.")
-
-    if refinement < 2:
-        raise ValueError("refinement must be >= 2.")
-
-    w = np.zeros(L, dtype=float)
-
-    # Loop over coarse intervals [n, n+1] within the window
-    for n in range(L - 1):
-        dphi_n = dphi[n]
-        dphi_np1 = dphi[n + 1]
-
-        # Fine grid over local coordinate s ∈ [0, 1]
-        s = np.linspace(0.0, 1.0, refinement)
-
-        # Piecewise-linear interpolation of φ' between dphi_n and dphi_np1
-        dphi_fine = (1.0 - s) * dphi_n + s * dphi_np1
-
-        # Assume x(t) is linear between x_n and x_{n+1}:
-        #   x(t(s)) = x_n(1 - s) + x_{n+1} s
-        #
-        # Then for the weak derivative:
-        #   ∫ x_t φ dt = -∫ x φ' dt
-        #
-        # Contribution of this interval to the integral -∫ x φ' dt can be written as
-        #   I_n ≈ A_n x_n + B_n x_{n+1}
-        #
-        # with
-        #   A_n = -∫ (1 - s) φ'(t(s)) dt
-        #   B_n = -∫ s       φ'(t(s)) dt
-        #
-        # Change of variable t = t_n + s dt ⇒ dt = dt * ds,
-        # so we just integrate over s with dx = dt / (refinement - 1).
-
-        integrand_left = (1.0 - s) * dphi_fine
-        integrand_right = s * dphi_fine
-
-        # Numerical quadrature on the fine grid (trapezoidal)
-        dx_fine = dt / (refinement - 1)
-
-        A_n = -np.trapezoid(integrand_left, dx=dx_fine)  # coefficient for x_n
-        B_n = -np.trapezoid(integrand_right, dx=dx_fine)  # coefficient for x_{n+1}
-
-        # Accumulate these interval contributions into nodal weights
-        w[n] += A_n
-        w[n + 1] += B_n
-
-    return w
-
-
-def _build_rhs_weights_with_interpolation(
-    phi: np.ndarray,
-    dt: float,
-    refinement: int = 4,
-) -> np.ndarray:
-    """
-    Build right-hand-side weak weights w_rhs for one window, using
-    piecewise-linear interpolation in time and a refined quadrature.
-
-    Parameters
-    ----------
-    phi : (L,)
-        Discrete samples of φ(t) on the window (prototype test function).
-    dt : float
-        Coarse time step between consecutive samples t_n.
-    refinement : int, optional
-        Number of fine evaluation points per coarse interval [t_n, t_{n+1}].
-        Must be >= 2.
-
-    Returns
-    -------
-    w_rhs : (L,)
-        Weights such that, for a windowed signal x[n],
-            ∫ x(t) φ(t) dt  ≈  sum_k x_k * w_rhs[k]
-        (over that window).
+    The LHS represents ∫ x_dot phi dt. Equivalently it includes the boundary
+    term [x phi] - ∫ x phi_dot dt, even when phi does not vanish at the ends.
+    The RHS represents ∫ f phi dt with linearly interpolated nodal f values.
     """
     phi = np.asarray(phi, dtype=float)
-    L = phi.shape[0]
+    if phi.ndim != 1 or phi.size < 2 or not np.all(np.isfinite(phi)):
+        raise ValueError("phi must contain at least two finite samples.")
+    if not np.isfinite(dt) or dt <= 0:
+        raise ValueError("dt must be finite and positive.")
 
-    if L < 2:
-        raise ValueError("Window length must be at least 2 to build RHS weights.")
-
-    if refinement < 2:
-        raise ValueError("refinement must be >= 2.")
-
-    w = np.zeros(L, dtype=float)
-
-    # Loop over coarse intervals [n, n+1] within the window
-    for n in range(L - 1):
-        phi_n = phi[n]
-        phi_np1 = phi[n + 1]
-
-        # Fine grid over s ∈ [0, 1]
-        s = np.linspace(0.0, 1.0, refinement)
-
-        # Piecewise-linear interpolation of φ
-        phi_fine = (1.0 - s) * phi_n + s * phi_np1
-
-        # Assume x(t) is linear between x_n and x_{n+1}:
-        #   x(t(s)) = x_n(1 - s) + x_{n+1} s
-        #
-        # Then
-        #   ∫ x φ dt ≈ A_n x_n + B_n x_{n+1}
-        # with
-        #   A_n = ∫ (1 - s) φ(t(s)) dt
-        #   B_n = ∫ s       φ(t(s)) dt
-        #
-        # t = t_n + s dt ⇒ dt = dt * ds
-
-        integrand_left = (1.0 - s) * phi_fine
-        integrand_right = s * phi_fine
-
-        dx_fine = dt / (refinement - 1)
-
-        A_n = np.trapezoid(integrand_left, dx=dx_fine)
-        B_n = np.trapezoid(integrand_right, dx=dx_fine)
-
-        w[n] += A_n
-        w[n + 1] += B_n
-
-    return w
+    lhs = np.zeros_like(phi)
+    rhs = np.zeros_like(phi)
+    area = (phi[:-1] + phi[1:]) / 2
+    lhs[:-1] -= area
+    lhs[1:] += area
+    rhs[:-1] += dt * (2 * phi[:-1] + phi[1:]) / 6
+    rhs[1:] += dt * (phi[:-1] + 2 * phi[1:]) / 6
+    return lhs, rhs

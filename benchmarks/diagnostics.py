@@ -1,4 +1,4 @@
-"""Supplementary S2-S5 diagnostics from the saved production trajectories."""
+"""Historical supplementary diagnostics from saved production trajectories."""
 
 from __future__ import annotations
 
@@ -588,5 +588,7 @@ def render(experiment, raw, config, output):
     print(f"Wrote {len(pages)} diagnostic pages: {output / (stem + '.pdf')}")
     if experiment == "joint":
         render_library_overview(raw, config, output)
-        from benchmarks.joint.feedback_comparison import render as render_feedback_comparison
+        from benchmarks.joint.feedback_comparison import (
+            render as render_feedback_comparison,
+        )
         render_feedback_comparison(raw, config, output)

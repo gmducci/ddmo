@@ -57,9 +57,8 @@ Documentation lives under:
 docs/
 ```
 
-Exploratory outputs should be kept out of version control. The selected PDF/PNG
-publication assets and provenance manifest in `benchmarks/figures/`
-are the deliberate exception.
+Exploratory outputs should be kept out of version control. Paper artwork is
+added only after its campaign and supplementary figures are finalized together.
 
 ## Public API
 
@@ -80,7 +79,6 @@ Do not commit:
 - `.DS_Store`;
 - virtual environments;
 - logs;
-- exploratory generated figures outside `benchmarks/figures/`;
+- exploratory generated figures;
 - generated `.npy`, `.pkl`, `.csv`, or checkpoint files;
 - local result folders.
-

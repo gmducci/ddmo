@@ -5,7 +5,8 @@ generated results in this directory.
 
 ## Quickstart
 
-- `quickstart/goodwin_weak.py` reproduces one Figure 1 “Weak, optimized” run.
+- `quickstart/goodwin_weak.py` runs one Figure 1 design with corrected weights
+  and compares it with the historical saved run.
 - `quickstart/goodwin_joint.py` reproduces one Figure 2 joint-library run.
 - `quickstart/brusselator_custom_library.py` demonstrates a parameterized
   custom feature library.

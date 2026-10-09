@@ -1,4 +1,4 @@
-"""Portable, checksummed numerical inputs for the publication figures."""
+"""Portable, checksummed inputs from the historical paper campaigns."""
 
 import hashlib
 import json
@@ -13,7 +13,7 @@ import tomllib
 from benchmarks.common.plan_runs import build_jobs
 
 ROOT = Path(__file__).resolve().parents[2]
-DATA = ROOT / "benchmarks/data"
+DATA = ROOT / "benchmarks/data/historical"
 
 
 def digest(path):
@@ -22,7 +22,7 @@ def digest(path):
 
 @contextmanager
 def trajectory_data(experiment):
-    """Load the deduplicated, exact saved trajectories for the SI diagnostics."""
+    """Load the historical saved trajectories for local diagnostics."""
     info = json.loads((DATA / "manifest.json").read_text())["datasets"][experiment]["trajectories"]
     path = DATA / info["file"]
     if digest(path) != info["sha256"]:

@@ -1,10 +1,10 @@
-"""Reproduce one Figure 1 "Weak, optimized" run.
+"""Run one Figure 1 design with the current weak-form weights.
 
 From the repository root, after installing the package:
     python examples/quickstart/goodwin_weak.py --noise 0.10 --seed 11
 
 The defaults are 10% noise and seed 11. A full run uses 2,400 model evaluations
-and may take several minutes.
+and may take several minutes. The bundled comparison run used earlier weights.
 """
 
 import argparse
@@ -14,7 +14,13 @@ from zipfile import ZipFile
 
 import numpy as np
 
-from ddmo import DataConstructor, FormulationSettings, OptimizerSettings, SolverSettings, identify
+from ddmo import (
+    DataConstructor,
+    FormulationSettings,
+    OptimizerSettings,
+    SolverSettings,
+    identify,
+)
 from ddmo.equations.goodwin_eqs import GoodwinModel
 from ddmo.library_functions import LibraryBuilder
 from ddmo.optimizer import (
@@ -23,7 +29,6 @@ from ddmo.optimizer import (
     trajectory_rmse,
 )
 from ddmo.utils.ode_data_generator import ODEDataGenerator
-
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--noise", type=float, default=0.10, choices=[0, 0.05, 0.10, 0.15, 0.20])
@@ -50,7 +55,7 @@ batch = ODEDataGenerator(
     clip_min=1e-10,
 ).generate()
 
-print(f"Generated {len(batch.x_noisy)} trajectories with {len(batch.time)} time points each.")  
+print(f"Generated {len(batch.x_noisy)} trajectories with {len(batch.time)} time points each.")
 
 # Trajectories 1-3 train the models; trajectory 4 selects one Pareto model.
 # Trajectories 5-6 are held out until after selection.
@@ -178,14 +183,14 @@ print("Selected settings:")
 for name, value in settings.items():
     print(f"  {name}: {float(value):.8g}")
 
-# The paper's saved run is bundled with the repository. Compare this one run.
-archive_path = Path(__file__).resolve().parents[2] / "benchmarks/data/noise.zip"
+# Compare with the archived, pre-correction paper run.
+archive_path = Path(__file__).resolve().parents[2] / "benchmarks/data/historical/noise.zip"
 with ZipFile(archive_path) as archive:
     suffix = f"-weak_optimized-noise{round(100 * args.noise):03d}-seed{args.seed:03d}.json"
     saved_name = next(name for name in archive.namelist() if name.endswith(suffix))
     saved = json.loads(archive.read(saved_name))
 
-print("\nSaved Figure 1 run:")
+print("\nHistorical Figure 1 run (earlier weak weights):")
 print(f"Validation NRMSE: {saved['selected']['validation']['rollout_nrmse']:.8g}")
 print(f"Test NRMSE:       {saved['test']['rollout_nrmse']:.8g}")
 print(f"Coefficient relative error: {saved['selected']['coefficient_metrics']['relative_l2_error']:.8g}")

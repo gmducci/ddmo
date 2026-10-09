@@ -1,4 +1,4 @@
-"""Regenerate publication figures from saved numerical data; no optimization."""
+"""Inspect archived benchmark data or render historical figures locally."""
 
 import argparse
 import importlib
@@ -7,40 +7,37 @@ from pathlib import Path
 
 from benchmarks.common.data import ROOT, digest, result_data, trajectory_data
 
-FIGURES = ROOT / "benchmarks/figures"
-
 
 def check():
-    manifest = json.loads((FIGURES / "manifest.json").read_text())
-    for record in manifest["files"]:
-        path = ROOT / record["path"]
-        if not path.is_file() or digest(path) != record["sha256"]:
-            raise ValueError(f"Missing or changed figure/input: {path}")
     for name in ("noise", "joint"):
         with result_data(name):
             pass
         with trajectory_data(name):
             pass
-    expected = {Path(item["path"]).name for item in manifest["files"]
-                if Path(item["path"]).parent == Path("benchmarks/figures")
-                and Path(item["path"]).suffix in (".pdf", ".png")}
-    actual = {p.name for p in FIGURES.iterdir() if p.suffix in (".pdf", ".png")}
-    if actual != expected:
-        raise ValueError("Unexpected publication artwork")
-    print(f"Verified {len(manifest['figures'])} figures and all 85 saved production runs and trajectories; no archive dependency.")
+    reference = json.loads(
+        (ROOT / "benchmarks/data/figure2_tutorial_block04.json").read_text()
+    )
+    if reference["provenance"]["weak_source_sha256"] != digest(
+        ROOT / "src/ddmo/formulation/weak.py"
+    ):
+        raise ValueError("Figure 2 tutorial reference uses different weak-form weights")
+    print("Verified 85 archived production runs and trajectories, plus the corrected Figure 2 tutorial source hash.")
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("experiment", nargs="?", choices=("all", "noise", "joint"), default="all")
-    parser.add_argument("--output-directory", type=Path, default=ROOT / ".local/benchmark_plots")
+    parser.add_argument("--output-directory", type=Path, default=ROOT / ".local/benchmark_plots/historical")
     parser.add_argument("--check", action="store_true")
+    parser.add_argument("--historical", action="store_true", help="render from the archived, pre-correction campaigns")
     parser.add_argument("--diagnostics", action="store_true", help="Render only supplementary trajectory diagnostics")
     parser.add_argument("--library-overview", action="store_true", help="Render only S4: joint trajectories and nonlinear library shapes")
     args = parser.parse_args()
     if args.check:
         check()
         return
+    if not args.historical:
+        parser.error("The bundled ten-run campaigns use older weak-form weights; pass --historical to render them")
     if args.library_overview:
         if args.experiment == "noise":
             parser.error("--library-overview applies to joint only")
@@ -59,7 +56,7 @@ def main():
                 from benchmarks.noise.equation_mismatch import render as render_mismatch
 
                 render_mismatch(config, raw, args.output_directory)
-    print(f"Regenerated figures in {args.output_directory}")
+    print(f"Rendered historical figures in {args.output_directory}")
 
 
 if __name__ == "__main__":

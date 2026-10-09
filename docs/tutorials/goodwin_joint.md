@@ -6,9 +6,9 @@ matrix and one test score; the selection-frequency heatmap requires all ten
 runs. The executable template is
 [`examples/quickstart/goodwin_joint.py`](../../examples/quickstart/goodwin_joint.py).
 
-The bundled block 4 reference uses the corrected weak-form weights. The
-checked-in ten-run Figure 2 artwork and supplementary figures still depict the
-earlier campaign; their coordinated replacement awaits the SI figure review.
+The bundled block 4 reference uses the corrected weak-form weights. The old
+ten-run artwork has been removed; its coordinated replacement awaits the SI
+figure review. Earlier numerical campaign data remain archived for audit.
 
 From the repository root, install the versions used for the saved campaign:
 

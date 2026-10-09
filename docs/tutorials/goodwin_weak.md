@@ -1,12 +1,14 @@
-# Reproduce one Figure 1 weak-form run
+# Run one Figure 1 weak-form design
 
-This tutorial runs **one** of the Figure 1 “Weak, optimized” cases. Choose one
+This tutorial runs **one** of the Figure 1 “Weak, optimized” designs. Choose one
 noise level and one seed; the script generates the same Goodwin trajectories,
 fits the same candidate library, and uses the same optimization settings and
-model-selection rule as the benchmark.
+model-selection rule. It uses the corrected weak-form weights. The saved
+Figure 1 campaign in `benchmarks/data/historical/` used the earlier weights,
+so its selected model and scores can differ.
 
-For a numeric match to the saved run, use Python **3.12.4** and install the
-versions recorded with the benchmark in a fresh environment. From the
+For the campaign environment, use Python **3.12.4** and install the
+recorded dependency versions in a fresh environment. From the
 repository root:
 
 ```bash
@@ -46,13 +48,13 @@ evaluations**, so it can take several minutes.
    fewer active coefficients, then lower training trajectory RMSE.
 5. It tests that selected model on the **two held-out trajectories** and prints
    all three Figure 1 metrics: test NRMSE, coefficient relative error, and
-   false-positive coefficient count. It also prints the corresponding saved
-   values and the largest difference between the selected coefficient matrices.
+   false-positive coefficient count. It also prints the historical saved
+   values and the difference between the selected coefficient matrices.
 
-The plotted Figure 1 point is the median of the five selected test results at
-that noise level. This script reproduces one of those five runs, not the median.
+The historical plotted Figure 1 point was the median of five selected test
+results at that noise level. This script runs one design, not the median.
 
-With those versions, the default case selects Pareto model 0 and reproduces
-the saved test NRMSE **0.16668603** and selected coefficients exactly. Other
-dependency versions can change the optimizer's result even with the same seed;
-the script prints the saved values so you can see any difference.
+In the corrected local campaign, the default design selected Pareto model 12
+with test NRMSE **0.14967033**. The historical saved run selected model 0 with
+test NRMSE **0.16668603**. The numerical comparison in the script makes this
+change visible; it is not an assertion that the two weight calculations agree.

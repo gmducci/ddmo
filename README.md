@@ -36,7 +36,8 @@ Run one of the example workflows from the repository root:
 python examples/quickstart/goodwin_weak.py
 ```
 
-This reproduces one full Figure 1 weak-form run and may take several minutes.
+This runs one Figure 1 weak-form design with current weights and may take
+several minutes. The historical saved result used earlier weights.
 
 or:
 
@@ -70,8 +71,10 @@ Maintained demonstrations are indexed in [`examples/`](examples/README.md).
 Frozen paper experiments and their output contract are documented in
 [`benchmarks/`](benchmarks/README.md).
 
-The selected, renumbered paper artwork is collected in
-[publication figures](benchmarks/figures).
+The earlier campaign data remain available for audit in
+[`benchmarks/data/historical/`](benchmarks/data/historical/).
+The old figure artwork has been removed while the corrected paper figures and SI
+layout are being finalized.
 
 ## Development
 

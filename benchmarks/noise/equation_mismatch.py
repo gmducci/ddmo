@@ -303,7 +303,7 @@ def render(config: dict[str, Any], raw_directory: Path, output: Path) -> None:
     records, example = collect(config, raw_directory)
     metadata = {
         "status": "diagnostic_at_true_parameters_with_saved_selected_weak_windows",
-        "source": "saved held-out Goodwin trajectories in benchmarks/data/noise_trajectories.npz",
+        "source": "saved held-out Goodwin trajectories in benchmarks/data/historical/noise_trajectories.npz",
         "normalization": (
             "RMS of each state mismatch divided by RMS of its exact clean derivative; "
             "then RMS across states"

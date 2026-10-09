@@ -28,9 +28,10 @@ reproduced its selected model, coefficients, settings, and test trajectory
 exactly.
 
 The complete corrected campaigns are currently in the ignored local folders
-`.local/figure1_weak_fix/` and `.local/figure2_weak_fix/`. The older source and
-artwork are also preserved in Git history and `.local/benchmark_archive/`.
-Neither local folder is required to import or test `ddmo`.
+`.local/figure1_weak_fix/` and `.local/figure2_weak_fix/`. They contain figure
+files, run JSON, trajectory NPZ, configuration, and provenance metadata. The
+older source and artwork remain available in Git history. Neither local folder
+is required to import or test `ddmo`.
 
 ## Check archived data
 

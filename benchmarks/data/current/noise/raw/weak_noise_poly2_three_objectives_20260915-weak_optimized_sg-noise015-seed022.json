@@ -1,0 +1,9499 @@
+{
+  "schema_version": 1,
+  "status": "complete",
+  "mode": "production",
+  "job": {
+    "job_id": "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise015-seed022",
+    "experiment": "weak_noise_poly2_three_objectives_20260915",
+    "system": "goodwin",
+    "method": "weak_optimized_sg",
+    "noise_level": 0.15,
+    "data_seed": 22,
+    "optimizer_seed": 22,
+    "population": 80,
+    "generations": 30,
+    "evaluation_budget": 2400,
+    "config": "/Users/gianmarcoducci/PROJECT/ddmo/.local/figure1_weak_fix/config.toml"
+  },
+  "data": {
+    "t_start": 0.0,
+    "t_end": 100.0,
+    "dt": 0.1,
+    "split_counts": {
+      "train": 3,
+      "validation": 1,
+      "test": 2
+    },
+    "initial_conditions": [
+      [
+        0.5,
+        1.0,
+        1.0
+      ],
+      [
+        0.2,
+        1.4,
+        0.8
+      ],
+      [
+        0.8,
+        0.6,
+        1.5
+      ],
+      [
+        0.35,
+        1.2,
+        1.4
+      ],
+      [
+        0.7,
+        1.5,
+        0.6
+      ],
+      [
+        1.0,
+        0.8,
+        1.2
+      ]
+    ]
+  },
+  "provenance": {
+    "git_commit": "7374e060ba7a3c3d5832e0d902cf9f6a791e3116",
+    "git_dirty": true,
+    "config_path": "/Users/gianmarcoducci/PROJECT/ddmo/.local/figure1_weak_fix/config.toml",
+    "config_sha256": "d8c126a4347bb06a166caee72fcb6a60281ed05f296e595c1e5be63a258f29ba",
+    "versions": {
+      "python": "3.12.4",
+      "ddmo": "0.1.0",
+      "numpy": "2.3.1",
+      "scipy": "1.16.0",
+      "scikit-learn": "1.7.0",
+      "pysindy": "1.7.5",
+      "pymoo": "0.6.1.5"
+    }
+  },
+  "actual_candidate_evaluations": 2400,
+  "failed_candidate_count": 56,
+  "excluded_invalid_result_count": 0,
+  "wall_time_seconds": 1417.4188355420483,
+  "pareto": [
+    {
+      "index": 0,
+      "objectives": {
+        "trajectory_rmse": 0.2943413976109584,
+        "durbin_watson_deviation": 1.9856325980348792,
+        "active_coefficients": 6.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 63.0,
+        "stride": 36.0,
+        "threshold": 0.32804577630065107,
+        "alpha": 0.25241372389108363
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          -0.19224996224583654,
+          0.950606833406104,
+          0.0
+        ],
+        [
+          0.0,
+          -0.14212659942372466,
+          1.0114029012135626
+        ],
+        [
+          0.0,
+          0.0,
+          -0.10440933363003221
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.6460431906836117,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.20410484842770166,
+        "support_accuracy": 1.0,
+        "support_precision": 1.0,
+        "support_recall": 1.0,
+        "support_f1": 1.0,
+        "support_exact": true,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 0,
+        "active_coefficients": 6
+      },
+      "validation": {
+        "rollout_nrmse": 0.10353971598130113,
+        "per_state_nrmse": [
+          0.16224894976318527,
+          0.09123452902277651,
+          0.057135669157941625
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.19225*x + 0.646043*1/(1+z^9.5)",
+        "dy/dt = 0.950607*x - 0.142127*y",
+        "dz/dt = 1.0114*y - 0.104409*z"
+      ]
+    },
+    {
+      "index": 1,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 47.0,
+        "stride": 8.0,
+        "threshold": 0.9567942479922134,
+        "alpha": 0.65701159514197
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 2,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 59.0,
+        "stride": 37.0,
+        "threshold": 0.9393061088166803,
+        "alpha": 0.8524324994873758
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 3,
+      "objectives": {
+        "trajectory_rmse": 0.2943413976109584,
+        "durbin_watson_deviation": 1.9856325980348792,
+        "active_coefficients": 6.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 63.0,
+        "stride": 36.0,
+        "threshold": 0.32804577630065107,
+        "alpha": 0.22109749802662307
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          -0.19224996224583654,
+          0.950606833406104,
+          0.0
+        ],
+        [
+          0.0,
+          -0.14212659942372466,
+          1.0114029012135626
+        ],
+        [
+          0.0,
+          0.0,
+          -0.10440933363003221
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.6460431906836117,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.20410484842770166,
+        "support_accuracy": 1.0,
+        "support_precision": 1.0,
+        "support_recall": 1.0,
+        "support_f1": 1.0,
+        "support_exact": true,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 0,
+        "active_coefficients": 6
+      },
+      "validation": {
+        "rollout_nrmse": 0.10353971598130113,
+        "per_state_nrmse": [
+          0.16224894976318527,
+          0.09123452902277651,
+          0.057135669157941625
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.19225*x + 0.646043*1/(1+z^9.5)",
+        "dy/dt = 0.950607*x - 0.142127*y",
+        "dz/dt = 1.0114*y - 0.104409*z"
+      ]
+    },
+    {
+      "index": 4,
+      "objectives": {
+        "trajectory_rmse": 0.7432350473588483,
+        "durbin_watson_deviation": 1.9977702950986387,
+        "active_coefficients": 5.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 23.0,
+        "stride": 33.0,
+        "threshold": 0.374149431146291,
+        "alpha": 0.8261564554634686
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.7085963134488047,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.1099353658205988
+        ],
+        [
+          0.0,
+          0.0,
+          -0.11190895795592117
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.13694544746156562,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.013011458599824726,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.6193429601055287,
+        "support_accuracy": 0.8611111111111112,
+        "support_precision": 0.6,
+        "support_recall": 0.5,
+        "support_f1": 0.5454545454545454,
+        "support_exact": false,
+        "false_positive_coefficients": 2,
+        "false_negative_coefficients": 3,
+        "active_coefficients": 5
+      },
+      "validation": {
+        "rollout_nrmse": 0.5218451784886682,
+        "per_state_nrmse": [
+          0.607198983352285,
+          0.4304824347577376,
+          0.5278541173559818
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.136945*x*y",
+        "dy/dt = 0.708596*x - 0.0130115*y*z",
+        "dz/dt = 1.10994*y - 0.111909*z"
+      ]
+    },
+    {
+      "index": 5,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9997760666218756,
+        "active_coefficients": 3.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 55.0,
+        "stride": 30.0,
+        "threshold": 0.5253027456235987,
+        "alpha": 0.7144425770447016
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          1.0563739581933267,
+          0.0
+        ],
+        [
+          -0.02219092984888403,
+          -0.16279376228151757,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.8175921983045586,
+        "support_accuracy": 0.8611111111111112,
+        "support_precision": 0.6666666666666666,
+        "support_recall": 0.3333333333333333,
+        "support_f1": 0.4444444444444444,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 4,
+        "active_coefficients": 3
+      },
+      "validation": {
+        "rollout_nrmse": 0.932462559482552,
+        "per_state_nrmse": [
+          0.7801970304265315,
+          0.6548955654710339,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.0221909*y",
+        "dy/dt = 1.05637*x - 0.162794*y",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 6,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9997760666218756,
+        "active_coefficients": 3.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 23.0,
+        "stride": 13.0,
+        "threshold": 0.5033028295053876,
+        "alpha": 0.8325780180549553
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          1.002088081080807,
+          0.0
+        ],
+        [
+          0.0,
+          -0.15150594202167939,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.126260632301355,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.8199998760072762,
+        "support_accuracy": 0.8611111111111112,
+        "support_precision": 0.6666666666666666,
+        "support_recall": 0.3333333333333333,
+        "support_f1": 0.4444444444444444,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 4,
+        "active_coefficients": 3
+      },
+      "validation": {
+        "rollout_nrmse": 0.789636172883478,
+        "per_state_nrmse": [
+          0.5768607048539189,
+          0.42975273124642455,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.126261*x*y",
+        "dy/dt = 1.00209*x - 0.151506*y",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 7,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.999953058992389,
+        "active_coefficients": 1.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 23.0,
+        "stride": 38.0,
+        "threshold": 0.5033028295053876,
+        "alpha": 0.8638802963612049
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.1446335080487186,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0033984322697342,
+        "support_accuracy": 0.8055555555555556,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 1
+      },
+      "validation": {
+        "rollout_nrmse": 1.580803699460941,
+        "per_state_nrmse": [
+          0.6561391782491768,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.144634*x*y",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 8,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9998605398868516,
+        "active_coefficients": 2.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 23.0,
+        "stride": 33.0,
+        "threshold": 0.5032335990547601,
+        "alpha": 0.8613565934184717
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.43791270250509884,
+          0.0
+        ],
+        [
+          -0.027121550616858694,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.8818166226977495,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.5,
+        "support_recall": 0.16666666666666666,
+        "support_f1": 0.25,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 5,
+        "active_coefficients": 2
+      },
+      "validation": {
+        "rollout_nrmse": 3.5311914212987965,
+        "per_state_nrmse": [
+          5.576647323548294,
+          3.654631857798004,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.0271216*y",
+        "dy/dt = 0.437913*x",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 9,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9998605398868516,
+        "active_coefficients": 2.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 23.0,
+        "stride": 33.0,
+        "threshold": 0.5032335990547601,
+        "alpha": 0.8613565934184717
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.43791270250509884,
+          0.0
+        ],
+        [
+          -0.027121550616858694,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.8818166226977495,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.5,
+        "support_recall": 0.16666666666666666,
+        "support_f1": 0.25,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 5,
+        "active_coefficients": 2
+      },
+      "validation": {
+        "rollout_nrmse": 3.5311914212987965,
+        "per_state_nrmse": [
+          5.576647323548294,
+          3.654631857798004,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.0271216*y",
+        "dy/dt = 0.437913*x",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 10,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.999953058992389,
+        "active_coefficients": 1.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 23.0,
+        "stride": 38.0,
+        "threshold": 0.5082236652657256,
+        "alpha": 0.3114020383821565
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.14631211490526358,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0034776364994957,
+        "support_accuracy": 0.8055555555555556,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 1
+      },
+      "validation": {
+        "rollout_nrmse": 1.5804370644300665,
+        "per_state_nrmse": [
+          0.6550392731565546,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.146312*x*y",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 11,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 51.0,
+        "stride": 31.0,
+        "threshold": 0.9694231100489112,
+        "alpha": 0.2475045600476107
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 12,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9997760666218756,
+        "active_coefficients": 3.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 23.0,
+        "stride": 8.0,
+        "threshold": 0.44882565557964127,
+        "alpha": 0.4304486091142992
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          1.023011056414675,
+          0.0
+        ],
+        [
+          0.0,
+          -0.15322357389572244,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.12495573485105405,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.8200406498920612,
+        "support_accuracy": 0.8611111111111112,
+        "support_precision": 0.6666666666666666,
+        "support_recall": 0.3333333333333333,
+        "support_f1": 0.4444444444444444,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 4,
+        "active_coefficients": 3
+      },
+      "validation": {
+        "rollout_nrmse": 0.7899781208787852,
+        "per_state_nrmse": [
+          0.5774464722709951,
+          0.4301928078152699,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.124956*x*y",
+        "dy/dt = 1.02301*x - 0.153224*y",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 13,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9998605398868516,
+        "active_coefficients": 2.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 23.0,
+        "stride": 33.0,
+        "threshold": 0.5032335990547601,
+        "alpha": 0.9081221282034148
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.43791270250509884,
+          0.0
+        ],
+        [
+          -0.027121550616858694,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.8818166226977495,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.5,
+        "support_recall": 0.16666666666666666,
+        "support_f1": 0.25,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 5,
+        "active_coefficients": 2
+      },
+      "validation": {
+        "rollout_nrmse": 3.5311914212987965,
+        "per_state_nrmse": [
+          5.576647323548294,
+          3.654631857798004,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.0271216*y",
+        "dy/dt = 0.437913*x",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 14,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 35.0,
+        "stride": 36.0,
+        "threshold": 0.9631854918304614,
+        "alpha": 0.25110854271924027
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 15,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 47.0,
+        "stride": 8.0,
+        "threshold": 0.9572658854821774,
+        "alpha": 0.7514724569678345
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 16,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 21.0,
+        "stride": 13.0,
+        "threshold": 0.902713904707231,
+        "alpha": 0.5633011388417543
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 17,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 25.0,
+        "stride": 7.0,
+        "threshold": 0.8991053076664202,
+        "alpha": 0.6822572601026277
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 18,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9997760666218756,
+        "active_coefficients": 3.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 23.0,
+        "stride": 12.0,
+        "threshold": 0.5033028295053876,
+        "alpha": 0.8997548240327669
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          1.0031552578943048,
+          0.0
+        ],
+        [
+          0.0,
+          -0.1514976906757403,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.12864994326692497,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.8201218442552777,
+        "support_accuracy": 0.8611111111111112,
+        "support_precision": 0.6666666666666666,
+        "support_recall": 0.3333333333333333,
+        "support_f1": 0.4444444444444444,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 4,
+        "active_coefficients": 3
+      },
+      "validation": {
+        "rollout_nrmse": 0.7883739405642965,
+        "per_state_nrmse": [
+          0.574831617184168,
+          0.4279951219586313,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.12865*x*y",
+        "dy/dt = 1.00316*x - 0.151498*y",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 19,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9997760666218756,
+        "active_coefficients": 3.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 63.0,
+        "stride": 38.0,
+        "threshold": 0.533730762315688,
+        "alpha": 0.2666080552811691
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.9613816816599872,
+          0.0
+        ],
+        [
+          -0.02208364532252019,
+          -0.14610949732749676,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.8172258931454632,
+        "support_accuracy": 0.8611111111111112,
+        "support_precision": 0.6666666666666666,
+        "support_recall": 0.3333333333333333,
+        "support_f1": 0.4444444444444444,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 4,
+        "active_coefficients": 3
+      },
+      "validation": {
+        "rollout_nrmse": 0.9480609896523652,
+        "per_state_nrmse": [
+          0.8116062690942561,
+          0.670281617312749,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.0220836*y",
+        "dy/dt = 0.961382*x - 0.146109*y",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 20,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9997760666218756,
+        "active_coefficients": 3.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 23.0,
+        "stride": 7.0,
+        "threshold": 0.5033028295053876,
+        "alpha": 0.9166037170782129
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          1.027917124195201,
+          0.0
+        ],
+        [
+          0.0,
+          -0.1545489136770426,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.12395253520593642,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.8200427243673216,
+        "support_accuracy": 0.8611111111111112,
+        "support_precision": 0.6666666666666666,
+        "support_recall": 0.3333333333333333,
+        "support_f1": 0.4444444444444444,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 4,
+        "active_coefficients": 3
+      },
+      "validation": {
+        "rollout_nrmse": 0.7899329632589359,
+        "per_state_nrmse": [
+          0.5784308701802149,
+          0.4290729370465024,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.123953*x*y",
+        "dy/dt = 1.02792*x - 0.154549*y",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 21,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 23.0,
+        "stride": 10.0,
+        "threshold": 0.902713904707231,
+        "alpha": 0.5443202520581328
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 22,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 21.0,
+        "stride": 34.0,
+        "threshold": 0.6040694925548269,
+        "alpha": 0.2723371282553932
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 23,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 21.0,
+        "stride": 35.0,
+        "threshold": 0.956071378027261,
+        "alpha": 0.8744063035935155
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 24,
+      "objectives": {
+        "trajectory_rmse": 0.2943413976109584,
+        "durbin_watson_deviation": 1.9856325980348792,
+        "active_coefficients": 6.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 63.0,
+        "stride": 36.0,
+        "threshold": 0.32804577630065107,
+        "alpha": 0.2214808733412367
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          -0.19224996224583654,
+          0.950606833406104,
+          0.0
+        ],
+        [
+          0.0,
+          -0.14212659942372466,
+          1.0114029012135626
+        ],
+        [
+          0.0,
+          0.0,
+          -0.10440933363003221
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.6460431906836117,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.20410484842770166,
+        "support_accuracy": 1.0,
+        "support_precision": 1.0,
+        "support_recall": 1.0,
+        "support_f1": 1.0,
+        "support_exact": true,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 0,
+        "active_coefficients": 6
+      },
+      "validation": {
+        "rollout_nrmse": 0.10353971598130113,
+        "per_state_nrmse": [
+          0.16224894976318527,
+          0.09123452902277651,
+          0.057135669157941625
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.19225*x + 0.646043*1/(1+z^9.5)",
+        "dy/dt = 0.950607*x - 0.142127*y",
+        "dz/dt = 1.0114*y - 0.104409*z"
+      ]
+    },
+    {
+      "index": 25,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 53.0,
+        "stride": 40.0,
+        "threshold": 0.8910965552286114,
+        "alpha": 0.3370157643803966
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 26,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 53.0,
+        "stride": 36.0,
+        "threshold": 0.9633928655443087,
+        "alpha": 0.2586865897880562
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 27,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 57.0,
+        "stride": 37.0,
+        "threshold": 0.9485356052683359,
+        "alpha": 0.5414771360539531
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 28,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 63.0,
+        "stride": 31.0,
+        "threshold": 0.9425100711825709,
+        "alpha": 0.8502644365152486
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 29,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 135.0,
+        "stride": 36.0,
+        "threshold": 0.8715490612432615,
+        "alpha": 0.726103110411345
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 30,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 41.0,
+        "stride": 38.0,
+        "threshold": 0.9995543782849295,
+        "alpha": 0.5345546126547315
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 31,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 25.0,
+        "stride": 37.0,
+        "threshold": 0.844950684294504,
+        "alpha": 0.8524324994873758
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 32,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9997760666218756,
+        "active_coefficients": 3.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 53.0,
+        "stride": 39.0,
+        "threshold": 0.5014484657755507,
+        "alpha": 0.25867819155012156
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.9898374269028112,
+          0.0
+        ],
+        [
+          -0.022267133032693513,
+          -0.14748457582558155,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.816949301522244,
+        "support_accuracy": 0.8611111111111112,
+        "support_precision": 0.6666666666666666,
+        "support_recall": 0.3333333333333333,
+        "support_f1": 0.4444444444444444,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 4,
+        "active_coefficients": 3
+      },
+      "validation": {
+        "rollout_nrmse": 0.9495081401958357,
+        "per_state_nrmse": [
+          0.8102544940975093,
+          0.6759748439399077,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.0222671*y",
+        "dy/dt = 0.989837*x - 0.147485*y",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 33,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 131.0,
+        "stride": 35.0,
+        "threshold": 0.9109293937864499,
+        "alpha": 0.731150881233941
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 34,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 63.0,
+        "stride": 31.0,
+        "threshold": 0.9694231100489112,
+        "alpha": 0.32125697416772114
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 35,
+      "objectives": {
+        "trajectory_rmse": 0.2943413976109584,
+        "durbin_watson_deviation": 1.9856325980348792,
+        "active_coefficients": 6.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 63.0,
+        "stride": 36.0,
+        "threshold": 0.32804577630065107,
+        "alpha": 0.3261661380111941
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          -0.19224996224583654,
+          0.950606833406104,
+          0.0
+        ],
+        [
+          0.0,
+          -0.14212659942372466,
+          1.0114029012135626
+        ],
+        [
+          0.0,
+          0.0,
+          -0.10440933363003221
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.6460431906836117,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.20410484842770166,
+        "support_accuracy": 1.0,
+        "support_precision": 1.0,
+        "support_recall": 1.0,
+        "support_f1": 1.0,
+        "support_exact": true,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 0,
+        "active_coefficients": 6
+      },
+      "validation": {
+        "rollout_nrmse": 0.10353971598130113,
+        "per_state_nrmse": [
+          0.16224894976318527,
+          0.09123452902277651,
+          0.057135669157941625
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.19225*x + 0.646043*1/(1+z^9.5)",
+        "dy/dt = 0.950607*x - 0.142127*y",
+        "dz/dt = 1.0114*y - 0.104409*z"
+      ]
+    },
+    {
+      "index": 36,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9997760666218756,
+        "active_coefficients": 3.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 21.0,
+        "stride": 8.0,
+        "threshold": 0.4938782955076085,
+        "alpha": 0.7887732119832513
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          1.0360154595091973,
+          0.0
+        ],
+        [
+          0.0,
+          -0.15626490084247097,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.12403477981020453,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.8201531915307807,
+        "support_accuracy": 0.8611111111111112,
+        "support_precision": 0.6666666666666666,
+        "support_recall": 0.3333333333333333,
+        "support_f1": 0.4444444444444444,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 4,
+        "active_coefficients": 3
+      },
+      "validation": {
+        "rollout_nrmse": 0.7890258217340821,
+        "per_state_nrmse": [
+          0.5782523960847044,
+          0.42652998656745156,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.124035*x*y",
+        "dy/dt = 1.03602*x - 0.156265*y",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 37,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 51.0,
+        "stride": 8.0,
+        "threshold": 0.9707855277389772,
+        "alpha": 0.8752857094603018
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 38,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 53.0,
+        "stride": 40.0,
+        "threshold": 0.8910965552286114,
+        "alpha": 0.33746796769141135
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 39,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9997760666218756,
+        "active_coefficients": 3.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 23.0,
+        "stride": 8.0,
+        "threshold": 0.5522171479234886,
+        "alpha": 0.25144187440046767
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          1.023011056414675,
+          0.0
+        ],
+        [
+          0.0,
+          -0.15322357389572244,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.12495573485105405,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.8200406498920612,
+        "support_accuracy": 0.8611111111111112,
+        "support_precision": 0.6666666666666666,
+        "support_recall": 0.3333333333333333,
+        "support_f1": 0.4444444444444444,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 4,
+        "active_coefficients": 3
+      },
+      "validation": {
+        "rollout_nrmse": 0.7899781208787852,
+        "per_state_nrmse": [
+          0.5774464722709951,
+          0.4301928078152699,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.124956*x*y",
+        "dy/dt = 1.02301*x - 0.153224*y",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 40,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 47.0,
+        "stride": 8.0,
+        "threshold": 0.9572658854821774,
+        "alpha": 0.7514724569678345
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 41,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 27.0,
+        "stride": 36.0,
+        "threshold": 0.949149587940615,
+        "alpha": 0.3812131222912096
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 42,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 47.0,
+        "stride": 8.0,
+        "threshold": 0.9567942479922134,
+        "alpha": 0.65701159514197
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 43,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 47.0,
+        "stride": 8.0,
+        "threshold": 0.9949649064147033,
+        "alpha": 0.9155437828242106
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 44,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9997760666218756,
+        "active_coefficients": 3.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 23.0,
+        "stride": 32.0,
+        "threshold": 0.5795448641669146,
+        "alpha": 0.25156417431568767
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.9746468009041964,
+          0.0
+        ],
+        [
+          0.0,
+          -0.13743214990913794,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.13596718213194509,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.8206623394572717,
+        "support_accuracy": 0.8611111111111112,
+        "support_precision": 0.6666666666666666,
+        "support_recall": 0.3333333333333333,
+        "support_f1": 0.4444444444444444,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 4,
+        "active_coefficients": 3
+      },
+      "validation": {
+        "rollout_nrmse": 0.7960438037845643,
+        "per_state_nrmse": [
+          0.5750335523004554,
+          0.45080277650314704,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.135967*x*y",
+        "dy/dt = 0.974647*x - 0.137432*y",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 45,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9997760666218756,
+        "active_coefficients": 3.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 23.0,
+        "stride": 10.0,
+        "threshold": 0.5033028295053876,
+        "alpha": 0.8325780180549553
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          1.008749763803251,
+          0.0
+        ],
+        [
+          0.0,
+          -0.15296093158157203,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.1260725593227216,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.8200060758465539,
+        "support_accuracy": 0.8611111111111112,
+        "support_precision": 0.6666666666666666,
+        "support_recall": 0.3333333333333333,
+        "support_f1": 0.4444444444444444,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 4,
+        "active_coefficients": 3
+      },
+      "validation": {
+        "rollout_nrmse": 0.7890006656587708,
+        "per_state_nrmse": [
+          0.5769140133010932,
+          0.4277929011251288,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.126073*x*y",
+        "dy/dt = 1.00875*x - 0.152961*y",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 46,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 55.0,
+        "stride": 40.0,
+        "threshold": 0.8897253592855832,
+        "alpha": 0.9001588847767681
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 47,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 53.0,
+        "stride": 39.0,
+        "threshold": 0.9031650762865997,
+        "alpha": 0.2586865897880562
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 48,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 55.0,
+        "stride": 37.0,
+        "threshold": 0.9567046761759957,
+        "alpha": 0.5314556414944855
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 49,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9997760666218756,
+        "active_coefficients": 3.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 23.0,
+        "stride": 12.0,
+        "threshold": 0.5033028295053876,
+        "alpha": 0.8997548240327669
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          1.0031552578943048,
+          0.0
+        ],
+        [
+          0.0,
+          -0.1514976906757403,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.12864994326692497,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.8201218442552777,
+        "support_accuracy": 0.8611111111111112,
+        "support_precision": 0.6666666666666666,
+        "support_recall": 0.3333333333333333,
+        "support_f1": 0.4444444444444444,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 4,
+        "active_coefficients": 3
+      },
+      "validation": {
+        "rollout_nrmse": 0.7883739405642965,
+        "per_state_nrmse": [
+          0.574831617184168,
+          0.4279951219586313,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.12865*x*y",
+        "dy/dt = 1.00316*x - 0.151498*y",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 50,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 23.0,
+        "stride": 33.0,
+        "threshold": 0.9816720090285215,
+        "alpha": 0.8273737827420153
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 51,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 55.0,
+        "stride": 39.0,
+        "threshold": 0.809473160500823,
+        "alpha": 0.7989002203382018
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 52,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9997760666218756,
+        "active_coefficients": 3.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 53.0,
+        "stride": 39.0,
+        "threshold": 0.49749625773778405,
+        "alpha": 0.2586865897880562
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.9894820648903386,
+          0.0
+        ],
+        [
+          -0.022067240771455502,
+          -0.14700982456377817,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.8169495207902423,
+        "support_accuracy": 0.8611111111111112,
+        "support_precision": 0.6666666666666666,
+        "support_recall": 0.3333333333333333,
+        "support_f1": 0.4444444444444444,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 4,
+        "active_coefficients": 3
+      },
+      "validation": {
+        "rollout_nrmse": 0.9500172168683666,
+        "per_state_nrmse": [
+          0.8109318190180805,
+          0.6768247490369288,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.0220672*y",
+        "dy/dt = 0.989482*x - 0.14701*y",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 53,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 63.0,
+        "stride": 31.0,
+        "threshold": 0.949318162400663,
+        "alpha": 0.32125697416772114
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 54,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 23.0,
+        "stride": 38.0,
+        "threshold": 0.9883344847109624,
+        "alpha": 0.5388674265942468
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 55,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 53.0,
+        "stride": 36.0,
+        "threshold": 0.7267927144741689,
+        "alpha": 0.46513048180671773
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 56,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 21.0,
+        "stride": 35.0,
+        "threshold": 0.902713904707231,
+        "alpha": 0.5633011388417543
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 57,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 53.0,
+        "stride": 36.0,
+        "threshold": 0.8929831224204648,
+        "alpha": 0.5364293652331538
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 58,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 53.0,
+        "stride": 37.0,
+        "threshold": 0.8929831224204648,
+        "alpha": 0.5364293652331538
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 59,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 21.0,
+        "stride": 35.0,
+        "threshold": 0.956071378027261,
+        "alpha": 0.87150482276628
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 60,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 27.0,
+        "stride": 35.0,
+        "threshold": 0.919910638920329,
+        "alpha": 0.855773882818469
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 61,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 47.0,
+        "stride": 8.0,
+        "threshold": 0.9404900643054055,
+        "alpha": 0.5477534490684675
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 62,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9997760666218756,
+        "active_coefficients": 3.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 23.0,
+        "stride": 8.0,
+        "threshold": 0.44953324802139294,
+        "alpha": 0.4632261246566703
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          1.023011056414675,
+          0.0
+        ],
+        [
+          0.0,
+          -0.15322357389572244,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.12495573485105405,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.8200406498920612,
+        "support_accuracy": 0.8611111111111112,
+        "support_precision": 0.6666666666666666,
+        "support_recall": 0.3333333333333333,
+        "support_f1": 0.4444444444444444,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 4,
+        "active_coefficients": 3
+      },
+      "validation": {
+        "rollout_nrmse": 0.7899781208787852,
+        "per_state_nrmse": [
+          0.5774464722709951,
+          0.4301928078152699,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.124956*x*y",
+        "dy/dt = 1.02301*x - 0.153224*y",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 63,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9998605398868516,
+        "active_coefficients": 2.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 23.0,
+        "stride": 33.0,
+        "threshold": 0.49784914732131463,
+        "alpha": 0.9081221282034148
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.43791270250509884,
+          0.0
+        ],
+        [
+          -0.027121550616858694,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.8818166226977495,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.5,
+        "support_recall": 0.16666666666666666,
+        "support_f1": 0.25,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 5,
+        "active_coefficients": 2
+      },
+      "validation": {
+        "rollout_nrmse": 3.5311914212987965,
+        "per_state_nrmse": [
+          5.576647323548294,
+          3.654631857798004,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.0271216*y",
+        "dy/dt = 0.437913*x",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 64,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 25.0,
+        "stride": 39.0,
+        "threshold": 0.844950684294504,
+        "alpha": 0.8529990293620551
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 65,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 25.0,
+        "stride": 37.0,
+        "threshold": 0.919910638920329,
+        "alpha": 0.855773882818469
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 66,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 25.0,
+        "stride": 37.0,
+        "threshold": 0.844950684294504,
+        "alpha": 0.7644060536428902
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 67,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 55.0,
+        "stride": 37.0,
+        "threshold": 0.9567046761759957,
+        "alpha": 0.5301701939126827
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 68,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9998605398868516,
+        "active_coefficients": 2.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 23.0,
+        "stride": 33.0,
+        "threshold": 0.5033028295053876,
+        "alpha": 0.8273737827420153
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.43791270250509884,
+          0.0
+        ],
+        [
+          -0.027121550616858694,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.8818166226977495,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.5,
+        "support_recall": 0.16666666666666666,
+        "support_f1": 0.25,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 5,
+        "active_coefficients": 2
+      },
+      "validation": {
+        "rollout_nrmse": 3.5311914212987965,
+        "per_state_nrmse": [
+          5.576647323548294,
+          3.654631857798004,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.0271216*y",
+        "dy/dt = 0.437913*x",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 69,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 139.0,
+        "stride": 35.0,
+        "threshold": 0.9115902446669726,
+        "alpha": 0.8334207489117202
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 70,
+      "objectives": {
+        "trajectory_rmse": 0.2943413976109584,
+        "durbin_watson_deviation": 1.9856325980348792,
+        "active_coefficients": 6.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 63.0,
+        "stride": 36.0,
+        "threshold": 0.3789212842757406,
+        "alpha": 0.2214808733412367
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          -0.19224996224583654,
+          0.950606833406104,
+          0.0
+        ],
+        [
+          0.0,
+          -0.14212659942372466,
+          1.0114029012135626
+        ],
+        [
+          0.0,
+          0.0,
+          -0.10440933363003221
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.6460431906836117,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 0.20410484842770166,
+        "support_accuracy": 1.0,
+        "support_precision": 1.0,
+        "support_recall": 1.0,
+        "support_f1": 1.0,
+        "support_exact": true,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 0,
+        "active_coefficients": 6
+      },
+      "validation": {
+        "rollout_nrmse": 0.10353971598130113,
+        "per_state_nrmse": [
+          0.16224894976318527,
+          0.09123452902277651,
+          0.057135669157941625
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.19225*x + 0.646043*1/(1+z^9.5)",
+        "dy/dt = 0.950607*x - 0.142127*y",
+        "dz/dt = 1.0114*y - 0.104409*z"
+      ]
+    },
+    {
+      "index": 71,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.999953058992389,
+        "active_coefficients": 1.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 21.0,
+        "stride": 36.0,
+        "threshold": 0.587939971952419,
+        "alpha": 0.22361632936304127
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.13695965051317488,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0030479093746194,
+        "support_accuracy": 0.8055555555555556,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 1,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 1
+      },
+      "validation": {
+        "rollout_nrmse": 1.583069646608638,
+        "per_state_nrmse": [
+          0.6629370196922691,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = -0.13696*x*y",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 72,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 63.0,
+        "stride": 31.0,
+        "threshold": 0.9694231100489112,
+        "alpha": 0.3208047708567064
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 73,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 27.0,
+        "stride": 33.0,
+        "threshold": 0.9115902446669726,
+        "alpha": 0.8445442085127353
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 74,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 39.0,
+        "stride": 38.0,
+        "threshold": 0.989309336034154,
+        "alpha": 0.5415733907812634
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 75,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 25.0,
+        "stride": 8.0,
+        "threshold": 0.8462286827312675,
+        "alpha": 0.462892568588944
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 76,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 23.0,
+        "stride": 38.0,
+        "threshold": 0.8104070060154575,
+        "alpha": 0.41954386873576244
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 77,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 23.0,
+        "stride": 33.0,
+        "threshold": 0.9689442351772303,
+        "alpha": 0.9081221282034148
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 78,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 6.0,
+        "window_length": 63.0,
+        "stride": 39.0,
+        "threshold": 0.9664696950921314,
+        "alpha": 0.28834522137855656
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    },
+    {
+      "index": 79,
+      "objectives": {
+        "trajectory_rmse": 4.360789929431513,
+        "durbin_watson_deviation": 1.9999830239969385,
+        "active_coefficients": 0.0
+      },
+      "variables": {
+        "degree": 5.0,
+        "window_length": 41.0,
+        "stride": 38.0,
+        "threshold": 0.9977239748718069,
+        "alpha": 0.5415733907812634
+      },
+      "feature_names": [
+        "x",
+        "y",
+        "z",
+        "x^2",
+        "y^2",
+        "z^2",
+        "x*y",
+        "x*z",
+        "y*z",
+        "1/(1+x^9.5)",
+        "1/(1+y^9.5)",
+        "1/(1+z^9.5)"
+      ],
+      "coefficients": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "coefficient_metrics": {
+        "relative_l2_error": 1.0,
+        "support_accuracy": 0.8333333333333334,
+        "support_precision": 0.0,
+        "support_recall": 0.0,
+        "support_f1": 0.0,
+        "support_exact": false,
+        "false_positive_coefficients": 0,
+        "false_negative_coefficients": 6,
+        "active_coefficients": 0
+      },
+      "validation": {
+        "rollout_nrmse": 3.2744615572319966,
+        "per_state_nrmse": [
+          5.7371127515623455,
+          2.723976837583555,
+          1.3622950825500904
+        ],
+        "simulation_error": null
+      },
+      "symbolic_equations": [
+        "dx/dt = 0",
+        "dy/dt = 0",
+        "dz/dt = 0"
+      ]
+    }
+  ],
+  "selected_index": 0,
+  "selected": {
+    "index": 0,
+    "objectives": {
+      "trajectory_rmse": 0.2943413976109584,
+      "durbin_watson_deviation": 1.9856325980348792,
+      "active_coefficients": 6.0
+    },
+    "variables": {
+      "degree": 6.0,
+      "window_length": 63.0,
+      "stride": 36.0,
+      "threshold": 0.32804577630065107,
+      "alpha": 0.25241372389108363
+    },
+    "feature_names": [
+      "x",
+      "y",
+      "z",
+      "x^2",
+      "y^2",
+      "z^2",
+      "x*y",
+      "x*z",
+      "y*z",
+      "1/(1+x^9.5)",
+      "1/(1+y^9.5)",
+      "1/(1+z^9.5)"
+    ],
+    "coefficients": [
+      [
+        -0.19224996224583654,
+        0.950606833406104,
+        0.0
+      ],
+      [
+        0.0,
+        -0.14212659942372466,
+        1.0114029012135626
+      ],
+      [
+        0.0,
+        0.0,
+        -0.10440933363003221
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.6460431906836117,
+        0.0,
+        0.0
+      ]
+    ],
+    "coefficient_metrics": {
+      "relative_l2_error": 0.20410484842770166,
+      "support_accuracy": 1.0,
+      "support_precision": 1.0,
+      "support_recall": 1.0,
+      "support_f1": 1.0,
+      "support_exact": true,
+      "false_positive_coefficients": 0,
+      "false_negative_coefficients": 0,
+      "active_coefficients": 6
+    },
+    "validation": {
+      "rollout_nrmse": 0.10353971598130113,
+      "per_state_nrmse": [
+        0.16224894976318527,
+        0.09123452902277651,
+        0.057135669157941625
+      ],
+      "simulation_error": null
+    },
+    "symbolic_equations": [
+      "dx/dt = -0.19225*x + 0.646043*1/(1+z^9.5)",
+      "dy/dt = 0.950607*x - 0.142127*y",
+      "dz/dt = 1.0114*y - 0.104409*z"
+    ]
+  },
+  "train": {
+    "rollout_nrmse": 0.07925733661853335,
+    "per_state_nrmse": [
+      0.09362928041177439,
+      0.07259079717200279,
+      0.07155193227182287
+    ],
+    "simulation_error": null
+  },
+  "test": {
+    "rollout_nrmse": 0.07268315026683786,
+    "per_state_nrmse": [
+      0.07686651683459628,
+      0.0681552296169632,
+      0.0730277043489541
+    ],
+    "simulation_error": null
+  },
+  "exponent_recovery": null,
+  "library_parameter_recovery": null,
+  "trajectory_artifact": "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise015-seed022.npz"
+}

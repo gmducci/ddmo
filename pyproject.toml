@@ -41,9 +41,6 @@ dev = [
 [project.urls]
 Homepage = "https://github.com/FHI-theory/ddmo"
 
-[project.scripts]
-ddmo = "ddmo.main:main"
-
 [tool.ruff.lint]
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
 # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or

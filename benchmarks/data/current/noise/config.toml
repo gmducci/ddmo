@@ -1,0 +1,76 @@
+schema_version = 1
+
+[experiment]
+name = "weak_noise_poly2_three_objectives_20260915"
+system = "goodwin"
+description = "Compare strong, fixed weak, optimized weak, and SG-preprocessed optimized weak identification under noise using a degree-2 polynomial candidate library with interactions and Hill inhibition."
+job_id_scheme = "semantic"
+methods = ["strong", "weak_fixed", "weak_optimized", "weak_optimized_sg"]
+noise_levels = [0.0, 0.05, 0.10, 0.15, 0.20]
+seeds = [11, 22, 33, 44, 55]
+
+[data]
+t_start = 0.0
+t_end = 100.0
+dt = 0.1
+train_trajectories = 3
+validation_trajectories = 1
+test_trajectories = 2
+noise_scale = "per_state_standard_deviation"
+initial_conditions = [
+  [0.5, 1.0, 1.0],
+  [0.2, 1.4, 0.8],
+  [0.8, 0.6, 1.5],
+  [0.35, 1.2, 1.4],
+  [0.7, 1.5, 0.6],
+  [1.0, 0.8, 1.2],
+]
+
+[truth]
+hill_exponent = 9.5
+k1 = 1.0
+k2 = 0.2
+k3 = 1.0
+k4 = 0.15
+k5 = 1.0
+k6 = 0.1
+K1 = 1.0
+
+[library]
+polynomial_degree = 2
+include_interactions = true
+
+[smoke]
+population = 12
+generations = 3
+t_end = 20.0
+
+[strong_derivative]
+method = "savitzky_golay"
+window_length = 21
+polynomial_order = 3
+
+[weak_fixed]
+family = "PolynomialWindow"
+degree = 2
+window_length = 61
+stride = 20
+
+[bounds.formulation]
+degree = [2, 6]
+window_length = [21, 151]
+stride = [5, 40]
+
+[bounds.solver]
+threshold = [0.001, 1.0]
+alpha = [0.000001, 1.0]
+
+[optimizer]
+algorithm = "NSGA2"
+population = 80
+generations = 30
+objectives = ["trajectory_rmse", "durbin_watson_deviation", "active_coefficients"]
+
+[selection]
+metric = "validation_rollout_nrmse"
+coefficient_zero_tolerance = 0.000001

@@ -1,0 +1,259 @@
+{
+  "status": "current_paper_result",
+  "page_size": "A4 portrait",
+  "pages": [
+    {
+      "page": 1,
+      "noise_level": 0.0,
+      "seed": 11,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise000-seed011",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise000-seed011",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise000-seed011"
+      ]
+    },
+    {
+      "page": 2,
+      "noise_level": 0.0,
+      "seed": 22,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise000-seed022",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise000-seed022",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise000-seed022"
+      ]
+    },
+    {
+      "page": 3,
+      "noise_level": 0.0,
+      "seed": 33,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise000-seed033",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise000-seed033",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise000-seed033"
+      ]
+    },
+    {
+      "page": 4,
+      "noise_level": 0.0,
+      "seed": 44,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise000-seed044",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise000-seed044",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise000-seed044"
+      ]
+    },
+    {
+      "page": 5,
+      "noise_level": 0.0,
+      "seed": 55,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise000-seed055",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise000-seed055",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise000-seed055"
+      ]
+    },
+    {
+      "page": 6,
+      "noise_level": 0.05,
+      "seed": 11,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise005-seed011",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise005-seed011",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise005-seed011"
+      ]
+    },
+    {
+      "page": 7,
+      "noise_level": 0.05,
+      "seed": 22,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise005-seed022",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise005-seed022",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise005-seed022"
+      ]
+    },
+    {
+      "page": 8,
+      "noise_level": 0.05,
+      "seed": 33,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise005-seed033",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise005-seed033",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise005-seed033"
+      ]
+    },
+    {
+      "page": 9,
+      "noise_level": 0.05,
+      "seed": 44,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise005-seed044",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise005-seed044",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise005-seed044"
+      ]
+    },
+    {
+      "page": 10,
+      "noise_level": 0.05,
+      "seed": 55,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise005-seed055",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise005-seed055",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise005-seed055"
+      ]
+    },
+    {
+      "page": 11,
+      "noise_level": 0.1,
+      "seed": 11,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise010-seed011",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise010-seed011",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise010-seed011"
+      ]
+    },
+    {
+      "page": 12,
+      "noise_level": 0.1,
+      "seed": 22,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise010-seed022",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise010-seed022",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise010-seed022"
+      ]
+    },
+    {
+      "page": 13,
+      "noise_level": 0.1,
+      "seed": 33,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise010-seed033",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise010-seed033",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise010-seed033"
+      ]
+    },
+    {
+      "page": 14,
+      "noise_level": 0.1,
+      "seed": 44,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise010-seed044",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise010-seed044",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise010-seed044"
+      ]
+    },
+    {
+      "page": 15,
+      "noise_level": 0.1,
+      "seed": 55,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise010-seed055",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise010-seed055",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise010-seed055"
+      ]
+    },
+    {
+      "page": 16,
+      "noise_level": 0.15,
+      "seed": 11,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise015-seed011",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise015-seed011",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise015-seed011"
+      ]
+    },
+    {
+      "page": 17,
+      "noise_level": 0.15,
+      "seed": 22,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise015-seed022",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise015-seed022",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise015-seed022"
+      ]
+    },
+    {
+      "page": 18,
+      "noise_level": 0.15,
+      "seed": 33,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise015-seed033",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise015-seed033",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise015-seed033"
+      ]
+    },
+    {
+      "page": 19,
+      "noise_level": 0.15,
+      "seed": 44,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise015-seed044",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise015-seed044",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise015-seed044"
+      ]
+    },
+    {
+      "page": 20,
+      "noise_level": 0.15,
+      "seed": 55,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise015-seed055",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise015-seed055",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise015-seed055"
+      ]
+    },
+    {
+      "page": 21,
+      "noise_level": 0.2,
+      "seed": 11,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise020-seed011",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise020-seed011",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise020-seed011"
+      ]
+    },
+    {
+      "page": 22,
+      "noise_level": 0.2,
+      "seed": 22,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise020-seed022",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise020-seed022",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise020-seed022"
+      ]
+    },
+    {
+      "page": 23,
+      "noise_level": 0.2,
+      "seed": 33,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise020-seed033",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise020-seed033",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise020-seed033"
+      ]
+    },
+    {
+      "page": 24,
+      "noise_level": 0.2,
+      "seed": 44,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise020-seed044",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise020-seed044",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise020-seed044"
+      ]
+    },
+    {
+      "page": 25,
+      "noise_level": 0.2,
+      "seed": 55,
+      "job_ids": [
+        "weak_noise_poly2_three_objectives_20260915-strong-noise020-seed055",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized-noise020-seed055",
+        "weak_noise_poly2_three_objectives_20260915-weak_optimized_sg-noise020-seed055"
+      ]
+    }
+  ],
+  "plot_test_trajectory": 1,
+  "config_sha256": "d8c126a4347bb06a166caee72fcb6a60281ed05f296e595c1e5be63a258f29ba",
+  "weak_source_sha256": "2ae5be810a5401bd9a323d4bb0ef83c58a9d4b9fba573af13f09d6d2acbfdf1b"
+}

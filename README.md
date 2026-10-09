@@ -37,7 +37,7 @@ python examples/quickstart/goodwin_weak.py
 ```
 
 This runs one Figure 1 weak-form design with current weights and may take
-several minutes. The historical saved result used earlier weights.
+several minutes.
 
 or:
 
@@ -71,10 +71,11 @@ Maintained demonstrations are indexed in [`examples/`](examples/README.md).
 Frozen paper experiments and their output contract are documented in
 [`benchmarks/`](benchmarks/README.md).
 
+The corrected Figure 1 and Figure 2 campaigns, selected paper figures, and A4
+supplementary PDFs are frozen under [`benchmarks/`](benchmarks/README.md).
+Verify their checksums and saved results with `python -m benchmarks.freeze`.
 The earlier campaign data remain available for audit in
 [`benchmarks/data/historical/`](benchmarks/data/historical/).
-The old figure artwork has been removed while the corrected paper figures and SI
-layout are being finalized.
 
 ## Development
 
@@ -84,7 +85,9 @@ Run the test suite with:
 python -m pytest
 ```
 
-Generated outputs, logs, local analysis folders, checkpoints, and large numerical result files should not be committed to the repository.
+Generated outputs, logs, local analysis folders, and checkpoints should not be
+committed. The reviewed paper results under `benchmarks/data/current/` are
+versioned intentionally.
 
 ## Contributing
 

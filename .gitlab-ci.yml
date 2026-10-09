@@ -12,3 +12,4 @@ test:
     - pip install pytest
   script:
     - python -m pytest
+    - python -m benchmarks.freeze

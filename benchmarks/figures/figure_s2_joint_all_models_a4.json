@@ -1,0 +1,82 @@
+{
+  "status": "current_paper_result",
+  "page_size": "A4 portrait",
+  "pages": [
+    {
+      "page": 1,
+      "noise_level": 0.1,
+      "seed": 101,
+      "block": 1,
+      "job_id": "joint_goodwin_fixed_pair-weak_joint_sg-train2-block01-noise010"
+    },
+    {
+      "page": 2,
+      "noise_level": 0.1,
+      "seed": 102,
+      "block": 2,
+      "job_id": "joint_goodwin_fixed_pair-weak_joint_sg-train2-block02-noise010"
+    },
+    {
+      "page": 3,
+      "noise_level": 0.1,
+      "seed": 103,
+      "block": 3,
+      "job_id": "joint_goodwin_fixed_pair-weak_joint_sg-train2-block03-noise010"
+    },
+    {
+      "page": 4,
+      "noise_level": 0.1,
+      "seed": 104,
+      "block": 4,
+      "job_id": "joint_goodwin_fixed_pair-weak_joint_sg-train2-block04-noise010"
+    },
+    {
+      "page": 5,
+      "noise_level": 0.1,
+      "seed": 105,
+      "block": 5,
+      "job_id": "joint_goodwin_fixed_pair-weak_joint_sg-train2-block05-noise010"
+    },
+    {
+      "page": 6,
+      "noise_level": 0.1,
+      "seed": 106,
+      "block": 6,
+      "job_id": "joint_goodwin_fixed_pair-weak_joint_sg-train2-block06-noise010"
+    },
+    {
+      "page": 7,
+      "noise_level": 0.1,
+      "seed": 107,
+      "block": 7,
+      "job_id": "joint_goodwin_fixed_pair-weak_joint_sg-train2-block07-noise010"
+    },
+    {
+      "page": 8,
+      "noise_level": 0.1,
+      "seed": 108,
+      "block": 8,
+      "job_id": "joint_goodwin_fixed_pair-weak_joint_sg-train2-block08-noise010"
+    },
+    {
+      "page": 9,
+      "noise_level": 0.1,
+      "seed": 109,
+      "block": 9,
+      "job_id": "joint_goodwin_fixed_pair-weak_joint_sg-train2-block09-noise010"
+    },
+    {
+      "page": 10,
+      "noise_level": 0.1,
+      "seed": 110,
+      "block": 10,
+      "job_id": "joint_goodwin_fixed_pair-weak_joint_sg-train2-block10-noise010"
+    }
+  ],
+  "plot_test_trajectories": [
+    1,
+    2
+  ],
+  "config_sha256": "ef2d873aa76ac4148e053cf2051c7568f46150edd7664ad23338d4a6f5f89da0",
+  "weak_source_sha256": "2ae5be810a5401bd9a323d4bb0ef83c58a9d4b9fba573af13f09d6d2acbfdf1b"
+}

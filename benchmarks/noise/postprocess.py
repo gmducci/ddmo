@@ -1,4 +1,4 @@
-"""Figure 1 and Figure S1: noise robustness and all-library coefficient recovery."""
+"""Figure 1 noise robustness and optional coefficient diagnostics."""
 from __future__ import annotations
 
 import argparse
@@ -505,7 +505,6 @@ def render(raw, config, output):
     (output / "figure_1_strong_fd_reference.json").write_text(
         json.dumps(reference_record, indent=2) + "\n", encoding="utf-8"
     )
-    plot_coefficients(output / "figure_s1_full_coefficient_recovery", records, config)
 
 
 def main():

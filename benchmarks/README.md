@@ -1,59 +1,58 @@
 # Paper benchmarks
 
-The previous Figure 1, Figure 2, and supplementary artwork has been removed
-from the tracked repository. It was generated before the corrected weak-form
-weight calculation. New paper artwork will be frozen together after the
-supplementary-figure review.
+The selected Figure 1 and Figure 2 results are frozen in
+[`data/current/`](data/current/) with their run JSON, saved trajectories,
+configurations, provenance, and SHA-256 manifest. The final main and A4
+supplementary figures are in [`figures/`](figures/).
 
-## Directory layout
-
-```text
-benchmarks/
-  common/       Goodwin data generation, execution, and result validation
-  noise/        Figure 1 configuration, runner, and plotting code
-  joint/        Figure 2 configuration, initial conditions, runner, and plotting code
-  data/         Corrected tutorial reference and historical/ campaign bundles
-  diagnostics.py
-  plot.py       Historical data checks and local rendering
-  run.py        Production campaign entry point
-```
-
-`data/historical/noise.zip` and `data/historical/joint.zip` contain the earlier production JSON
-results. Their matching `*_trajectories.npz` files hold the saved trajectories,
-and `data/historical/manifest.json` records checksums and original source commits. They
-are retained for audit, not presented as current corrected-weight paper results.
-The [Figure 2 block 4 tutorial reference](data/figure2_tutorial_block04.json)
-is a compact corrected-weight result. A clean run from commit `ab7da8a3`
-reproduced its selected model, coefficients, settings, and test trajectory
-exactly.
-
-The complete corrected campaigns are currently in the ignored local folders
-`.local/figure1_weak_fix/` and `.local/figure2_weak_fix/`. They contain figure
-files, run JSON, trajectory NPZ, configuration, and provenance metadata. The
-older source and artwork remain available in Git history. Neither local folder
-is required to import or test `ddmo`.
-
-## Check archived data
+## Verify the frozen results
 
 From the repository root, in the project environment:
+
+```bash
+python -m benchmarks.freeze
+```
+
+This checks every tracked campaign file against the manifest, the complete
+75-run Figure 1 and 10-run Figure 2 job matrices, evaluation budgets, saved
+trajectory scores, main figure hashes, and the A4 supplementary page lists.
+The Figure 1 PDF has one page per noise/seed pair, with all three selected
+models against the same noisy test data. The Figure 2 PDF has one page per
+selected joint-library run. To render the A4 pages from saved data:
+
+```bash
+python -m benchmarks.si_paper
+```
+
+Rendered copies go to `.local/si_paper_render/`. To replace a frozen figure,
+copy the reviewed output to `figures/` and regenerate the checksum manifest
+with `python -m benchmarks.freeze --write-manifest`.
+
+The 25 strong-form Figure 1 baselines were reused from the earlier campaign;
+the matching trajectories and their origin are recorded in
+[`data/current/noise/strong_trajectory_provenance.json`](data/current/noise/strong_trajectory_provenance.json).
+The 50 corrected weak-form and 10 joint-library run JSON records have
+`git_dirty=true` in their original provenance. Their saved weak-form source
+hash matches this repository, and the stored configuration and artifacts are
+checked by the freeze command. A separate clean Figure 2 block 4 run is in
+[`data/current/verification/`](data/current/verification/); it reproduced the
+selected model, coefficients, settings, and test trajectory exactly. This
+does not claim an independent rerun of all 60 corrected runs.
+
+## Historical audit data
+
+[`data/historical/`](data/historical/) contains the earlier production JSON
+results and saved trajectories, generated before the corrected weak-form
+weight calculation. Its manifest records checksums and source commits. Check
+the 85 archived records with:
 
 ```bash
 python -m benchmarks.plot --check
 ```
 
-This validates all 85 archived production records and their trajectory bundles,
-then checks that the corrected tutorial reference names the current weak-form
-source hash. It does not certify artwork.
-
-To render the historical figures locally for comparison:
-
-```bash
-python -m benchmarks.plot --historical
-```
-
-Outputs go to `.local/benchmark_plots/historical/`. They are excluded from Git.
-Use `noise` or `joint` to render one experiment, and `--diagnostics` or
-`--library-overview` for the historical supplementary views.
+To render historical figures for comparison, run
+`python -m benchmarks.plot --historical`. Output goes to the ignored
+`.local/benchmark_plots/historical/` directory.
 
 ## Run new campaigns
 
@@ -64,9 +63,9 @@ python -m benchmarks.run noise --workers 5
 python -m benchmarks.run joint --workers 5
 ```
 
-Each command runs or resumes its full campaign and writes new raw results,
-logs, and plots under `.local/benchmark_runs/<experiment>/`. A cached job is
-reused only when its commit, config hash, artifact, and evaluation budget match.
+Each command runs or resumes a campaign under the ignored
+`.local/benchmark_runs/<experiment>/` directory. A cached job is reused only
+when its commit, config hash, artifact, and evaluation budget match.
 
 | Experiment | Design | Budget |
 |---|---|---|
@@ -75,8 +74,9 @@ reused only when its commit, config hash, artifact, and evaluation budget match.
 
 Both campaigns minimize trajectory RMSE, Durbin–Watson deviation from two,
 and active coefficient count. Joint optimization searches Hill and exponential
-library parameters, weak-window settings, and STLSQ settings. The exact
-settings are in `noise/config.toml` and `joint/config.toml`.
+library parameters, weak-window settings, and STLSQ settings. The settings
+are in [`noise/config.toml`](noise/config.toml) and
+[`joint/config.toml`](joint/config.toml).
 
-The corrected-weight tutorial for one joint run is in
-[`docs/tutorials/goodwin_joint.md`](../docs/tutorials/goodwin_joint.md).
+The [Figure 2 reproduction tutorial](../docs/tutorials/goodwin_joint.md)
+walks through one joint run.

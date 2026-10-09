@@ -62,6 +62,7 @@ Project documentation is available in [`docs/`](docs/):
 
 - [Installation](docs/installation.md)
 - [Quickstart](docs/quickstart.md)
+- [Figure 2 reproduction tutorial](docs/tutorials/goodwin_joint.md)
 - [Optimization objectives](docs/objectives.md)
 - [Development guide](docs/development.md)
 

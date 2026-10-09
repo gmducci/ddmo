@@ -3,6 +3,11 @@
 **Figures to use in the paper are in [figures/](figures/).**
 No manuscript, legacy experiments, campaign snapshots, or exploratory plots live here.
 
+The corrected-weight Figure 2 tutorial has a separately verified block 4
+reference at [data/figure2_tutorial_block04.json](data/figure2_tutorial_block04.json).
+The ten-run bundle and selected Figure 2/SI artwork below still belong to the
+earlier campaign. They will be replaced together after the SI figure review.
+
 ```text
 benchmarks/
   README.md

@@ -14,6 +14,7 @@ The package provides modular components for:
 
 - [Installation](installation.md)
 - [Quickstart](quickstart.md)
+- [Tutorials](tutorials/index.md)
 - [Optimization objectives](objectives.md)
 - [Development guide](development.md)
 

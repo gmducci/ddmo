@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "job": {
+    "ic_block": 4,
+    "data_seed": 104,
+    "optimizer_seed": 1004,
+    "evaluation_budget": 2400
+  },
+  "selected_index": 7,
+  "selected": {
+    "feature_names": [
+      "x",
+      "y",
+      "z",
+      "x^2",
+      "y^2",
+      "z^2",
+      "x*y",
+      "x*z",
+      "y*z",
+      "1/(1+x^11.5774)",
+      "1/(1+y^11.5774)",
+      "1/(1+z^11.5774)",
+      "exp(-6.15*x)",
+      "exp(-6.15*y)",
+      "exp(-6.15*z)"
+    ],
+    "coefficients": [
+      [
+        -0.2002793194653459,
+        1.020146185379269,
+        0.0
+      ],
+      [
+        0.0,
+        -0.15094470067078727,
+        0.9772164812231076
+      ],
+      [
+        0.0,
+        0.0,
+        -0.09979827663818018
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        179.86076389418264,
+        0.0,
+        0.0
+      ]
+    ],
+    "variables": {
+      "gamma_1": 11.577404118397743,
+      "gamma_2": 6.148414999188718,
+      "degree": 3.0,
+      "window_length": 29.0,
+      "stride": 34.0,
+      "threshold": 0.38995681136790444,
+      "alpha": 0.7029334058277178
+    },
+    "validation": {
+      "rollout_nrmse": 0.03050775919469979,
+      "per_state_nrmse": [
+        0.03799701955097357,
+        0.027411005293524637,
+        0.02611525273960117
+      ],
+      "simulation_error": null
+    },
+    "symbolic_equations": [
+      "dx/dt = -0.200279*x + 179.861*exp(-6.15*z)",
+      "dy/dt = 1.02015*x - 0.150945*y",
+      "dz/dt = 0.977216*y - 0.0997983*z"
+    ]
+  },
+  "test": {
+    "rollout_nrmse": 0.033232010196529986,
+    "per_state_nrmse": [
+      0.041096745182081985,
+      0.028146583884115107,
+      0.03045270152339285
+    ],
+    "simulation_error": null
+  },
+  "provenance": {
+    "corrected_run_sha256": "3ae281079df7a3fdcc77876ad0db5a81b4affb08eac1f22cb8861d4e4d8f77ac",
+    "weak_source_sha256": "2ae5be810a5401bd9a323d4bb0ef83c58a9d4b9fba573af13f09d6d2acbfdf1b",
+    "corrected_run_git_commit": "7374e060ba7a3c3d5832e0d902cf9f6a791e3116",
+    "corrected_run_git_dirty": true,
+    "clean_verification_commit": "ab7da8a35913d9fcb769e735e9ded040d1f705b6",
+    "clean_verification_matches_selected_result": true,
+    "python": "3.12.4",
+    "dependency_versions": {
+      "python": "3.12.4",
+      "ddmo": "0.1.0",
+      "numpy": "2.3.1",
+      "scipy": "1.16.0",
+      "scikit-learn": "1.7.0",
+      "pysindy": "1.7.5",
+      "pymoo": "0.6.1.5"
+    }
+  }
+}

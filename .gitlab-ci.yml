@@ -1,5 +1,6 @@
 stages:
   - test
+  - release
 
 test:
   stage: test
@@ -12,3 +13,16 @@ test:
     - pip install pytest
   script:
     - python -m pytest
+
+release_v1_0_0:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/cli:latest
+  needs: [test]
+  rules:
+    - if: '$CI_COMMIT_TAG == "v1.0.0"'
+  script:
+    - echo "Publishing ${CI_COMMIT_TAG} after tests pass"
+  release:
+    tag_name: $CI_COMMIT_TAG
+    name: "ddmo $CI_COMMIT_TAG"
+    description: ./RELEASE_NOTES.md

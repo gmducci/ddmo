@@ -10,8 +10,7 @@ The package is designed around a modular workflow: construct candidate function 
 - **Strong and weak formulations** for sparse model identification.
 - **Sparse-regression solvers** built around PySINDy and related optimization tools.
 - **Multi-objective optimization** of formulation, solver, and library parameters.
-- **Maintained examples** for Goodwin-type and Brusselator dynamical systems.
-- **Reproducible publication benchmarks** kept separate from user tutorials.
+- **Benchmark examples** for Goodwin-type and Brusselator dynamical systems.
 - **Modular package structure** separating data, formulation, solver, optimization, and utilities.
 
 ## Installation
@@ -33,16 +32,13 @@ pip install -e ".[dev]"
 Run one of the example workflows from the repository root:
 
 ```bash
-python examples/quickstart/goodwin_weak.py
+python examples/tutorial_goodwin_weak.py
 ```
-
-This runs one Figure 1 weak-form design with current weights and may take
-several minutes.
 
 or:
 
 ```bash
-python examples/quickstart/brusselator_custom_library.py
+python examples/tutorial_custom_library_brusselator.py
 ```
 
 The main public API can be imported directly from `ddmo`:
@@ -63,19 +59,7 @@ Project documentation is available in [`docs/`](docs/):
 
 - [Installation](docs/installation.md)
 - [Quickstart](docs/quickstart.md)
-- [Figure 2 reproduction tutorial](docs/tutorials/goodwin_joint.md)
-- [Optimization objectives](docs/objectives.md)
 - [Development guide](docs/development.md)
-
-Maintained demonstrations are indexed in [`examples/`](examples/README.md).
-Frozen paper experiments and their output contract are documented in
-[`benchmarks/`](benchmarks/README.md).
-
-The corrected Figure 1 and Figure 2 campaigns, selected paper figures, and A4
-supplementary PDFs are frozen under [`benchmarks/`](benchmarks/README.md).
-Verify their checksums and saved results with `python -m benchmarks.freeze`.
-The earlier campaign data remain available for audit in
-[`benchmarks/data/historical/`](benchmarks/data/historical/).
 
 ## Development
 
@@ -85,9 +69,7 @@ Run the test suite with:
 python -m pytest
 ```
 
-Generated outputs, logs, local analysis folders, and checkpoints should not be
-committed. The reviewed paper results under `benchmarks/data/current/` are
-versioned intentionally.
+Generated outputs, logs, local analysis folders, checkpoints, and large numerical result files should not be committed to the repository.
 
 ## Contributing
 

@@ -1,60 +1,159 @@
-# Run one Figure 1 weak-form design
+# Goodwin weak-form tutorial
 
-This tutorial runs **one** of the Figure 1 “Weak, optimized” designs. Choose one
-noise level and one seed; the script generates the same Goodwin trajectories,
-fits the same candidate library, and uses the same optimization settings and
-model-selection rule. It uses the corrected weak-form weights. The saved
-Figure 1 campaign in `benchmarks/data/historical/` used the earlier weights,
-so its selected model and scores can differ.
+This tutorial explains `examples/tutorial_goodwin_weak.py`.
 
-For the campaign environment, use Python **3.12.4** and install the
-recorded dependency versions in a fresh environment. From the
-repository root:
+The script identifies a Goodwin oscillator model from noisy benchmark data
+using the weak formulation. The weak formulation is useful when numerical
+derivatives are unreliable because it builds the regression problem from
+windowed integral quantities.
+
+Run it from the repository root:
 
 ```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
-python -m pip install -e . "numpy==2.3.1" "scipy==1.16.0" "scikit-learn==1.7.0" "pysindy==1.7.5" "pymoo==0.6.1.5" "setuptools<81"
+PYTHONPATH=src python examples/tutorial_goodwin_weak.py
 ```
 
-Then run:
+After editable installation:
 
 ```bash
-python examples/quickstart/goodwin_weak.py
+python examples/tutorial_goodwin_weak.py
 ```
 
-The defaults are **10% noise** and **seed 11**. To reproduce another point:
+## Workflow
 
-```bash
-python examples/quickstart/goodwin_weak.py --noise 0.20 --seed 55
+The script follows the same order as the package workflow:
+
+```text
+load data
+build candidate library
+construct DataConstructor
+configure OptimizerSettings
+configure SolverSettings
+configure FormulationSettings
+call identify(...)
+print parameters and plot the first solution
 ```
 
-Noise can be `0`, `0.05`, `0.10`, `0.15`, or `0.20`. Seed can be `11`, `22`,
-`33`, `44`, or `55`. These are the 25 “Weak, optimized” cases in Figure 1.
-Each command runs just the chosen case. A full run makes **2,400 candidate
-evaluations**, so it can take several minutes.
+## 1. Load data
 
-## What the script does
+```python
+x_0_train = np.load(BENCHMARK_FOLDER / "x_0.npy")
+x_noisy = np.load(BENCHMARK_FOLDER / "x_train_noise.npy")
+time_array = np.load(BENCHMARK_FOLDER / "time.npy")
+```
 
-1. It generates six Goodwin trajectories on the benchmark time grid, using the
-   chosen seed for the observation noise.
-2. It fits on three noisy trajectories. The candidate library contains degree-2
-   polynomials, interactions, and a Hill term with exponent 9.5.
-3. NSGA-II searches the weak-window settings and STLSQ settings with the chosen
-   seed. Its three objectives are training trajectory RMSE, Durbin–Watson
-   deviation, and the number of active coefficients.
-4. It simulates each valid Pareto model on the **one validation trajectory**.
-   The model with the lowest validation rollout NRMSE is selected. Ties prefer
-   fewer active coefficients, then lower training trajectory RMSE.
-5. It tests that selected model on the **two held-out trajectories** and prints
-   all three Figure 1 metrics: test NRMSE, coefficient relative error, and
-   false-positive coefficient count. It also prints the historical saved
-   values and the difference between the selected coefficient matrices.
+`x_noisy` is used both as training data and as the raw trajectory shown in the
+plot.
 
-The historical plotted Figure 1 point was the median of five selected test
-results at that noise level. This script runs one design, not the median.
+## 2. Build the candidate library
 
-In the corrected local campaign, the default design selected Pareto model 12
-with test NRMSE **0.14967033**. The historical saved run selected model 0 with
-test NRMSE **0.16668603**. The numerical comparison in the script makes this
-change visible; it is not an assertion that the two weight calculations agree.
+```python
+library = (
+    LibraryBuilder()
+    .add_polynomial(max_degree=2, include_interactions=True)
+    .add_hill(exponent_param="gamma_1")
+    .add_exponential(rate_param="gamma_2")
+)
+```
+
+The library defines the terms the solver is allowed to select. `gamma_1` and
+`gamma_2` are not fixed here; they are optimized later.
+
+## 3. Construct the data object
+
+```python
+training_data = DataConstructor(
+    x_train=data["x_train"],
+    time_array=data["time_array"],
+    x_0=data["x_0"],
+    x_raw=data["x_raw"],
+)
+```
+
+No derivative array is passed. That is the main practical difference from a
+strong-form workflow.
+
+## 4. Configure optimization
+
+```python
+optimizer_settings = OptimizerSettings(
+    library_bounds={
+        "gamma_1": (8.4, 9.6),
+        "gamma_2": (1.0, 10.0),
+    },
+    formulation_bounds={
+        "degree": (2, 7),
+        "stride": (50, 250),
+        "window_length": (127, 801),
+    },
+    n_obj=2,
+    n_gen=10,
+    algorithm="NSGA3",
+    pop_size=50,
+    seed=42,
+)
+```
+
+`library_bounds` tune parameters inside the candidate library.
+`formulation_bounds` tune the weak-form test functions.
+
+For quick debugging, reduce `n_gen` and `pop_size`. For a more serious search,
+increase them.
+
+## 5. Configure the solver
+
+```python
+solver_settings = SolverSettings(
+    solver_name="pysindy",
+    regularization="STLSQ",
+    regularization_parameters={
+        "normalize_columns": False,
+        "alpha": 0.05,
+        "threshold": 0.1,
+    },
+    scale_features=True,
+)
+```
+
+The solver fits sparse coefficients after the weak formulation has built the
+regression matrices.
+
+## 6. Configure the weak formulation
+
+```python
+formulation_settings = FormulationSettings(
+    formulation="weak",
+    test_function="PolynomialWindow",
+    degree=2,
+    window_length=65,
+    stride=50,
+)
+```
+
+These are the starting values. Because `degree`, `window_length`, and `stride`
+also appear in `formulation_bounds`, the optimizer can change them.
+
+## 7. Run identification
+
+```python
+result = identify(
+    data_instance=training_data,
+    optimizer_settings=optimizer_settings,
+    solver_settings=solver_settings,
+    formulation_settings=formulation_settings,
+    library_object=library.build,
+)
+```
+
+The tutorial prints the selected optimizer parameters with names and plots
+`result.solutions[0]` against the noisy data.
+
+## What to change first
+
+- Faster run: decrease `n_gen` and `pop_size`.
+- Cleaner or noisier data: replace `x_train` and `x_raw`.
+- Different weak-form search: change `degree`, `stride`, and `window_length`.
+- Different sparse model: change `threshold` or add it to `solver_bounds`.
+- Different candidate terms: edit the `LibraryBuilder` chain.
+
+For the smallest package overview, see `docs/tutorials/minimal_workflow.md`.

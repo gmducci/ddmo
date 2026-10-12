@@ -14,8 +14,6 @@ The package provides modular components for:
 
 - [Installation](installation.md)
 - [Quickstart](quickstart.md)
-- [Tutorials](tutorials/index.md)
-- [Optimization objectives](objectives.md)
 - [Development guide](development.md)
 
 ## Repository layout
@@ -28,3 +26,4 @@ docs/          Project documentation
 ```
 
 Generated outputs, logs, local experiment results, and analysis folders should not be committed to the repository.
+

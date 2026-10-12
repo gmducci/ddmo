@@ -26,20 +26,19 @@ python -c "import ddmo; print(ddmo.__all__)"
 
 ## 2. Run an existing example
 
-Run one of the tutorial examples:
+The fastest way to verify that the package works is to run one of the tutorial examples:
 
 ```bash
-python examples/quickstart/goodwin_weak.py
+python examples/tutorial_goodwin_weak.py
 ```
 
 or:
 
 ```bash
-python examples/quickstart/brusselator_custom_library.py
+python examples/tutorial_custom_library_brusselator.py
 ```
 
 These examples load or generate trajectory data, build a candidate function library, configure the formulation, solver, and optimizer, and run model identification.
-The Goodwin example reproduces a full Figure 1 case and may take several minutes.
 
 ## 3. Import the public API
 
@@ -205,6 +204,7 @@ formulation_bounds = {
 optimizer_settings = OptimizerSettings(
     library_bounds=library_bounds,
     formulation_bounds=formulation_bounds,
+    n_obj=2,
     n_gen=10,
     algorithm="NSGA3",
     pop_size=50,
@@ -218,6 +218,7 @@ optimizer_settings = OptimizerSettings(
     library_bounds=library_bounds,
     formulation_bounds={},
     solver_bounds={"threshold": (0.01, 1.0)},
+    n_obj=2,
     n_gen=3,
     algorithm="NSGA3",
     pop_size=50,
@@ -229,10 +230,6 @@ Bounds use the format:
 ```python
 {"parameter_name": (lower_bound, upper_bound)}
 ```
-
-For weak formulations, `window_length` always means the actual number of data
-samples in the window. Optimized values are rounded to an integer and even
-values are advanced to the next valid odd length.
 
 ## 10. Run identification
 
@@ -247,29 +244,6 @@ result = identify(
     library_object=library.build,
 )
 ```
-
-The default objectives are trajectory MSE and Durbin-Watson deviation. To use
-trajectory error and optional model sparsity instead:
-
-```python
-from ddmo.optimizer import make_active_coefficient_count, trajectory_mse
-
-objectives = {
-    "trajectory_mse": trajectory_mse,
-    "active_coefficients": make_active_coefficient_count(tolerance=1e-6),
-}
-
-result = identify(
-    data_instance=training_data,
-    optimizer_settings=optimizer_settings,
-    solver_settings=solver_settings,
-    formulation_settings=formulation_settings,
-    library_object=library.build,
-    objective_functions=objectives,
-)
-```
-
-See [Optimization objectives](objectives.md) for custom objective functions.
 
 The returned object contains the identification results, including fitted trajectories and optimization outputs.
 
@@ -359,6 +333,7 @@ optimizer_settings = OptimizerSettings(
         "stride": (50, 250),
         "window_length": (127, 801),
     },
+    n_obj=2,
     n_gen=10,
     algorithm="NSGA3",
     pop_size=50,

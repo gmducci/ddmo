@@ -56,6 +56,3 @@ lightning_logs/
 **/lightning_logs/
 *.ckpt
 events.out.tfevents.*
-
-# Local benchmark archives, runs, and exploratory outputs
-.local/

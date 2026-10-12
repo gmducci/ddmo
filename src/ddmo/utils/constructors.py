@@ -116,8 +116,7 @@ class OptimizerSettings:
             These parameters are passed to the library function as a dict.
         formulation_bounds: Bounds for formulation parameters as {name: (min, max)}.
             These control the weak formulation (stride, degree, window_length).
-        n_obj: Deprecated optional objective count. ``identify`` derives the
-            actual count from its named objective-function mapping.
+        n_obj: Number of objective functions.
         n_gen: Number of generations to run.
         algorithm: Algorithm name. Options: "NSGA2", "NSGA3". Default: "NSGA2".
         pop_size: Population size. Default: 100.
@@ -131,6 +130,7 @@ class OptimizerSettings:
         OptimizerSettings(
             library_bounds={"gamma_1": (8.4, 9.6), "gamma_2": (1.0, 10.0)},
             formulation_bounds={"stride": (5, 120), "degree": (3, 7)},
+            n_obj=2,
             n_gen=100
         )
     """
@@ -138,9 +138,9 @@ class OptimizerSettings:
     # Required parameters
     library_bounds: dict[str, tuple[float, float]]
     formulation_bounds: dict[str, tuple[float, float]]
+    n_obj: int
     n_gen: int
     solver_bounds: dict[str, tuple[float, float]] | None = None
-    n_obj: int | None = None
 
     # Optional with sensible defaults
     algorithm: str = "NSGA2"
@@ -155,8 +155,6 @@ class OptimizerSettings:
         """Validate bounds format."""
         if self.solver_bounds is None:
             self.solver_bounds = {}
-        if self.n_obj is not None and self.n_obj <= 0:
-            raise ValueError("n_obj must be positive when provided")
 
         for name, bounds in {
             **self.library_bounds,

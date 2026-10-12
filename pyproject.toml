@@ -7,6 +7,9 @@ name = "ddmo"
 version = "0.1.0"
 description = "Data-Driven Model Optimization: Discover differential equations from data using sparse regression and multi-objective optimization."
 readme = "README.md"
+authors = [
+    {name = "Your Name", email = "your.email@example.com"},
+]
 license = {text = "MIT"}
 requires-python = ">=3.10, <4"
 classifiers = [
@@ -40,6 +43,9 @@ dev = [
 
 [project.urls]
 Homepage = "https://github.com/FHI-theory/ddmo"
+
+[project.scripts]
+ddmo = "ddmo.main:main"
 
 [tool.ruff.lint]
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.

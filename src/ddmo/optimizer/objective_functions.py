@@ -1,7 +1,5 @@
 # objective_functions.py
-from collections.abc import Callable, Sequence
-from dataclasses import dataclass
-from typing import Any
+from collections.abc import Sequence
 
 import numpy as np
 import scipy.stats as stats
@@ -10,109 +8,39 @@ from scipy.stats import linregress
 from sklearn import metrics
 
 
-@dataclass(frozen=True)
-class ObjectiveContext:
-    """Inputs available to a user-defined optimization objective.
-
-    Objective functions receive one context object rather than a changing list
-    of positional arguments. This gives users access to the observed data and
-    the complete solver result, including trajectories and coefficients.
+def compute_dw_coefficient(DataConstructor, sol):
     """
-
-    data: Any
-    solver_result: Any
-
-    @property
-    def solution(self):
-        return self.solver_result.solution
-
-    @property
-    def coefficients(self):
-        return self.solver_result.coefficients
-
-
-ObjectiveFunction = Callable[[ObjectiveContext], float]
-
-
-def trajectory_mse(context: ObjectiveContext) -> float:
-    """Return the worst per-state trajectory mean squared error."""
-    return compute_mse(context.data, context.solution)
-
-
-def trajectory_rmse(context: ObjectiveContext) -> float:
-    """Return the worst per-state trajectory root mean squared error."""
-    return float(np.sqrt(compute_mse(context.data, context.solution)))
-
-
-def durbin_watson_deviation(context: ObjectiveContext) -> float:
-    """Return the worst absolute residual Durbin-Watson deviation from two."""
-    return compute_dw_coefficient(context.data, context.solution)
-
-
-def active_coefficient_count(
-    context: ObjectiveContext,
-    *,
-    tolerance: float = 1e-8,
-) -> float:
-    """Count fitted coefficients whose absolute value exceeds ``tolerance``."""
-    coefficients = np.asarray(context.coefficients, dtype=float)
-    return float(np.count_nonzero(np.abs(coefficients) > tolerance))
-
-
-def make_active_coefficient_count(
-    *,
-    tolerance: float = 1e-8,
-) -> ObjectiveFunction:
-    """Create an active-coefficient objective with a custom zero tolerance."""
-    if tolerance < 0:
-        raise ValueError("tolerance must be non-negative")
-
-    def objective(context: ObjectiveContext) -> float:
-        return active_coefficient_count(context, tolerance=tolerance)
-
-    objective.__name__ = "active_coefficient_count"
-    return objective
-
-
-DEFAULT_OBJECTIVES: dict[str, ObjectiveFunction] = {
-    "trajectory_mse": trajectory_mse,
-    "durbin_watson_deviation": durbin_watson_deviation,
-}
-
-
-def compute_dw_coefficient(data, sol) -> float:
-    """Return the worst absolute Durbin-Watson deviation from two.
-
-    A value of zero is ideal. The maximum is taken across all state variables
-    and trajectories so that one autocorrelated residual series cannot be
-    hidden by better-behaved series.
+    Computes the Durbin-Watson statistic for residuals between reference and predicted values.
+    Returns the maximum absolute deviation from 2 across all dimensions and initial conditions.
     """
-    x_blocks = _trajectory_blocks(data.x_raw)
+    x_blocks = _trajectory_blocks(DataConstructor.x_raw)
     sol_blocks = _solution_blocks(sol, x_blocks)
-    deviations = np.zeros((data.dimension, len(x_blocks)))
+    dw_matrix = np.zeros(
+        (DataConstructor.dimension, len(x_blocks))
+    )
 
     for i, (x_ref_block, x_pred_block) in enumerate(zip(x_blocks, sol_blocks)):
-        for j in range(data.dimension):
+        for j in range(DataConstructor.dimension):
             x_ref = x_ref_block[:, j]
             x_pred = x_pred_block[:, j]
             residuals = x_ref - x_pred
-            if np.allclose(residuals, 0.0):
-                deviation = 0.0
-            else:
-                dw_stat = float(sm.stats.stattools.durbin_watson(residuals))
-                deviation = abs(dw_stat - 2.0)
-            deviations[j, i] = deviation
+            dw_matrix[j, i] = np.abs(sm.stats.stattools.durbin_watson(residuals))
 
-    return float(np.max(deviations))
+    dw_stat = np.min(dw_matrix)
+
+    dw_measure = 2 - dw_stat
+    return dw_measure
 
 
-def compute_mse(data, sol):
-    x_blocks = _trajectory_blocks(data.x_raw)
+def compute_mse(DataConstructor, sol):
+    x_blocks = _trajectory_blocks(DataConstructor.x_raw)
     sol_blocks = _solution_blocks(sol, x_blocks)
-    score_fit_matrix = np.zeros((data.dimension, len(x_blocks)))
+    score_fit_matrix = np.zeros(
+        (DataConstructor.dimension, len(x_blocks))
+    )
 
     for i, (x_ref_block, x_pred_block) in enumerate(zip(x_blocks, sol_blocks)):
-        for j in range(data.dimension):
+        for j in range(DataConstructor.dimension):
             x_ref = x_ref_block[:, j]
             x_pred = x_pred_block[:, j]
             score_fit_matrix[j, i] = metrics.mean_squared_error(x_ref, x_pred)
@@ -125,9 +53,15 @@ def compute_mse(data, sol):
 def compute_ppcc_matrix(DataConstructor, sol, metric="quantiles"):
     x_blocks = _trajectory_blocks(DataConstructor.x_raw)
     sol_blocks = _solution_blocks(sol, x_blocks)
-    ppcc_matrix = np.zeros((DataConstructor.dimension, len(x_blocks)))
-    slope_qq_plot = np.zeros((DataConstructor.dimension, len(x_blocks)))
-    intercept_qq_plot = np.zeros((DataConstructor.dimension, len(x_blocks)))
+    ppcc_matrix = np.zeros(
+        (DataConstructor.dimension, len(x_blocks))
+    )
+    slope_qq_plot = np.zeros(
+        (DataConstructor.dimension, len(x_blocks))
+    )
+    intercept_qq_plot = np.zeros(
+        (DataConstructor.dimension, len(x_blocks))
+    )
     # calculate the pij element of P
     for i, (x_ref_block, x_pred_block) in enumerate(zip(x_blocks, sol_blocks)):
         time_array = _time_vector_for_block(DataConstructor.time_array, i)
@@ -138,7 +72,9 @@ def compute_ppcc_matrix(DataConstructor, sol, metric="quantiles"):
             residuals = x_ref - x_pred
 
             # De-trend the residuals, to compute the theoretical quantile
-            slope_drift, intercept, _, _, _ = linregress(time_array, residuals)
+            slope_drift, intercept, _, _, _ = linregress(
+                time_array, residuals
+            )
 
             drift = slope_drift * time_array + intercept
             corrected_residuals = residuals - drift

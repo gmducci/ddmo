@@ -57,8 +57,7 @@ Documentation lives under:
 docs/
 ```
 
-Exploratory outputs should be kept out of version control. Paper artwork is
-added only after its campaign and supplementary figures are finalized together.
+Generated outputs should be kept out of version control.
 
 ## Public API
 
@@ -79,6 +78,7 @@ Do not commit:
 - `.DS_Store`;
 - virtual environments;
 - logs;
-- exploratory generated figures;
+- generated figures;
 - generated `.npy`, `.pkl`, `.csv`, or checkpoint files;
 - local result folders.
+

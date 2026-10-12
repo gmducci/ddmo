@@ -39,6 +39,26 @@ checked by the freeze command. A separate clean Figure 2 block 4 run is in
 selected model, coefficients, settings, and test trajectory exactly. This
 does not claim an independent rerun of all 60 corrected runs.
 
+## Replay a selected trajectory
+
+Replay a frozen selected model directly from its coefficient matrix, feature
+library settings, saved initial condition, and time grid:
+
+```bash
+python -m benchmarks.replay noise --method weak_optimized --noise 0.10 --seed 11
+python -m benchmarks.replay joint --noise 0.10 --seed 104 --split test --index 1
+```
+
+Noise runs have three methods, so specify `--method strong`,
+`--method weak_optimized`, or `--method weak_optimized_sg`. The joint campaign
+has one method. `--split` selects `train`, `validation`, or `test` (default:
+`test`); `--index` is zero-based within that split (default: `0`). The command
+checks the replay against the saved prediction, reports the maximum difference,
+and writes a CSV to `.local/benchmark_replay/`. Use `--output path.csv` to
+choose another location. This does not rerun optimization or regenerate noisy
+observations. Runs whose saved prediction is non-finite cannot produce a
+replayable full trajectory.
+
 ## Historical audit data
 
 [`data/historical/`](data/historical/) contains the earlier production JSON

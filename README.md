@@ -16,7 +16,7 @@ The package is designed around a modular workflow: construct candidate function 
 ## Installation
 
 ```bash
-git clone https://github.com/FHI-theory/ddmo.git
+git clone https://gitlab.mpcdf.mpg.de/gducci/ddmo.git
 cd ddmo
 pip install -e .
 ```

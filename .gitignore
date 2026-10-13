@@ -34,6 +34,7 @@ pyrightconfig.json
 .editorconfig
 
 # Local/postprocessing outputs
+.local/
 examples/analysis/
 examples/results_cluster/
 examples/results_parametric/

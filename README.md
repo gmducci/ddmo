@@ -16,7 +16,7 @@ The package is designed around a modular workflow: construct candidate function 
 ## Installation
 
 ```bash
-git clone https://gitlab.mpcdf.mpg.de/gducci/ddmo.git
+git clone https://gitlab.mpcdf.mpg.de/fhi-theory/ddmo.git
 cd ddmo
 pip install -e .
 ```
@@ -85,3 +85,7 @@ git push origin feature/my-change
 ```
 
 Then open a merge request or pull request.
+
+## Acknowledgements
+
+The authors acknowledge support from the Federal Ministry of Research, Technology and Space (BMFTR) in the framework of the project ASCEND (03SF0798A).

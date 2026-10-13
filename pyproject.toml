@@ -39,7 +39,7 @@ dev = [
     'ruff']
 
 [project.urls]
-Homepage = "https://gitlab.mpcdf.mpg.de/gducci/ddmo"
+Homepage = "https://gitlab.mpcdf.mpg.de/fhi-theory/ddmo"
 
 [tool.ruff.lint]
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.

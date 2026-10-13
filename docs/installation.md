@@ -3,7 +3,7 @@
 ## Clone the repository
 
 ```bash
-git clone https://gitlab.mpcdf.mpg.de/gducci/ddmo.git
+git clone https://gitlab.mpcdf.mpg.de/fhi-theory/ddmo.git
 cd ddmo
 ```
 

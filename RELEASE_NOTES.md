@@ -17,7 +17,7 @@ The frozen paper benchmark campaign and figures remain on the
 ## Install
 
 ```bash
-git clone --branch v1.0.0 https://gitlab.mpcdf.mpg.de/gducci/ddmo.git
+git clone --branch v1.0.0 https://gitlab.mpcdf.mpg.de/fhi-theory/ddmo.git
 cd ddmo
 pip install .
 ```
